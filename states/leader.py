@@ -12,7 +12,7 @@ class Leader(Drone):
 
     def move_forward_in_branch(self):
         # while not self.lidar.loop and not self.lidar.dead_end and not self.lidar.intersection:
-        if (self.distance_drone_x(self.follower) > self.distance_max) or (len(self.follower.message_received) != 0 and self.follower.message_received[-1] == 'Come closer'):
+        if self.follower != None and ((self.distance_drone_x(self.follower) > self.distance_max) or (len(self.follower.message_received) != 0 and self.follower.message_received[-1] == 'Come closer')):
             if len(self.follower.message_received) != 0:
                 if self.follower.message_received[-1] != "Come closer":
                     print('Sending message to follower')

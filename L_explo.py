@@ -44,43 +44,6 @@ RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
 print(INIT_XYZ)
-# def lidar(
-#         numRays = NUM_RAYS,
-#         rayLen = RAY_LENGTH,
-#         drone_pos = None,
-#         rayHitColor = RAY_HIT_COLOR,
-#         rayMissColor = RAY_MISS_COLOR,
-#         show_lidar = SHOW_LIDAR,
-#           ):
-#     if drone_pos == None :
-#         print("Please select a drone")
-#     else:
-#         rayFrom = []
-#         rayTo = []
-#         rayIds = []
-
-#         for i in range(numRays):
-#             rayFrom.append(drone_pos)
-#             rayTo.append([
-#                 rayFrom[i][0] + rayLen * math.sin(2. * math.pi * float(i) / numRays),
-#                 rayFrom[i][1] + rayLen * math.cos(2. * math.pi * float(i) / numRays), rayFrom[i][2]
-#             ])
-#             rayIds.append(-1)
-        
-#         results = p.rayTestBatch(rayFrom, rayTo, numRays)
-
-#         if show_lidar:
-#             p.removeAllUserDebugItems()
-#             for i in range(0,numRays,numRays//4):
-#                 hitObjectUid = results[i][0]
-
-#                 if (hitObjectUid < 0):
-#                     hitPosition = [0, 0, 0]
-#                     p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
-#                 else:
-#                     hitPosition = results[i][3]
-#                     p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
-#         return results
 
 def run(
         drone=DEFAULT_DRONES,
@@ -109,17 +72,14 @@ def run(
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
     p.loadURDF("L_shape.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
-    drones = []
-    for i in range(num_drones):
-        if i == num_drones-1:
-            drones.append(Leader(drones[i-1],position = INIT_XYZ[i], preceding=None))
-            drones[i-1].preceding = drones[i]
-        else:
-            if i != 0:
-                drones.append(Follower(drones[i-1],position = INIT_XYZ[i], preceding=None))
-                drones[i-1].preceding = drones[i]
-            else:
-                drones.append(Follower(None,position = INIT_XYZ[i], preceding=None))
+
+    n = p.getNumBodies(physicsClientId=PYB_CLIENT)
+    env_id_drones = {}
+    for bid in range(n):
+        info = p.getBodyInfo(bid, physicsClientId=PYB_CLIENT)
+        pos = p.getBasePositionAndOrientation(bid, physicsClientId=PYB_CLIENT)
+        if info[1] == b'cf2' :
+            env_id_drones[bid] = {"env_position" : pos, "drone_id" : None}
 
     #### Initialize the logger #################################
     # logger = Logger(logging_freq_hz=control_freq_hz,
@@ -144,7 +104,6 @@ def run(
     show_lidar = SHOW_LIDAR
     angles = np.linspace(-np.pi, np.pi, NUM_RAYS)
     index = np.where(angles == 0)[0][0]
-    print(index)
     a = angles[index:]
     b = angles[:index]
     ray_angles = np.concatenate((a,b))
@@ -155,6 +114,60 @@ def run(
         obs, reward, terminated, truncated, info = env.step(action)
         print("Etape ", sim_steps)
         print(num_drones, "drones chargé")
+
+        if sim_steps == 0: # Decouverte des Followers
+            drones = []
+            for drone_i in range(num_drones):
+                pos = env.pos[drone_i]
+                for key, value in env_id_drones.items():
+                    pos_compare = np.array([value["env_position"][0][0], value["env_position"][0][1], value["env_position"][0][2]])
+                    truth = 0
+                    for i in range(len(pos)):
+                        if pos[i] == pos_compare[i]:
+                            truth+=1
+                    if truth == 3:
+                        value["drone_id"] = drone_i
+                if drone_i == num_drones-1:
+                    drones.append(Leader(None,position = INIT_XYZ[drone_i], preceding=None))
+                else:
+                    drones.append(Follower(None,position = INIT_XYZ[drone_i], preceding=None))
+
+            for drone_i in range(num_drones):
+                rayFrom = []
+                rayTo = []
+                rayIds = []
+
+                for rays in range(numRays):
+                    rayFrom.append(env.pos[drone_i])
+                    rayTo.append([
+                        rayFrom[rays][0] + rayLen * math.sin(2. * math.pi * float(rays) / numRays),
+                        rayFrom[rays][1] + rayLen * math.cos(2. * math.pi * float(rays) / numRays), rayFrom[rays][2]
+                    ])
+                    rayIds.append(-1)
+                
+                results = p.rayTestBatch(rayFrom, rayTo, numRays)
+                p.removeAllUserDebugItems()
+                for i in range(numRays):
+                    hitObjectUid = results[i][0]
+
+                    if (hitObjectUid < 0):
+                        hitPosition = [0, 0, 0]
+                        p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
+                    else:
+                        hitPosition = results[i][3]
+                        p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
+                        
+                ids = [(t[0],t[3]) for t in results]
+
+                for id in ids: # suppositions que les drones sont en ligne
+                    if id[0] in env_id_drones.keys():
+                        
+                        if id[1][1] > env.pos[drone_i][1]:
+                            drones[drone_i].preceding = drones[env_id_drones[id[0]]["drone_id"]]
+                        elif id[1][1] < env.pos[drone_i][1]:
+                            drones[drone_i].follower = drones[env_id_drones[id[0]]["drone_id"]]
+
+        p.removeAllUserDebugItems()
 
         if takeoff:
             for j in range(num_drones):

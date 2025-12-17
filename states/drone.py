@@ -52,11 +52,11 @@ class Drone():
         self.action[1] = 0.2 # Forward
 
         if gap_analysis[gap_sel] > 0:
-            self.action[4] = (abs(gap_analysis[gap_sel])/math.pi) # Rotation
+            self.action[4] = (abs(gap_analysis[gap_sel])/math.pi)*0.7 # Rotation
             self.action[0] = 0.1 # Lateral
 
         if gap_analysis[gap_sel] < 0:
-            self.action[4] = -(abs(gap_analysis[gap_sel])/math.pi)
+            self.action[4] = -(abs(gap_analysis[gap_sel])/math.pi)*0.7
             self.action[0] = -0.1
 
         else:
