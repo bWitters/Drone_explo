@@ -164,8 +164,10 @@ def run(
                         
                         if id[1][1] > env.pos[drone_i][1]:
                             drones[drone_i].preceding = drones[env_id_drones[id[0]]["drone_id"]]
+                            drones[drone_i].preceding_id = id[0]
                         elif id[1][1] < env.pos[drone_i][1]:
                             drones[drone_i].follower = drones[env_id_drones[id[0]]["drone_id"]]
+                            drones[drone_i].follower_id = id[0]
 
         p.removeAllUserDebugItems()
 

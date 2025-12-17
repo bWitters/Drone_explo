@@ -3,12 +3,14 @@ from sensors_analyzer_simple import SensorsAnalyzer
 import math
 
 class Drone():
-    def __init__(self, follower, position, preceding): # sensors, 
+    def __init__(self, follower, position, preceding, follower_id, preceding_id): # sensors, 
         self.is_leader = False
         self.is_follower = False
         self.is_reconfig_follower = False
         self.state_commands = None
         self.follower = follower
+        self.follower_id = follower_id
+        self.preceding_id = preceding_id
         self.preceding = preceding
         self.position = position
         self.message_received = []
