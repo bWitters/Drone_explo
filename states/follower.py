@@ -1,8 +1,8 @@
 from states.drone import Drone
 
 class Follower(Drone):
-    def __init__(self, follower, position, preceding): # sensors, 
-        super().__init__(follower=follower, position=position, preceding=preceding) # sensors=sensors, 
+    def __init__(self, follower=None, position=None, preceding=None, follower_id=None, preceding_id=None): 
+        super().__init__(follower=follower, position=position, preceding=preceding, follower_id=follower_id, preceding_id=preceding_id) 
     
     def follow_agent_in_front(self):
         self.action = [0,0,0,float(0.1),0]

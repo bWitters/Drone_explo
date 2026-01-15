@@ -2,11 +2,11 @@ from states.drone import Drone
 import numpy as np
 
 class Leader(Drone):
-    def __init__(self, follower, position, preceding): # sensors, 
-        super().__init__(follower=follower, position=position, preceding=preceding) # sensors=sensors, 
+    def __init__(self, follower=None, position=None, preceding=None, follower_id=None, preceding_id=None):
+        super().__init__(follower=follower, position=position, preceding=preceding, follower_id=follower_id, preceding_id=preceding_id) 
 
     def run(self, lidar_data, lidar_ray_angles):
-        print("Leader is running")
+        #print("Leader is running")
         self.sensorsAnalyzer.analyze(lidar_data, lidar_ray_angles)
         self.move_forward_in_branch()
 
@@ -15,15 +15,16 @@ class Leader(Drone):
         if self.follower != None and ((self.distance_drone_x(self.follower) > self.distance_max) or (len(self.follower.message_received) != 0 and self.follower.message_received[-1] == 'Come closer')):
             if len(self.follower.message_received) != 0:
                 if self.follower.message_received[-1] != "Come closer":
-                    print('Sending message to follower')
+                    #print('Sending message to follower')
                     self.msg_to_follower("Come closer")
             else:
-                print('Sending message to follower')
+                #print('Sending message to follower')
                 self.msg_to_follower("Come closer")
             self.action = [0,0,0,float(0.1),0]
         else:
-            print("Bonne distance")
-            self.follow_the_branch(self.sensorsAnalyzer.analyzed_data["positive gap direction"],0)
+            #print("Bonne distance")
+            self.follow_the_branch(self.sensorsAnalyzer.analyzed_data["positive gap direction"],0,self.sensorsAnalyzer.analyzed_data["positive gap number"])
+            print("\n\n")
 
         # if self.lidar.loop :
         #     print("Loop management begin")

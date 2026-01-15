@@ -34,7 +34,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 500
 DEFAULT_CONTROL_FREQ_HZ = 25
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 2
+NUM_DRONES = 5
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 INIT_XYZ = np.array([[.0, 0+ .2*i, .1] for i in range(NUM_DRONES)])
 INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
@@ -44,6 +44,30 @@ RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
 print(INIT_XYZ)
+
+def world_to_object_ref(points, yaw, center=None):
+    """
+    Rotate `points` (Nx3 or 3,) around Z by `yaw` (radians).
+    If center is given, rotate around that 3-vector (world coordinates).
+    Returns an array of same shape as input.
+    """
+    pts = np.asarray(points, dtype=float)
+    single = (pts.ndim == 1)
+    if single:
+        pts = pts.reshape(1, 3)
+    if center is not None:
+        c = np.asarray(center, dtype=float).reshape(1, 3)
+        pts = pts - c
+    ca = math.cos(yaw)
+    sa = math.sin(yaw)
+    R = np.array([[ca, -sa, 0.0],
+                  [sa,  ca, 0.0],
+                  [0.0, 0.0, 1.0]])
+    # rotate points
+    rotated = pts.dot(R.T)
+    if center is not None:
+        rotated = rotated + c
+    return rotated.reshape(3,) if single else rotated
 
 def run(
         drone=DEFAULT_DRONES,
@@ -112,8 +136,8 @@ def run(
         # t = i/env.ctrl_freq
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
-        print("Etape ", sim_steps)
-        print(num_drones, "drones chargé")
+        #print("Etape ", sim_steps)
+        #print(num_drones, "drones chargé")
 
         if sim_steps == 0: # Decouverte des Followers
             drones = []
@@ -128,9 +152,9 @@ def run(
                     if truth == 3:
                         value["drone_id"] = drone_i
                 if drone_i == num_drones-1:
-                    drones.append(Leader(None,position = INIT_XYZ[drone_i], preceding=None))
+                    drones.append(Leader(position = INIT_XYZ[drone_i]))
                 else:
-                    drones.append(Follower(None,position = INIT_XYZ[drone_i], preceding=None))
+                    drones.append(Follower(position = INIT_XYZ[drone_i]))
 
             for drone_i in range(num_drones):
                 rayFrom = []
@@ -144,8 +168,8 @@ def run(
                         rayFrom[rays][1] + rayLen * math.cos(2. * math.pi * float(rays) / numRays), rayFrom[rays][2]
                     ])
                     rayIds.append(-1)
-                
-                results = p.rayTestBatch(rayFrom, rayTo, numRays)
+
+                results = p.rayTestBatch(rayFrom, rayTo)
                 p.removeAllUserDebugItems()
                 for i in range(numRays):
                     hitObjectUid = results[i][0]
@@ -186,8 +210,9 @@ def run(
                                 rayFrom[i][1] + rayLen * math.cos(2. * math.pi * float(i) / numRays), rayFrom[i][2]
                             ])
                             rayIds.append(-1)
-                        
-                        results = p.rayTestBatch(rayFrom, rayTo, numRays)
+
+                                
+                        results = p.rayTestBatch(rayFrom, rayTo) #numRays
 
                         if show_lidar:
                             p.removeAllUserDebugItems()
@@ -203,7 +228,7 @@ def run(
                         action[j, :] = [take_off_trajectory[sim_steps][0],take_off_trajectory[sim_steps][1],take_off_trajectory[sim_steps][2], float(0.1),0]
                         drones[j].position = env.pos[j]
                         rpy = env.rpy[j]
-                        print(drones[j].position)
+                        #print(rpy)
                     except Exception as e:
                         print("Erreur, boucle stoppé")
                         print(f"Erreur {e}")
@@ -212,7 +237,7 @@ def run(
                 takeoff = False
         else:
             for j in range(num_drones):
-                print("Drone n°",j)
+                #print("Drone n°",j)
                 try:
                     rayFrom = []
                     rayTo = []
@@ -225,17 +250,21 @@ def run(
                             rayFrom[i][1] + rayLen * math.cos(2. * math.pi * float(i) / numRays), rayFrom[i][2]
                         ])
                         rayIds.append(-1)
-                    
-                    results = p.rayTestBatch(rayFrom, rayTo, numRays)
+                                
+                    # rotate only directions
+                    dirs = np.asarray(rayTo) - np.asarray(rayFrom)
+                    dirs_rot = world_to_object_ref(dirs, env.rpy[j][2], center=None)  # rotate vector around origin
+                    rayTo_rot = np.asarray(rayFrom) + dirs_rot
+                    results = p.rayTestBatch(rayFrom, rayTo_rot.tolist())
 
                     if show_lidar:
                         p.removeAllUserDebugItems()
-                        for i in range(0,numRays,numRays//numRays):
+                        for i in range(0,numRays,numRays//4):
                             hitObjectUid = results[i][0]
 
                             if (hitObjectUid < 0):
                                 hitPosition = [0, 0, 0]
-                                p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
+                                p.addUserDebugLine(rayFrom[i], rayTo_rot[i], rayMissColor, replaceItemUniqueId=rayIds[i])
                             else:
                                 hitPosition = results[i][3]
                                 p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
@@ -243,11 +272,13 @@ def run(
                     
                     distances = [t[2]*RAY_LENGTH for t in results]
                     drones[j].run(distances, ray_angles)
-                    print(drones[j].action)
-                    action[j, :] = drones[j].action
+                    print("Action : ", drones[j].action[0:3])
+                    print(world_to_object_ref(drones[j].action[0:3], env.rpy[j][2]))
+                    new_action = world_to_object_ref(drones[j].action[0:3], env.rpy[j][2])
+                    action_to_send = [new_action[0], new_action[1], new_action[2], drones[j].action[3], drones[j].action[4]]
+                    action[j, :] = action_to_send
                     drones[j].position = env.pos[j]
                     rpy = env.rpy[j]
-                    print(drones[j].position)
                 except Exception as e:
                     print("Erreur, boucle stoppé")
                     print(type(e))    

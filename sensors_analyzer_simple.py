@@ -72,6 +72,20 @@ class SensorsAnalyzer():
         self.UpdateGapDetection(self.analyzed_data["positive gap index ray"])
         self.analyzed_data["positive gap number"] = len(self.analyzed_data["positive gap detection memory"])
         self.analyzed_data["positive gap angle ray"], self.analyzed_data["positive gap direction"] = self.ComputePositiveGap(self.analyzed_data["positive gap detection memory"],lidar_ray_angles)[:2]
+        print("### Analyse ###")
+        print("\n\n")
+        print("Positive gap index ray :")
+        print(self.analyzed_data["positive gap index ray"])
+        print("\n\n")
+        print("Gap number")
+        print(self.analyzed_data["positive gap number"])
+        print("\n\n")
+        print("Gap angle ray")
+        print(self.analyzed_data["positive gap angle ray"])
+        print("\n\n")
+        print("Gap direction")
+        print(self.analyzed_data["positive gap direction"])
+
 
     # Detection des gap poisitifs
     def PositiveGapDetector(self, lidar_data, distance_threshold):
