@@ -90,7 +90,7 @@ class VelocityAviary(BaseAviary):
             a = action[k, :]
 
             dir_xyz    = a[0:3]                  # direction in WORLD frame
-            speed_frac = float(np.clip(a[3], 0.0, 1.0))
+            speed_frac = float(np.clip(a[3], 0.0, 1.0))  #norm des vitesses
             yaw_rate   = float(a[4]) if a.shape[0] >= 5 else 0.0  # rad/s
 
             if np.linalg.norm(dir_xyz) > 1e-6:

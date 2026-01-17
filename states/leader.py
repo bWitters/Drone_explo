@@ -20,7 +20,7 @@ class Leader(Drone):
             else:
                 #print('Sending message to follower')
                 self.msg_to_follower("Come closer")
-            self.action = [0,0,0,float(0.1),0]
+            self.action = [0,0,0,0,0]
         else:
             #print("Bonne distance")
             self.follow_the_branch(self.sensorsAnalyzer.analyzed_data["positive gap direction"],0,self.sensorsAnalyzer.analyzed_data["positive gap number"])

@@ -10,16 +10,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="1.35 0.2 3.0"/>
+        <box size="1.6 0.2 3.0"/>
       </geometry>
       <material name="wall_n_mat">
-        <color rgba="0.85 0.85 0.9 0.4"/>
+        <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="1.35 0.2 3.0"/>
+        <box size="1.6 0.2 3.0"/>
       </geometry>
     </collision>
     <inertial>
@@ -28,7 +28,7 @@
     </inertial>
   </link>
   <joint name="wall_n_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0 2.6 0"/>
+    <origin rpy="0 0 0" xyz="0 3.1 0"/>
     <parent link="world"/>
     <child link="wall_n"/>
   </joint>
@@ -36,16 +36,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="1.35 0.2 3.0"/>
+        <box size="1.6 0.2 3.0"/>
       </geometry>
       <material name="wall_s_mat">
-        <color rgba="0.85 0.85 0.9 0.4"/>
+        <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="1.35 0.2 3.0"/>
+        <box size="1.6 0.2 3.0"/>
       </geometry>
     </collision>
     <inertial>
@@ -54,7 +54,7 @@
     </inertial>
   </link>
   <joint name="wall_s_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0 -2.6 0"/>
+    <origin rpy="0 0 0" xyz="0 -3.1 0"/>
     <parent link="world"/>
     <child link="wall_s"/>
   </joint>
@@ -62,16 +62,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="5.4 0.2 3.0"/>
+        <box size="6.4 0.2 3.0"/>
       </geometry>
       <material name="wall_e_mat">
-        <color rgba="0.85 0.85 0.9 0.4"/>
+        <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="5.4 0.2 3.0"/>
+        <box size="6.4 0.2 3.0"/>
       </geometry>
     </collision>
     <inertial>
@@ -80,7 +80,7 @@
     </inertial>
   </link>
   <joint name="wall_e_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0.725 0 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="0.85 0 0"/>
     <parent link="world"/>
     <child link="wall_e"/>
   </joint>
@@ -88,16 +88,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="5.4 0.2 3.0"/>
+        <box size="6.4 0.2 3.0"/>
       </geometry>
       <material name="wall_w_mat">
-        <color rgba="0.85 0.85 0.9 0.4"/>
+        <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 1.5"/>
       <geometry>
-        <box size="5.4 0.2 3.0"/>
+        <box size="6.4 0.2 3.0"/>
       </geometry>
     </collision>
     <inertial>
@@ -106,7 +106,7 @@
     </inertial>
   </link>
   <joint name="wall_w_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-0.725 0 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.85 0 0"/>
     <parent link="world"/>
     <child link="wall_w"/>
   </joint>

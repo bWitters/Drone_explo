@@ -15,8 +15,8 @@ class Drone():
         self.position = position
         self.message_received = []
         self.action = [0, 0, 0, float(0.1), 0]
-        self.distance_max = 0.5
-        self.distance_min = 0.2
+        self.distance_max = 0.51
+        self.distance_min = 0.49
         self.is_doing_something = False
         self.sensorsAnalyzer = SensorsAnalyzer()
         self.analyzed_data = []

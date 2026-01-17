@@ -5,7 +5,7 @@ class Follower(Drone):
         super().__init__(follower=follower, position=position, preceding=preceding, follower_id=follower_id, preceding_id=preceding_id) 
     
     def follow_agent_in_front(self):
-        self.action = [0,0,0,float(0.1),0]
+        self.action = [0,0,0,0,0]
         if len(self.message_received) != 0 and self.message_received[-1] == "Come closer":
             print("Come closer received")
             if self.follower != None:
@@ -17,7 +17,7 @@ class Follower(Drone):
                     else:
                         print('Sending message to follower')
                         self.msg_to_follower("Come closer")
-                    self.action = [0,0,0,float(0.1),0]
+                    self.action = [0,0,0,0,0]
                 else:
                     self.get_closer()
             else:
@@ -28,7 +28,7 @@ class Follower(Drone):
     def get_closer(self):
         if self.distance_drone_x(self.preceding) < self.distance_min:
             self.message_received.pop()
-            self.action = [0,0,0,float(0.1),0]
+            self.action = [0,0,0,0,0]
             print("End of getting closer")
         else:
             print("Getting closer")

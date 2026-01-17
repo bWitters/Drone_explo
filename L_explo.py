@@ -34,9 +34,9 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 500
 DEFAULT_CONTROL_FREQ_HZ = 25
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 5
+NUM_DRONES = 2
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-INIT_XYZ = np.array([[.0, 0+ .2*i, .1] for i in range(NUM_DRONES)])
+INIT_XYZ = np.array([[.0, -0.5+ .5*i, .1] for i in range(NUM_DRONES)])
 INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
 NUM_RAYS = 181
 RAY_LENGTH = 1.5
@@ -95,6 +95,7 @@ def run(
 
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
+    #p.loadURDF("corridor.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
     p.loadURDF("L_shape.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
@@ -116,7 +117,7 @@ def run(
     take_off_trajectory = [[0,0,1] for i in range(100)]
     action = np.zeros((num_drones,5))
     START = time.time()
-    running = 1500
+    running = 2500
     skip = False
     takeoff = True
     
@@ -153,8 +154,10 @@ def run(
                         value["drone_id"] = drone_i
                 if drone_i == num_drones-1:
                     drones.append(Leader(position = INIT_XYZ[drone_i]))
+                    drones[-1].is_leader = True
                 else:
                     drones.append(Follower(position = INIT_XYZ[drone_i]))
+                    drones[-1].is_follower = True
 
             for drone_i in range(num_drones):
                 rayFrom = []
@@ -273,10 +276,24 @@ def run(
                     distances = [t[2]*RAY_LENGTH for t in results]
                     drones[j].run(distances, ray_angles)
                     print("Action : ", drones[j].action[0:3])
-                    print(world_to_object_ref(drones[j].action[0:3], env.rpy[j][2]))
-                    new_action = world_to_object_ref(drones[j].action[0:3], env.rpy[j][2])
-                    action_to_send = [new_action[0], new_action[1], new_action[2], drones[j].action[3], drones[j].action[4]]
-                    action[j, :] = action_to_send
+                    if drones[j].is_follower:
+                        vx_w, vy_w, vz_w, speed_frac, wz = drones[j].action
+                        v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
+                        if v_norm < 1e-6:
+                            # No translation; keep yaw rate
+                            action[j, :] = [0.0, 0.0, 0.0, 0.0, float(wz)]
+                        else:
+                            # Unit direction + speed fraction w.r.t. speed_limit
+                            dir_x = vx_w / v_norm
+                            dir_y = vy_w / v_norm
+                            dir_z = vz_w / v_norm
+                            speed_frac = min(1.0, v_norm / max(1e-6, 0.1))
+                            action[j, :] = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
+                    elif drones[j].is_leader:
+                        print(world_to_object_ref(drones[j].action[0:3], env.rpy[j][2]))
+                        new_action = world_to_object_ref(drones[j].action[0:3], env.rpy[j][2])
+                        action_to_send = [new_action[0], new_action[1], new_action[2], drones[j].action[3], drones[j].action[4]]
+                        action[j, :] = action_to_send
                     drones[j].position = env.pos[j]
                     rpy = env.rpy[j]
                 except Exception as e:
