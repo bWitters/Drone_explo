@@ -20,7 +20,7 @@ from states.follower import Follower
 
 import yaml
 
-with open("L_shape.yaml") as stream:
+with open("croix.yaml") as stream:
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -34,7 +34,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 500
 DEFAULT_CONTROL_FREQ_HZ = 25
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 3
+NUM_DRONES = 1
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 INIT_XYZ = np.array([[.0, -0.5+ .5*i, .1] for i in range(NUM_DRONES)])
 INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
@@ -96,7 +96,7 @@ def run(
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
     #p.loadURDF("corridor.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
-    p.loadURDF("L_shape.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("croix.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
     env_id_drones = {}
@@ -113,13 +113,16 @@ def run(
     #                 )
 
     #### Run the simulation ####################################
-    delta = 150 # 3s @ 25hz control loop 
+    """
+    Boucle principale utilisant les State Machines pour le contrôle des drones.
+    
+    Au lieu d'utiliser des if/else imbriqués, chaque drone a une state machine
+    qui gère automatiquement les transitions et les actions correspondantes.
+    """
     take_off_trajectory = [[0,0,1] for i in range(100)]
     action = np.zeros((num_drones,5))
     START = time.time()
     running = 2500
-    skip = False
-    takeoff = True
     
     debut = time.time()
     numRays = NUM_RAYS
@@ -134,13 +137,10 @@ def run(
     ray_angles = np.concatenate((a,b))
     
     for sim_steps in range(running):
-        # t = i/env.ctrl_freq
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
-        #print("Etape ", sim_steps)
-        #print(num_drones, "drones chargé")
 
-        if sim_steps == 0: # Decouverte des Followers
+        if sim_steps == 0: # Découverte des drones et leurs relations
             drones = []
             for drone_i in range(num_drones):
                 pos = env.pos[drone_i]
@@ -186,9 +186,8 @@ def run(
                         
                 ids = [(t[0],t[3]) for t in results]
 
-                for id in ids: # suppositions que les drones sont en ligne
+                for id in ids:
                     if id[0] in env_id_drones.keys():
-                        
                         if id[1][1] > env.pos[drone_i][1]:
                             drones[drone_i].preceding = drones[env_id_drones[id[0]]["drone_id"]]
                             drones[drone_i].preceding_id = id[0]
@@ -198,123 +197,59 @@ def run(
 
         p.removeAllUserDebugItems()
 
-        if takeoff:
-            for j in range(num_drones):
-                    print("Drone n°",j)
-                    try:
-                        rayFrom = []
-                        rayTo = []
-                        rayIds = []
+        #### Exécuter le contrôle pour chaque drone (gérées par State Machines) ####
+        for j in range(num_drones):
+            try:
+                # Générer les rayons lidar
+                rayFrom = []
+                rayTo = []
+                rayIds = []
 
-                        for i in range(numRays):
-                            rayFrom.append(env.pos[j])
-                            rayTo.append([
-                                rayFrom[i][0] + rayLen * math.sin(2. * math.pi * float(i) / numRays),
-                                rayFrom[i][1] + rayLen * math.cos(2. * math.pi * float(i) / numRays), rayFrom[i][2]
-                            ])
-                            rayIds.append(-1)
+                for i in range(numRays):
+                    rayFrom.append(env.pos[j])
+                    rayTo.append([
+                        rayFrom[i][0] + rayLen * math.sin(2. * math.pi * float(i) / numRays),
+                        rayFrom[i][1] + rayLen * math.cos(2. * math.pi * float(i) / numRays), rayFrom[i][2]
+                    ])
+                    rayIds.append(-1)
 
-                                
-                        results = p.rayTestBatch(rayFrom, rayTo) #numRays
+                # Test lidar raycast
+                results = p.rayTestBatch(rayFrom, rayTo)
 
-                        if show_lidar:
-                            p.removeAllUserDebugItems()
-                            for i in range(0,numRays,numRays//4):
-                                hitObjectUid = results[i][0]
-
-                                if (hitObjectUid < 0):
-                                    hitPosition = [0, 0, 0]
-                                    p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
-                                else:
-                                    hitPosition = results[i][3]
-                                    p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
-                        action[j, :] = [take_off_trajectory[sim_steps][0],take_off_trajectory[sim_steps][1],take_off_trajectory[sim_steps][2], float(0.1),0]
-                        drones[j].position = env.pos[j]
-                        rpy = env.rpy[j]
-                        #print(rpy)
-                    except Exception as e:
-                        print("Erreur, boucle stoppé")
-                        print(f"Erreur {e}")
-                        break
-            if sim_steps == 99:
-                takeoff = False
-        else:
-            for j in range(num_drones):
-                #print("Drone n°",j)
-                try:
-                    rayFrom = []
-                    rayTo = []
-                    rayIds = []
-
-                    for i in range(numRays):
-                        rayFrom.append(env.pos[j])
-                        rayTo.append([
-                            rayFrom[i][0] + rayLen * math.sin(2. * math.pi * float(i) / numRays),
-                            rayFrom[i][1] + rayLen * math.cos(2. * math.pi * float(i) / numRays), rayFrom[i][2]
-                        ])
-                        rayIds.append(-1)
-                                
-                    # rotate only directions
-                    dirs = np.asarray(rayTo) - np.asarray(rayFrom)
-                    dirs_rot = world_to_object_ref(dirs, env.rpy[j][2], center=None)  # rotate vector around origin
-                    rayTo_rot = np.asarray(rayFrom) + dirs_rot
-                    results = p.rayTestBatch(rayFrom, rayTo_rot.tolist())
-
-                    if show_lidar:
-                        p.removeAllUserDebugItems()
-                        for i in range(0,numRays,numRays//4):
-                            hitObjectUid = results[i][0]
-
-                            if (hitObjectUid < 0):
-                                hitPosition = [0, 0, 0]
-                                p.addUserDebugLine(rayFrom[i], rayTo_rot[i], rayMissColor, replaceItemUniqueId=rayIds[i])
-                            else:
-                                hitPosition = results[i][3]
-                                p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
-                    
-                    
-                    distances = [t[2]*RAY_LENGTH for t in results]
-                    drones[j].run(distances, ray_angles)
-                    print("Action : ", drones[j].action[0:3])
-                    if drones[j].is_follower:
-                        vx_w, vy_w, vz_w, speed_frac, wz = drones[j].action
-                        v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
-                        if v_norm < 1e-6:
-                            # No translation; keep yaw rate
-                            action[j, :] = [0.0, 0.0, 0.0, 0.0, float(wz)]
+                # Affichage du lidar (optionnel)
+                if show_lidar:
+                    p.removeAllUserDebugItems()
+                    for i in range(0, numRays, numRays//4):
+                        hitObjectUid = results[i][0]
+                        if hitObjectUid < 0:
+                            p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
                         else:
-                            # Unit direction + speed fraction w.r.t. speed_limit
-                            dir_x = vx_w / v_norm
-                            dir_y = vy_w / v_norm
-                            dir_z = vz_w / v_norm
-                            speed_frac = min(0.8, v_norm / max(1e-6, 0.8))
-                            action[j, :] = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
-                    elif drones[j].is_leader:
-                        print(world_to_object_ref(drones[j].action[0:3], env.rpy[j][2]))
-                        new_action = world_to_object_ref(drones[j].action[0:3], env.rpy[j][2])
-                        action_to_send = [new_action[0], new_action[1], new_action[2], drones[j].action[3], drones[j].action[4]]
-                        vx_w, vy_w, vz_w, speed_frac, wz = action_to_send
-                        v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
-                        if v_norm < 1e-6:
-                            # No translation; keep yaw rate
-                            action[j, :] = [0.0, 0.0, 0.0, 0.0, float(wz)]
-                        else:
-                            # Unit direction + speed fraction w.r.t. speed_limit
-                            dir_x = vx_w / v_norm
-                            dir_y = vy_w / v_norm
-                            dir_z = vz_w / v_norm
-                            speed_frac = min(1.0, v_norm / max(1e-6, 1.0))
-                            action[j, :] = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
-                    drones[j].position = env.pos[j]
-                    rpy = env.rpy[j]
-                except Exception as e:
-                    print("Erreur, boucle stoppé")
-                    print(type(e))    
-                    print(e.args)     
-                    print(e)      
-                    traceback.print_exc()    
-                    input("Continue ?")
-                    break
+                            hitPosition = results[i][3]
+                            p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
+
+                # Extraire les distances lidar depuis les résultats
+                lidar_data = [results[i][4] for i in range(numRays)]  # Distance hit or max_distance
+                
+                # Mettre à jour la position du drone
+                drones[j].position = env.pos[j]
+                
+                # =========== APPELER LE STATE MACHINE DU DRONE ===========
+                # C'est ICI que toute la logique de contrôle se fait maintenant !
+                # Plus de if/else imbriqués, tout est géré par la state machine.
+                if drones[j].is_leader:
+                    drones[j].run(lidar_data, ray_angles, sim_steps)
+                elif drones[j].is_follower:
+                    drones[j].run(lidar_data, ray_angles, sim_steps)
+                
+                # Récupérer l'action calculée par la state machine
+                action[j, :] = drones[j].action
+                
+            except Exception as e:
+                print(f"Erreur drone n°{j}: {e}")
+                import traceback
+                traceback.print_exc()
+                break
+                    
 
         #### Log the simulation ####################################
         # for j in range(NUM_DRONES):

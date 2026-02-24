@@ -1,30 +1,37 @@
 from states.drone import Drone
+from states.leader_state_machine import LeaderStateMachine
 import numpy as np
 
 class Leader(Drone):
+    """
+    Leader: drone qui explore l'environnement.
+    
+    Comportement via LeaderStateMachine:
+    - TAKEOFF: montée initiale
+    - MOVING_FORWARD: suit le gap (espace libre) détecté
+    - WAITING_FOR_FOLLOWER: attend que le follower se rapproche
+    - ALIGNMENT: s'aligne avec le gap si angle erreur > 10°
+    """
+    
     def __init__(self, follower=None, position=None, preceding=None, follower_id=None, preceding_id=None):
-        super().__init__(follower=follower, position=position, preceding=preceding, follower_id=follower_id, preceding_id=preceding_id) 
-
-    def run(self, lidar_data, lidar_ray_angles):
-        #print("Leader is running")
-        self.sensorsAnalyzer.analyze(lidar_data, lidar_ray_angles)
-        self.move_forward_in_branch()
-
-    def move_forward_in_branch(self):
-        # while not self.lidar.loop and not self.lidar.dead_end and not self.lidar.intersection:
-        if self.follower != None and ((self.distance_drone_x(self.follower) > self.distance_max) or (len(self.follower.message_received) != 0 and self.follower.message_received[-1] == 'Come closer')):
-            if len(self.follower.message_received) != 0:
-                if self.follower.message_received[-1] != "Come closer":
-                    #print('Sending message to follower')
-                    self.msg_to_follower("Come closer")
-            else:
-                #print('Sending message to follower')
-                self.msg_to_follower("Come closer")
-            self.action = [0,0,0,0,0]
-        else:
-            #print("Bonne distance")
-            self.follow_the_branch(self.sensorsAnalyzer.analyzed_data["positive gap direction"],0,self.sensorsAnalyzer.analyzed_data["positive gap number"])
-            print("\n\n")
+        super().__init__(follower=follower, position=position, preceding=preceding, follower_id=follower_id, preceding_id=preceding_id)
+        
+        # Créer la state machine pour ce Leader
+        self.state_machine = LeaderStateMachine(self, initial='TAKEOFF')
+    
+    def run(self, lidar_data, lidar_ray_angles, sim_steps):
+        """
+        Appelé chaque étape de simulation.
+        Délègue au state machine pour décider de l'action.
+        
+        Args:
+            lidar_data: distances lidar
+            lidar_ray_angles: angles des rayons lidar
+            sim_steps: étape actuelle de simulation
+        """
+        # Mettre à jour la state machine
+        # Elle gère les transitions et exécute l'action appropriée
+        self.state_machine.update(lidar_data, lidar_ray_angles, sim_steps)
 
         # if self.lidar.loop :
         #     print("Loop management begin")

@@ -3,14 +3,6 @@ from sensors_analyzer_simple import SensorsAnalyzer
 import math
 
 class Drone():
-    """
-    Classe de base pour tous les drones.
-    Intègre un contrôleur lidar et des propriétés communes.
-    
-    Les state machines (LeaderStateMachine, FollowerStateMachine) sont
-    créées dans les sous-classes Leader et Follower.
-    """
-    
     def __init__(self, follower=None, position=None, preceding=None, follower_id=None, preceding_id=None):
         self.is_leader = False
         self.is_follower = False
@@ -30,9 +22,6 @@ class Drone():
         self.analyzed_data = []
         self.prev_angle_error = 0.0  # for derivative term
         self.yaw_rate_controller = {"Kp": 0.8, "Kd": 0.1}  # PD gains
-        
-        # State machine (sera set dans les sous-classes)
-        self.state_machine = None
     
     # def state_change(self, new_state):
     #     match new_state:
@@ -61,41 +50,34 @@ class Drone():
     
     def follow_the_branch(self, gap_analysis, gap_sel, nb_gap):
         """
-        Contrôleur pour suivre un gap (espace libre) détecté par lidar.
-        
-        Utilise un contrôleur PD (proportionnel-dérivé) pour l'angle yaw.
-        Appelé depuis LeaderStateMachine (états MOVING_FORWARD, ALIGNMENT).
-        
-        Args:
-            gap_analysis: liste des angles d'erreur (rad) pour chaque gap détecté
-            gap_sel: index du gap à suivre (0 = le plus grand)
-            nb_gap: nombre total de gaps détectés
+        gap_analysis: list of angle errors (rad) to each gap
+        gap_sel: index of selected gap to follow
+        nb_gap: number of gaps detected
         """
         angle_error = gap_analysis[gap_sel]  # écart angulaire en radians
         
-        # Contrôleur PD: Proportionnel + Dérivé pour réduire oscillations
-        Kp = self.yaw_rate_controller["Kp"]  # Gain proportionnel
-        Kd = self.yaw_rate_controller["Kd"]  # Gain dérivé
+        # Proportional controller: convert angle error to angular velocity command
+        # Tune Kp based on your drone dynamics (start with 0.5-1.0)
+        Kp = self.yaw_rate_controller["Kp"]
+        Kd = self.yaw_rate_controller["Kd"]
         
-        # Commande angulaire (saturée à [-2.0, 2.0] rad/s)
+        # Calculate angular velocity command
         yaw_rate_cmd = np.clip(
             - Kp * angle_error + Kd * (angle_error - self.prev_angle_error),
             -2.0, 2.0
         )
         self.prev_angle_error = angle_error
         
-        # Tolérance d'alignement: ~10 degrés
-        angle_tolerance = 0.174  # 10° en radians
+        # Check if drone is roughly aligned (within ~10 degrees tolerance)
+        angle_tolerance = 0.174  # ~10 degrees in radians
         
         if abs(angle_error) > angle_tolerance:
-            # État ALIGNMENT: rotation rapide
-            self.action[1] = 0.1      # Vitesse forward réduite
-            self.action[4] = yaw_rate_cmd  # Vitesse angulaire complète
+            self.action[1] = 0.1
+            self.action[4] = yaw_rate_cmd
             print(f"Aligning to gap: angle_error={np.degrees(angle_error):.1f}°, yaw_rate={yaw_rate_cmd:.2f} rad/s")
         else:
-            # État MOVING_FORWARD: vitesse nominale + correction fine
-            self.action[1] = 0.2      # Vitesse forward nominale
-            self.action[4] = yaw_rate_cmd * 0.3  # Correction fine (30% complète)
+            self.action[1] = 0.2
+            self.action[4] = yaw_rate_cmd * 0.3
             print(f"Aligned! Moving forward. Fine correction: {yaw_rate_cmd*0.3:.2f} rad/s")
 
     
@@ -105,29 +87,16 @@ class Drone():
     # def new_follower(self, follower_drone):
     #     self.follower = follower_drone
 
-    def msg_to_follower(self, msg_type):
-        """
-        Envoyer un message au follower (si existe).
-        Utilisé par le state machine du Leader pour communiquer.
-        
-        Args:
-            msg_type: "Come closer" ou "Reconfiguration"
-        """
-        if not self.follower:
-            return
-        
-        match msg_type:
+    def msg_to_follower(self, type):
+        match type:
             case "Come closer":
                 self.follower.message_received.append("Come closer")
-                print(f"[{self.__class__.__name__}] → Sending 'Come closer' to follower")
-            
+                #print(self.follower.message_received)
+                #print("Come closer message sent")
             case "Reconfiguration":
-                self.follower.message_received.append("Reconfiguration")
-                print(f"[{self.__class__.__name__}] → Sending 'Reconfiguration' to follower")
-            
+                print("Reconfiguration message sent")
             case "Reconfiguration over":
-                self.follower.message_received.append("Reconfiguration over")
-                print(f"[{self.__class__.__name__}] → Sending 'Reconfiguration over' to follower")
+                print("Reconfiguration over message sent")
     
     # def msg_to_preceding(self, type):
     #     match type:
