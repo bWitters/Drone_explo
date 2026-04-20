@@ -1,3 +1,18 @@
+# Files
+.vscode/
+ray_analyse.py
+raycast.py
+results/
+room_config.yaml
+room_with_obstacles.urdf
+room_with_obstacles.xacro
+sensors_analyzer.py
+test copy.py
+vortex.py
+vortex_utils/
+worlds/
+ignoredfiles/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
