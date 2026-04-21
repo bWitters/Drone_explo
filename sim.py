@@ -38,7 +38,7 @@ NUM_DRONES = 1
 INIT_XYZ = np.array([[.0, -0.5+ .5*i, .1] for i in range(NUM_DRONES)])
 INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
 NUM_RAYS = 181
-RAY_LENGTH = 1.5
+RAY_LENGTH = 4
 RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
@@ -90,11 +90,10 @@ def run(
                         gui=gui,
                         user_debug_gui=user_debug_gui
                         )
-    # ctrl = CTBRControl(drone_model=drone)
 
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
-    #p.loadURDF("corridor.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    
     p.loadURDF("croix.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
