@@ -15,8 +15,7 @@ from gym_pybullet_drones.control.DSLPIDControl import DSLPIDControl
 from gym_pybullet_drones.utils.Logger import Logger
 from gym_pybullet_drones.utils.utils import sync, str2bool
 
-from states.leader import Leader
-from states.follower import Follower
+from state_machine import DroneMachine
 
 import yaml
 

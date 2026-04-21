@@ -89,16 +89,18 @@ class DroneMachine():
             while self.yaw != init_yaw -180:
                 self.yaw += 10
             
-#Init Machine
-drone = DroneMachine("test")
 
-#Run
-if COPY_DIAGRAM:
-    m = HierarchicalGraphMachine(states=drone.states, transitions=drone.transitions, initial="takeoff")
+if __name__ == "__main__":
+    #Init Machine
+    drone = DroneMachine("test")
 
-    pyperclip.copy(m.get_graph().draw(None))
+    #Run
+    if COPY_DIAGRAM:
+        m = HierarchicalGraphMachine(states=drone.states, transitions=drone.transitions, initial="takeoff")
 
-for i in range(10):
-    print(drone.state)
-    drone._execute()
-    drone.update()
+        pyperclip.copy(m.get_graph().draw(None))
+
+    for i in range(10):
+        print(drone.state)
+        drone._execute()
+        drone.update()
