@@ -1,5 +1,6 @@
 # Files
 .vscode/
+test*
 ray_analyse.py
 raycast.py
 results/
