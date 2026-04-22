@@ -6,8 +6,6 @@ import math
 import pybullet as p
 import pybullet_data as pd
 import traceback
-from transforms3d.quaternions import rotate_vector, qconjugate, mat2quat, qmult
-from transforms3d.utils import normalized_vector
 
 from gym_pybullet_drones.utils.enums import DroneModel, Physics
 from VelocityAviary import VelocityAviary
@@ -15,11 +13,11 @@ from gym_pybullet_drones.control.DSLPIDControl import DSLPIDControl
 from gym_pybullet_drones.utils.Logger import Logger
 from gym_pybullet_drones.utils.utils import sync, str2bool
 
-from state_machine import DroneMachine
+from StateMachines.state_machine import DroneMachine
 
 import yaml
 
-with open("croix.yaml") as stream:
+with open("Map/Croix/croix.yaml") as stream:
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -35,10 +33,10 @@ DEFAULT_CONTROL_FREQ_HZ = 25
 DEFAULT_OUTPUT_FOLDER = 'results'
 NUM_DRONES = 1
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-INIT_XYZ = np.array([[.0, -0.5+ .5*i, .1] for i in range(NUM_DRONES)])
+INIT_XYZ = np.array([[.0, -1+ .5*i, .1] for i in range(NUM_DRONES)])
 INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
-NUM_RAYS = 181
-RAY_LENGTH = 4
+NUM_RAYS = 65
+RAY_LENGTH = 10
 RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
@@ -93,22 +91,8 @@ def run(
 
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
-    
-    p.loadURDF("croix.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
-    n = p.getNumBodies(physicsClientId=PYB_CLIENT)
-    env_id_drones = {}
-    for bid in range(n):
-        info = p.getBodyInfo(bid, physicsClientId=PYB_CLIENT)
-        pos = p.getBasePositionAndOrientation(bid, physicsClientId=PYB_CLIENT)
-        if info[1] == b'cf2' :
-            env_id_drones[bid] = {"env_position" : pos, "drone_id" : None}
-
-    #### Initialize the logger #################################
-    # logger = Logger(logging_freq_hz=control_freq_hz,
-    #                 num_drones=NUM_DRONES,
-    #                 output_folder=output_folder,
-    #                 )
+    p.loadURDF("Map/Croix/croix.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     #### Run the simulation ####################################
     """
@@ -132,93 +116,61 @@ def run(
     a = angles[index:]
     b = angles[:index]
     ray_angles = np.concatenate((a,b))
+    drones = []
+    drones.append(DroneMachine())
     for sim_steps in range(running):
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
 
-        if sim_steps == 0: # Découverte des drones et leurs relations
-            drones = []
-            for drone_i in range(num_drones):
-                pos = env.pos[drone_i]
-                for key, value in env_id_drones.items():
-                    pos_compare = np.array([value["env_position"][0][0], value["env_position"][0][1], value["env_position"][0][2]])
-                    truth = 0
-                    for i in range(len(pos)):
-                        if pos[i] == pos_compare[i]:
-                            truth+=1
-                    if truth == 3:
-                        value["drone_id"] = drone_i
-                if drone_i == num_drones-1:
-                    drones.append(Leader(position = INIT_XYZ[drone_i]))
-                    drones[-1].is_leader = True
-                else:
-                    drones.append(Follower(position = INIT_XYZ[drone_i]))
-                    drones[-1].is_follower = True
-
-            for drone_i in range(num_drones):
-                rayFrom = []
-                rayTo = []
-                rayIds = []
-
-                for rays in range(numRays):
-                    rayFrom.append(env.pos[drone_i])
-                    rayTo.append([
-                        rayFrom[rays][0] + rayLen * math.sin(2. * math.pi * float(rays) / numRays),
-                        rayFrom[rays][1] + rayLen * math.cos(2. * math.pi * float(rays) / numRays), rayFrom[rays][2]
-                    ])
-                    rayIds.append(-1)
-
-                results = p.rayTestBatch(rayFrom, rayTo)
-                p.removeAllUserDebugItems()
-                for i in range(numRays):
-                    hitObjectUid = results[i][0]
-
-                    if (hitObjectUid < 0):
-                        hitPosition = [0, 0, 0]
-                        p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
-                    else:
-                        hitPosition = results[i][3]
-                        p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
-                        
-                ids = [(t[0],t[3]) for t in results]
-
-                for id in ids:
-                    if id[0] in env_id_drones.keys():
-                        if id[1][1] > env.pos[drone_i][1]:
-                            drones[drone_i].preceding = drones[env_id_drones[id[0]]["drone_id"]]
-                            drones[drone_i].preceding_id = id[0]
-                        elif id[1][1] < env.pos[drone_i][1]:
-                            drones[drone_i].follower = drones[env_id_drones[id[0]]["drone_id"]]
-                            drones[drone_i].follower_id = id[0]
-
-        p.removeAllUserDebugItems()
-
+        
         #### Exécuter le contrôle pour chaque drone (gérées par State Machines) ####
         for j in range(num_drones):
             try:
+                ### LIDAR ###
                 # Générer les rayons lidar
                 rayFrom = []
                 rayTo = []
                 rayIds = []
 
-                for i in range(numRays):
-                    rayFrom.append(env.pos[j])
-                    rayTo.append([
-                        rayFrom[i][0] + rayLen * math.sin(2. * math.pi * float(i) / numRays),
-                        rayFrom[i][1] + rayLen * math.cos(2. * math.pi * float(i) / numRays), rayFrom[i][2]
-                    ])
-                    rayIds.append(-1)
+                startOfRays = [-3/40*math.pi, math.pi/2-3/40*math.pi, math.pi-3/40*math.pi, 3*math.pi/2-3/40*math.pi]
+
+                for starts in startOfRays:
+                    for i in range(16):
+                        rayFrom.append(env.pos[j])
+                        rayTo.append([
+                            rayFrom[i][0] + rayLen * math.sin((3/20*math.pi * float(i)/15) + starts),
+                            rayFrom[i][1] + rayLen * math.cos((3/20*math.pi * float(i)/15) + starts),
+                            rayFrom[i][2]
+                        ])
+                        rayIds.append(-1)
+                    
+
+                    
+                    #### Debug Lidar ####
+                    
+                    # results = p.rayTestBatch(rayFrom, rayTo)
+
+                    # # Affichage du lidar (optionnel)
+                    # if show_lidar:
+                    #     p.removeAllUserDebugItems()
+                    #     for i in range(len(results)):
+                    #         hitObjectUid = results[i][0]
+                    #         if hitObjectUid < 0:
+                    #             p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
+                    #         else:
+                    #             hitPosition = results[i][3]
+                    #             p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
 
                 # Test lidar raycast
                 dirs = np.asarray(rayTo) - np.asarray(rayFrom)
                 dirs_rot = world_to_object_ref(dirs, env.rpy[j][2], center=None)  # rotate vector around origin
                 rayTo_rot = np.asarray(rayFrom) + dirs_rot
-                results = p.rayTestBatch(rayFrom, rayTo_rot.tolist())
+                results = p.rayTestBatch(rayFrom, rayTo)
 
                 # Affichage du lidar (optionnel)
                 if show_lidar:
                     p.removeAllUserDebugItems()
-                    for i in range(0, numRays, numRays//4):
+                    for i in range(len(results)):
                         hitObjectUid = results[i][0]
                         if hitObjectUid < 0:
                             p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
@@ -227,23 +179,28 @@ def run(
                             p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
 
                 # Extraire les distances lidar depuis les résultats
-                lidar_data = [results[i][2]*RAY_LENGTH for i in range(numRays)]  # Distance hit or max_distance
+                lidar_data = [results[i][2]*RAY_LENGTH for i in range(len(results))]  # Distance hit or max_distance
                 
-                # Mettre à jour la position du drone
+                mins_ray = [math.inf,math.inf,math.inf,math.inf]
+                for i in range(len(results)):
+                    if i < 16 :
+                        if results[i][2]*RAY_LENGTH < mins_ray[0]:
+                            mins_ray[0] = results[i][2]*RAY_LENGTH
+                    elif i < 32:
+                        if results[i][2]*RAY_LENGTH < mins_ray[1]:
+                            mins_ray[1] = results[i][2]*RAY_LENGTH
+                    elif i < 48:
+                        if results[i][2]*RAY_LENGTH < mins_ray[2]:
+                            mins_ray[2] = results[i][2]*RAY_LENGTH
+                    elif i < 64:
+                        if results[i][2]*RAY_LENGTH < mins_ray[3]:
+                            mins_ray[3] = results[i][2]*RAY_LENGTH
+                    
+                
                 drones[j].position = env.pos[j]
-                
-                # =========== APPELER LE STATE MACHINE DU DRONE ===========
-                # C'est ICI que toute la logique de contrôle se fait maintenant !
-                # Plus de if/else imbriqués, tout est géré par la state machine.
-                if drones[j].is_leader:
-                    drones[j].run(lidar_data, ray_angles, sim_steps)
-                elif drones[j].is_follower:
-                    drones[j].run(lidar_data, ray_angles, sim_steps)
-                
-                print(world_to_object_ref(drones[j].action[0:3], env.rpy[j][2]))
-                new_action = world_to_object_ref(drones[j].action[0:3], env.rpy[j][2])
-                action_to_send = [new_action[0], new_action[1], new_action[2], drones[j].action[3], drones[j].action[4]]
-                vx_w, vy_w, vz_w, speed_frac, wz = action_to_send
+                drones[j].process_lidar(mins_ray)
+                drones[j].execute()
+                vx_w, vy_w, vz_w, speed_frac, wz = drones[j].action
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
                 if v_norm < 1e-6:
                     # No translation; keep yaw rate
@@ -260,20 +217,7 @@ def run(
                 print(f"Erreur drone n°{j}: {e}")
                 import traceback
                 traceback.print_exc()
-                break
-                    
-
-        #### Log the simulation ####################################
-        # for j in range(NUM_DRONES):
-        #     logger.log(drone=j,
-        #                 timestamp=i/env.CTRL_FREQ,
-        #                 state=obs[j]
-        #                 )
-
-        #### Printout ##############################################
-        # env.render()
-
-        
+                break        
 
         #### Sync the simulation ###################################
         if gui:
@@ -285,15 +229,6 @@ def run(
     input("Press enter to continue...")
     #### Close the environment #################################
     env.close()
-
-    #### Save the simulation results ###########################
-    # logger.save()
-    # logger.save_as_csv("beta") # Optional CSV save
-
-    # #### Plot the simulation results ###########################
-    # if plot:
-    #     logger.plot()
-
 
 if __name__ == "__main__":
     #### Define and parse (optional) arguments for the script ##

@@ -12,6 +12,7 @@ vortex.py
 vortex_utils/
 worlds/
 ignoredfiles/
+Usefull/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
