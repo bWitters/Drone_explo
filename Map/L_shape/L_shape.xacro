@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<robot name="corridor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- World link -->
+  <link name="world"/>
+
+  <!-- YAML path argument  -->
+  <xacro:property name="config_yaml" value="L_shape.yaml"/>
+
+  <!-- Load YAML -->
+  <xacro:property name="CFG" value="${ xacro.load_yaml(config_yaml) }"/>
+
+  <!-- Constants -->
+  <xacro:property name="PI" value="${3.141592653589793}"/>
+
+  <!-- Dimensions: L_in = clair-voie intérieure, L_out = dimension extérieure -->
+  <xacro:property name="L_in"  value="${CFG['length']}"/>
+  <xacro:property name="L_out" value="${CFG['length'] + 2*CFG['thk']}"/>
+
+  <!-- Wall macro -->
+  <xacro:macro name="wall" params="name x y yaw length thk height rgba">
+    <link name="${name}">
+      <visual>
+        <origin xyz="0 0 ${height/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${length} ${thk} ${height}"/>
+        </geometry>
+        <material name="${name}_mat">
+          <color rgba="${rgba[0]} ${rgba[1]} ${rgba[2]} ${ (rgba[3] if len(rgba) > 3 else 1.0) }"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${height/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${length} ${thk} ${height}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0"/>
+        <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+    <joint name="${name}_world" type="fixed">
+      <origin xyz="${x} ${y} 0" rpy="0 0 ${yaw}"/>
+      <parent link="world"/>
+      <child link="${name}"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Room walls (positionnés pour que l'intérieur fasse L_in) -->
+  <xacro:wall name="wall_n"
+              x="${L_out/4}"
+              y="${  L_in/2 + CFG['thk']/2 }"
+              yaw="0"
+              length="${L_out-L_out/4}"
+              thk="${CFG['thk']}"
+              height="${CFG['height']}"
+              rgba="${CFG['rgba']}"/>
+            
+  <xacro:wall name="wall_p_n"
+              x="${(L_out/8+L_out/4)}"
+              y="${-(L_out/4 -L_in/2 - CFG['thk']/2 )}"
+              yaw="0"
+              length="${L_out/2}"
+              thk="${CFG['thk']}"
+              height="${CFG['height']}"
+              rgba="${CFG['rgba']}"/>
+
+  <xacro:wall name="wall_s"
+              x="0"
+              y="${ -L_in/2 - CFG['thk']/2 }"
+              yaw="0"
+              length="${L_out/4}"
+              thk="${CFG['thk']}"
+              height="${CFG['height']}"
+              rgba="${CFG['rgba']}"/>
+
+  <xacro:wall name="wall_e"
+              x="${  L_in/8 + CFG['thk']/2 }"
+              y="${-L_out/8}"
+              yaw="${PI/2}"
+              length="${L_out-L_out/4}"
+              thk="${CFG['thk']}"
+              height="${CFG['height']}"
+              rgba="${CFG['rgba']}"/>
+
+  <xacro:wall name="wall_w"
+              x="${ -L_in/8 - CFG['thk']/2 }"
+              y="0"
+              yaw="${PI/2}"
+              length="${L_out}"
+              thk="${CFG['thk']}"
+              height="${CFG['height']}"
+              rgba="${CFG['rgba']}"/>
+
+</robot>
