@@ -18,7 +18,7 @@ class LeaderCurve(Behavior):
     def role(self):
         return self.agent.role.current_state.id 
     
-    def update_action(self): # FIXME
+    def update_action(self):
         if LeaderCurve.Active.Sub_Stop.Stop in self.configuration:
             self.send("standby_stop")
             self.send("do_send_come_closer")
