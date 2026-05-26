@@ -23,3 +23,4 @@ class Situation(Enum):
     STOCK_HEIGHT = auto()
     CENTERED_IN_CORRIDOR = auto()
     COME_CLOSER_SENT = auto()
+    BACKWARD_TOO_FAR = auto()
