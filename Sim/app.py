@@ -11,7 +11,7 @@ from gym_pybullet_drones.utils.utils import sync, str2bool
 from agents import Drones
 import yaml
 
-with open("Map/Intersection/Intersection.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
+with open("Map/Multiple_corner/Multiple_corner.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -25,7 +25,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 500
 DEFAULT_CONTROL_FREQ_HZ = 25
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 3
+NUM_DRONES = 7
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 INIT_XYZ = np.array([[.0, 0 -.4*i, 0] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
@@ -62,7 +62,7 @@ def run(
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
 
-    p.loadURDF("Map/Intersection/Intersection.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("Map/Multiple_corner/Multiple_corner.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     #### ID drones ####
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)

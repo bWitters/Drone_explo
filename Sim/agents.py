@@ -88,7 +88,7 @@ class Drones():
         from Actions.send_come_closer import SendComeCloser
         from Actions.turn_around import TurnAround
         from Actions.takeoff import Takeoff
-        from Actions.test import Test
+        #from Actions.test import Test
         from Actions.center_in_corridor import CenterInCorridor
         from Actions.center_in_curve import CenterInCurve
         from Actions.height_control import HeightControl
@@ -106,7 +106,7 @@ class Drones():
         self.turn_around_action = TurnAround(self)
         self.takeoff_action = Takeoff(self)
         self.send_come_closer_action = SendComeCloser(self)
-        self.test_action = Test(self)
+        #self.test_action = Test(self)
         self.center_in_corridor_action = CenterInCorridor(self)
         self.center_in_curve_action = CenterInCurve(self)
         self.height_control_action = HeightControl(self)
@@ -123,7 +123,7 @@ class Drones():
                              "Takeoff" : self.takeoff_action,
                              "Send Come Closer" : self.send_come_closer_action,
                              "Move" : self.move_action,
-                             "Test" : self.test_action,
+                             #"Test" : self.test_action,
                              "Center in corridor" : self.center_in_corridor_action,
                              "Center in curve" : self.center_in_curve_action,
                              "Height control" : self.height_control_action,
@@ -168,7 +168,7 @@ class Drones():
                                                 self.gap_direction_determination_action,
                                                 self.rotation_action,
                                                 self.move_action,
-                                                self.test_action,
+                                                #self.test_action,
                                                 self.center_in_curve_action
                                                 )
 
