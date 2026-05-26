@@ -15,8 +15,8 @@ class Drones():
         self.position = [0,0,0]
         self.rpy = [0,0,0]
 
-        nom_fichier = f"StateMachinesReorganised/logs/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
-        nom_fichier_rt = f"StateMachinesReorganised/real_time_logs/drone_{unique_id}.csv"
+        nom_fichier = f"Sim/logs/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
+        nom_fichier_rt = f"Sim/real_time_logs/drone_{unique_id}.csv"
         self.file_rt = open(nom_fichier_rt,"w")
         self.commands_logs_rt = csv.writer(self.file_rt)
         self.commands_logs_rt.writerow(["vx","vy","vz","speed_frac","v_yaw"])

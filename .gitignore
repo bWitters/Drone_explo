@@ -1,5 +1,6 @@
 # Files
-/StateMachinesReorganised/logs/
+logs/
+real_time_logs/
 .vscode/
 test*
 ray_analyse.py
