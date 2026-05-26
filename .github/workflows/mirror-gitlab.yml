@@ -1,20 +1,28 @@
 name: Mirror GitLab to GitHub
 on:
   schedule:
-    - cron: '*/15 * * * *'
-  workflow_dispatch: # Permet de lancer manuellement
+    - cron: '*/15 * * * *' # Tous les 15 minutes
+  workflow_dispatch: # Pour lancer manuellement
+
 jobs:
   mirror:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          token: TEST_TOKEN
+          fetch-depth: 0 # Récupère tout l'historique
+
+      # Ajoute le dépôt GitLab comme remote avec authentification
       - name: Pull from GitLab
         run: |
           git remote add gitlab https://oauth2:GITLAB_TOKEN@gitlab.inria.fr/bwitters/Drone_explo.git
           git fetch gitlab
-          git checkout main
-          git merge gitlab/main --allow-unrelated-histories
+
+      # Fusionne les changements et pousse vers GitHub
+      - name: Push to GitHub
+        run: |
+          git checkout main # ou ta branche principale
+          git merge gitlab/main --allow-unrelated-histories -m "Mirror from GitLab"
           git push origin main
+        env:
+          GITHUB_TOKEN: TEST_TOKEN # Utilisé pour l'authentification GitHub
