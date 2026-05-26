@@ -168,6 +168,17 @@ class SituationState():
             return True
         return False
     
+    def is_backward_too_far(self,neighbors_distance):
+        if neighbors_distance["F"] != None:
+            if self.dist(neighbors_distance["F"]) > 4.7:
+                return (True, 2)
+            elif self.dist(neighbors_distance["F"]) > 4:
+                return (True, 1)
+            else:
+                return (False, 0)
+        else:
+            return (False, 0)
+    
     def update_situation(self, gaps_dir,
                          occupied_neighborhood,
                          graph_branch_counter_var,
@@ -188,3 +199,4 @@ class SituationState():
         #self.situation[Situation.CLOSE_TO_EXPLORED_BRANCH] = self.is_close_to_explored_branch(occupied_neighborhood)
         self.situation[Situation.AGENT_DETECTION] = self.agent_detection(occupied_neighborhood)
         self.situation[Situation.CENTERED_IN_CORRIDOR] = self.is_centered_in_corridor()
+        self.situation[Situation.BACKWARD_TOO_FAR] = self.is_backward_too_far(neighbors_distance)

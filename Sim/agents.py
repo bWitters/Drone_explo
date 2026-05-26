@@ -45,7 +45,6 @@ class Drones():
         from Behaviors.follower_intersection import FollowerIntersection
         from Behaviors.leader_curve import LeaderCurve
         from Behaviors.follower_curve import FollowerCurve
-        from Behaviors.forced_wait import ForcedWait
 
         self.stock_behavior = Stock(agent = self)
         self.takeoff_behavior = Takeoff(agent = self)
@@ -88,12 +87,13 @@ class Drones():
         from Actions.send_come_closer import SendComeCloser
         from Actions.turn_around import TurnAround
         from Actions.takeoff import Takeoff
-        from Actions.test import Test
+        #from Actions.test import Test
         from Actions.center_in_corridor import CenterInCorridor
         from Actions.center_in_curve import CenterInCurve
         from Actions.height_control import HeightControl
         from Actions.center_in_intersection import CenterInIntersection
         from Actions.rotation_control import RotationControl
+        from Actions.forced_waiting import ForcedWaiting
 
         self.stop_action = Stop(self)
         self.change_role_action = ChangeRole(self)
@@ -106,12 +106,13 @@ class Drones():
         self.turn_around_action = TurnAround(self)
         self.takeoff_action = Takeoff(self)
         self.send_come_closer_action = SendComeCloser(self)
-        self.test_action = Test(self)
+        #self.test_action = Test(self)
         self.center_in_corridor_action = CenterInCorridor(self)
         self.center_in_curve_action = CenterInCurve(self)
         self.height_control_action = HeightControl(self)
         self.center_in_intersection_action = CenterInIntersection(self)
         self.rotation_conrol_action = RotationControl(self)
+        self.forced_waiting_action = ForcedWaiting(self)
 
         self.actions_dict = {"Stop" : self.stop_action,
                              "Change Role" : self.change_role_action,
@@ -123,12 +124,13 @@ class Drones():
                              "Takeoff" : self.takeoff_action,
                              "Send Come Closer" : self.send_come_closer_action,
                              "Move" : self.move_action,
-                             "Test" : self.test_action,
+                             #"Test" : self.test_action,
                              "Center in corridor" : self.center_in_corridor_action,
                              "Center in curve" : self.center_in_curve_action,
                              "Height control" : self.height_control_action,
                              "Center in intersection" : self.center_in_intersection_action,
-                             "Rotation control" : self.rotation_conrol_action
+                             "Rotation control" : self.rotation_conrol_action,
+                             "Forced waiting" : self.forced_waiting_action
                              }
 
 
@@ -149,7 +151,8 @@ class Drones():
                                                    self.send_come_closer_action,
                                                    self.center_in_corridor_action,
                                                    self.height_control_action,
-                                                   self.rotation_conrol_action
+                                                   self.rotation_conrol_action,
+                                                   self.forced_waiting_action
                                                    )
         
         self.leader_intersection_behavior.add_listener(self.stop_action,
@@ -168,7 +171,7 @@ class Drones():
                                                 self.gap_direction_determination_action,
                                                 self.rotation_action,
                                                 self.move_action,
-                                                self.test_action,
+                                                #self.test_action,
                                                 self.center_in_curve_action
                                                 )
 
@@ -182,7 +185,8 @@ class Drones():
                                                      self.send_come_closer_action,
                                                      self.center_in_corridor_action,
                                                      self.height_control_action,
-                                                     self.rotation_conrol_action
+                                                     self.rotation_conrol_action,
+                                                     self.forced_waiting_action
                                                      )
         
         self.follower_intersection_behavior.add_listener(self.stop_action,

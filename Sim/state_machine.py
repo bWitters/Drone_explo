@@ -20,6 +20,9 @@ class DroneStateMachine(StateChart):
                    LeaderIntersection.to(LeaderCorridor)|
                    LeaderCorridor.to(LeaderCurve)|
                    LeaderCurve.to(LeaderCorridor))
+    
+    waiting = (LeaderCorridor.to(ForcedWait)|
+               ForcedWait.to(LeaderCorridor))
 
     reach_intersection = (LeaderCorridor.to(LeaderIntersection)|
                           LeaderIntersection.to.itself())

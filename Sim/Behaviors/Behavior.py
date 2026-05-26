@@ -45,6 +45,13 @@ class Behavior(StateChart):
             do_RotationControl = Idle_RotationControl.to(RotationControl)
             standby_RotationControl = RotationControl.to(Idle_RotationControl)
         
+        class Sub_ForcedWaiting(State.Compound):
+            Idle_ForcedWaiting = State(initial=True)
+            ForcedWaiting = State()
+
+            do_ForcedWaiting = Idle_ForcedWaiting.to(ForcedWaiting)
+            standby_ForcedWaiting = ForcedWaiting.to(Idle_ForcedWaiting)
+        
         class Sub_CenterInIntersection(State.Compound):
             Idle_CenterInIntersection = State(initial=True)
             CenterInIntersection = State()
