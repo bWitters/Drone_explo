@@ -1,0 +1,395 @@
+<?xml version="1.0"?>
+<robot name="corridor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- World link -->
+  <link name="world"/>
+
+  <!-- YAML path argument  -->
+  <xacro:property name="config_yaml" value="Multiple_corner.yaml"/>
+
+  <!-- Load YAML -->
+  <xacro:property name="CFG" value="${ xacro.load_yaml(config_yaml) }"/>
+
+  <!-- Constants -->
+  <xacro:property name="PI" value="${3.141592653589793}"/>
+
+  <!-- Dimensions: L = wall length -->
+  <xacro:property name="L"  value="${CFG['length']}"/>
+
+  <!-- Dimensions: thk = wall thikness -->
+  <xacro:property name="thk"  value="${CFG['thk']}"/>
+
+  <!-- Dimensions: H = wall height -->
+  <xacro:property name="H"  value="${CFG['height']}"/>
+
+  <!-- Dimensions: color = wall color -->
+  <xacro:property name="color"  value="${CFG['rgba']}"/>
+
+  <!-- Dimensions: W = corridor width -->
+  <xacro:property name="W"  value="${CFG['width']}"/>
+
+  <!-- Wall macro -->
+  <xacro:macro name="wall" params="name x y yaw length thk height rgba">
+    <link name="${name}">
+      <visual>
+        <origin xyz="0 0 ${height/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${thk} ${length} ${height}"/>
+        </geometry>
+        <material name="${name}_mat">
+          <color rgba="${rgba[0]} ${rgba[1]} ${rgba[2]} ${ (rgba[3] if len(rgba) > 3 else 1.0) }"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 ${height/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${thk} ${length} ${height}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0"/>
+        <inertia ixx="1e-6" iyy="1e-6" izz="1e-6" ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+    <joint name="${name}_world" type="fixed">
+      <origin xyz="${x} ${y} 0" rpy="0 0 ${yaw}"/>
+      <parent link="world"/>
+      <child link="${name}"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Corridor macro -->
+  <xacro:macro name="corridor" params="name x y yaw length thk height rgba width">
+
+    <!-- compute rotation (cos/sin) and rotate local offsets -->
+    <xacro:property name="_yaw" value="${float(yaw)}"/>
+    <xacro:property name="_c" value="${math.cos(_yaw)}"/>
+    <xacro:property name="_s" value="${math.sin(_yaw)}"/>
+
+    <!-- Left wall local offset -->
+    <xacro:property name="_left_dx" value="${width/2 + thk/2}"/>
+    <xacro:property name="_left_dy" value="0"/>
+    <xacro:property name="_left_x" value="${x + _left_dx*_c - _left_dy*_s}"/>
+    <xacro:property name="_left_y" value="${y + _left_dx*_s + _left_dy*_c}"/>
+
+    <!-- Mur gauche -->
+    <xacro:wall
+      name="${name}_left"
+      x="${_left_x}"
+      y="${_left_y}"
+      yaw="${yaw}"
+      length="${length}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}" />
+
+    <!-- Right wall local offset -->
+    <xacro:property name="_right_dx" value="${-(width/2 + thk/2)}"/>
+    <xacro:property name="_right_dy" value="0"/>
+    <xacro:property name="_right_x" value="${x + _right_dx*_c - _right_dy*_s}"/>
+    <xacro:property name="_right_y" value="${y + _right_dx*_s + _right_dy*_c}"/>
+
+    <!-- Mur droit -->
+    <xacro:wall
+      name="${name}_right"
+      x="${_right_x}"
+      y="${_right_y}"
+      yaw="${yaw}"
+      length="${length}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}" />
+
+  </xacro:macro>
+
+  <!-- U_corridor macro -->
+  <xacro:macro name="u_corridor" params="name x y yaw length thk height rgba width">
+
+    <!-- compute rotation (cos/sin) and rotate local offsets -->
+    <xacro:property name="_yaw" value="${float(yaw)}"/>
+    <xacro:property name="_c" value="${math.cos(_yaw)}"/>
+    <xacro:property name="_s" value="${math.sin(_yaw)}"/>
+
+    <!-- Left wall local offset -->
+    <xacro:property name="_left_dx" value="${width/2 + thk/2}"/>
+    <xacro:property name="_left_dy" value="0"/>
+    <xacro:property name="_left_x" value="${x + _left_dx*_c - _left_dy*_s}"/>
+    <xacro:property name="_left_y" value="${y + _left_dx*_s + _left_dy*_c}"/>
+
+    <!-- Mur gauche -->
+    <xacro:wall
+      name="${name}_left"
+      x="${_left_x}"
+      y="${_left_y}"
+      yaw="${yaw}"
+      length="${length}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}" />
+
+    <!-- Right wall local offset -->
+    <xacro:property name="_right_dx" value="${-(width/2 + thk/2)}"/>
+    <xacro:property name="_right_dy" value="0"/>
+    <xacro:property name="_right_x" value="${x + _right_dx*_c - _right_dy*_s}"/>
+    <xacro:property name="_right_y" value="${y + _right_dx*_s + _right_dy*_c}"/>
+
+    <!-- Mur droit -->
+    <xacro:wall
+      name="${name}_right"
+      x="${_right_x}"
+      y="${_right_y}"
+      yaw="${yaw}"
+      length="${length}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}" />
+    
+    <xacro:property name="_back_dx" value="0"/>
+    <xacro:property name="_back_dy" value="${-length/2-thk/2}"/>
+    <xacro:property name="_back_x" value="${x + _back_dx*_c - _back_dy*_s}"/>
+    <xacro:property name="_back_y" value="${y + _back_dx*_s + _back_dy*_c}"/>
+
+    <!-- Mur Derrière -->
+    <xacro:wall
+      name="${name}_back"
+      x="${_back_x}"
+      y="${_back_y}"
+      yaw="${yaw+PI/2}"
+      length="${width}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}"/>
+
+  </xacro:macro>
+
+  <!-- Corner macro -->
+  <xacro:macro name="corner" params="name x y yaw length thk height rgba width">
+
+    <!-- compute rotation (cos/sin) and rotate local offsets -->
+    <xacro:property name="_yaw" value="${float(yaw)}"/>
+    <xacro:property name="_c" value="${math.cos(_yaw)}"/>
+    <xacro:property name="_s" value="${math.sin(_yaw)}"/>
+
+    <!-- Left wall local offset -->
+    <xacro:property name="_left_dx" value="${width/2 + thk/2}"/>
+    <xacro:property name="_left_dy" value="${-(length/2-width/2)/2-width/2}"/>
+    <xacro:property name="_left_x" value="${x + _left_dx*_c - _left_dy*_s}"/>
+    <xacro:property name="_left_y" value="${y + _left_dx*_s + _left_dy*_c}"/>
+
+    <!-- Mur Droit -->
+    <xacro:wall
+      name="${name}_left"
+      x="${_left_x}"
+      y="${_left_y}"
+      yaw="${yaw}"
+      length="${length/2-width/2}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}" />
+
+    <!-- Right wall local offset -->
+    <xacro:property name="_right_dx" value="${-(width/2 + thk/2)}"/>
+    <xacro:property name="_right_dy" value="${-(length+width)/4+width/2}"/>
+    <xacro:property name="_right_x" value="${x + _right_dx*_c - _right_dy*_s}"/>
+    <xacro:property name="_right_y" value="${y + _right_dx*_s + _right_dy*_c}"/>
+
+    <!-- Mur Gauche -->
+    <xacro:wall
+      name="${name}_right"
+      x="${_right_x}"
+      y="${_right_y}"
+      yaw="${yaw}"
+      length="${(length+width)/2}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}" />
+    
+    <xacro:property name="_front_up_dx" value="${(length+width)/4-width/2}"/>
+    <xacro:property name="_front_up_dy" value="${width/2+thk/2}"/>
+    <xacro:property name="_front_up_x" value="${x + _front_up_dx*_c - _front_up_dy*_s}"/>
+    <xacro:property name="_front_up_y" value="${y + _front_up_dx*_s + _front_up_dy*_c}"/>
+
+    <!-- Mur Fond_haut -->
+    <xacro:wall
+      name="${name}_front_up"
+      x="${_front_up_x}"
+      y="${_front_up_y}"
+      yaw="${yaw+PI/2}"
+      length="${(length+width)/2}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}"/>
+
+      <xacro:property name="_front_down_dx" value="${+(length/2-width/2)/2+width/2}"/>
+    <xacro:property name="_front_down_dy" value="${-width/2-thk/2}"/>
+    <xacro:property name="_front_down_x" value="${x + _front_down_dx*_c - _front_down_dy*_s}"/>
+    <xacro:property name="_front_down_y" value="${y + _front_down_dx*_s + _front_down_dy*_c}"/>
+
+    <!-- Mur Fond_bas -->
+    <xacro:wall
+      name="${name}_front_down"
+      x="${_front_down_x}"
+      y="${_front_down_y}"
+      yaw="${yaw+PI/2}"
+      length="${length/2-width/2}"
+      thk="${thk}"
+      height="${height}"
+      rgba="${rgba}"/>
+
+  </xacro:macro>
+
+  <!-- corridors (positionnés pour que l'intérieur fasse width) -->
+  <xacro:corridor
+  name="1"
+  x="0.0"
+  y="0.0"
+  yaw="0.0"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corner
+  name="2"
+  x="0.0"
+  y="2.0"
+  yaw="0.0"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corridor
+  name="3"
+  x="2.0"
+  y="2.0"
+  yaw="${PI/2}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corner
+  name="4"
+  x="4.0"
+  y="2.0"
+  yaw="${PI}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corridor
+  name="5"
+  x="4.0"
+  y="4.0"
+  yaw="${0}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corner
+  name="6"
+  x="4.0"
+  y="6.0"
+  yaw="${PI*3/2}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corridor
+  name="7"
+  x="2.0"
+  y="6.0"
+  yaw="${PI/2}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corridor
+  name="8"
+  x="0.0"
+  y="6.0"
+  yaw="${PI/2}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corner
+  name="9"
+  x="-2.0"
+  y="6.0"
+  yaw="${0}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corridor
+  name="10"
+  x="-2.0"
+  y="4.0"
+  yaw="${0}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corridor
+  name="11"
+  x="-2.0"
+  y="2.0"
+  yaw="${0}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corridor
+  name="12"
+  x="-2.0"
+  y="0.0"
+  yaw="${0}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corner
+  name="13"
+  x="-2.0"
+  y="-2.0"
+  yaw="${PI/2}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+
+  <xacro:corner
+  name="14"
+  x="0.0"
+  y="-2.0"
+  yaw="${PI}"
+  length="${L}"
+  width="${W}"
+  height="${H}"
+  thk="${thk}"
+  rgba="${color}"/>
+</robot>

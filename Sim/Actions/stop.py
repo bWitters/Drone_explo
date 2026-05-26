@@ -1,0 +1,14 @@
+from agents import Drones
+
+from Actions.Action import Action
+
+class Stop(Action):
+
+    def __init__(self, agent):
+        self.agent: Drones = agent
+
+        super().__init__(self.name)
+
+    def action(self):
+        self.agent.move_drone = [0,0,0,0,0]
+

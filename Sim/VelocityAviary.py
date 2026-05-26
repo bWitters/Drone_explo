@@ -93,7 +93,7 @@ class VelocityAviary(BaseAviary):
             speed_frac = float(np.clip(a[3], 0.0, 1.0))  #norm des vitesses
             yaw_rate   = float(a[4]) if a.shape[0] >= 5 else 0.0  # rad/s
 
-            if np.linalg.norm(dir_xyz) > 1e-4:
+            if np.linalg.norm(dir_xyz) > 1e-6:
                 v_unit = dir_xyz / np.linalg.norm(dir_xyz)
             else:
                 v_unit = np.zeros(3, dtype=np.float32)

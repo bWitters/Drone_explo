@@ -1,0 +1,6 @@
+source /opt/ros/jazzy/setup.bash
+ros2 run xacro xacro -o {map_name}.urdf {map_name}.xacro
+ros2 run xacro xacro -o Map/{map_name}/{map_name}.urdf Map/{map_name}/{map_name}.xacro
+
+
+ros2 run xacro xacro -o Map/Multiple_corner/Multiple_corner.urdf Map/Multiple_corner/Multiple_corner.xacro

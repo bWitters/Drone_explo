@@ -1,0 +1,25 @@
+from enum import Enum, auto
+
+class Situation(Enum):
+    """Class representing the situation of an agent in the environment."""
+    STOCK = auto()
+    CORRIDOR = auto()
+    INTERSECTION = auto()
+    CURVE = auto()
+    AGENT_IN_INTERSECTION_DETECTION = auto()
+    ALL_BRANCH_EXPLORED = auto()
+    COME_CLOSER = auto()
+    FORCED_WAIT = auto()
+    CLOSE_TO_LEADER = auto()
+    FORCED_WAIT_AGENT_DETECTION = auto()
+    AGENT_IN_FRONT_DETECTION = auto()
+    AGENT_BEHIND_DETECTION = auto()
+    AGENT_DETECTION = auto()
+    TOO_CLOSE = auto()
+    BACKWARD_TOO_CLOSE = auto()
+    FRONT_TOO_CLOSE = auto()
+    CLOSE_TO_EXPLORED_BRANCH = auto()
+    GOOD_HEIGHT = auto()
+    STOCK_HEIGHT = auto()
+    CENTERED_IN_CORRIDOR = auto()
+    COME_CLOSER_SENT = auto()

@@ -6,15 +6,12 @@ import pybullet as p
 
 from gym_pybullet_drones.utils.enums import DroneModel, Physics
 from VelocityAviary import VelocityAviary
-from gym_pybullet_drones.utils.Logger import Logger
 from gym_pybullet_drones.utils.utils import sync, str2bool
 
-from StateMachines.state_machine import LeaderMachine
-from StateMachines.follow_machine_v2 import FollowerMachine
-
+from agents import Drones
 import yaml
 
-with open("Map/L_shape/L_shape.yaml") as stream:
+with open("Map/Intersection/Intersection.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -28,9 +25,10 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 500
 DEFAULT_CONTROL_FREQ_HZ = 25
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 2
+NUM_DRONES = 3
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-INIT_XYZ = np.array([[.0, -1+ .5*i, .1] for i in range(NUM_DRONES)])
+INIT_XYZ = np.array([[.0, 0 -.4*i, 0] for i in range(NUM_DRONES)])
+STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
 INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
 RAY_LENGTH = 10
 RAY_HIT_COLOR = [1, 0, 0]
@@ -64,7 +62,7 @@ def run(
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
 
-    p.loadURDF("Map/L_shape/L_shape.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("Map/Intersection/Intersection.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     #### ID drones ####
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
@@ -78,7 +76,7 @@ def run(
     #### Run the simulation ####################################
     action = np.zeros((num_drones,5))
     START = time.time()
-    running = 2500
+    running = 5000
     
     debut = time.time()
     rayLen = RAY_LENGTH
@@ -93,46 +91,35 @@ def run(
 
         if sim_steps == 0: # Découverte des drones et leurs relations
             drones = []
+            unique_id = 2
             for drone_i in range(num_drones):
                 pos = env.pos[drone_i]
                 for key, value in env_id_drones.items():
                     pos_compare = np.array([value["env_position"][0][0], value["env_position"][0][1], value["env_position"][0][2]])
                     truth = 0
                     for i in range(len(pos)):
-                        if pos[i] == pos_compare[i]:
+                        if abs(pos[i] - pos_compare[i]) < 0.2:
                             truth+=1
                     if truth == 3:
-                        value["drone_id"] = drone_i
-                if drone_i == num_drones-1:
-                    drones.append(LeaderMachine())
+                        env_id_drones[key]["drone_id"] = drone_i
+                if drone_i == 0:
+                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA))
                 else:
-                    drones.append(FollowerMachine())
+                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA))
+                    unique_id +=1
+            
+            for i in range(unique_id-1):
+                if NUM_DRONES>0:
+                    if i == 0:
+                        drones[i].neighboring_agent_list["F"] = drones[i+1]
+                    elif i == unique_id-2:
+                        drones[i].neighboring_agent_list["P"] = drones[i-1]
+                    else:
+                        drones[i].neighboring_agent_list["F"] = drones[i+1]
+                        drones[i].neighboring_agent_list["P"] = drones[i-1]
+                    #print(drones[i].neighboring_agent_list)
 
-            for drone_i in range(num_drones):
-                rayFrom = []
-                rayTo = []
-                rayIds = []
 
-                for rays in range(numRays):
-                    rayFrom.append(env.pos[drone_i])
-                    rayTo.append([
-                        rayFrom[rays][0] + rayLen * math.sin(2. * math.pi * float(rays) / numRays),
-                        rayFrom[rays][1] + rayLen * math.cos(2. * math.pi * float(rays) / numRays), rayFrom[rays][2]
-                    ])
-                    rayIds.append(-1)
-
-                results = p.rayTestBatch(rayFrom, rayTo)
-                        
-                ids = [(t[0],t[3]) for t in results]
-
-                for id in ids:
-                    if id[0] in env_id_drones.keys():
-                        if id[1][1] > env.pos[drone_i][1]:
-                            drones[drone_i].preceding = drones[env_id_drones[id[0]]["drone_id"]]
-                            drones[drone_i].preceding_id = id[0]
-                        elif id[1][1] < env.pos[drone_i][1]:
-                            drones[drone_i].follower = drones[env_id_drones[id[0]]["drone_id"]]
-                            drones[drone_i].follower_id = id[0]
 
         p.removeAllUserDebugItems()
 
@@ -157,23 +144,6 @@ def run(
                             rayFrom[i][2]
                         ])
                         rayIds.append(-1)
-                    
-
-                    
-                    #### Debug Lidar ####
-                    
-                    # results = p.rayTestBatch(rayFrom, rayTo)
-
-                    # # Affichage du lidar (optionnel)
-                    # if show_lidar:
-                    #     p.removeAllUserDebugItems()
-                    #     for i in range(len(results)):
-                    #         hitObjectUid = results[i][0]
-                    #         if hitObjectUid < 0:
-                    #             p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
-                    #         else:
-                    #             hitPosition = results[i][3]
-                    #             p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
 
                 results = p.rayTestBatch(rayFrom, rayTo)
 
@@ -189,26 +159,25 @@ def run(
                             p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
 
                 # Extraire les distances lidar depuis les résultats                
-                mins_ray = [math.inf,math.inf,math.inf,math.inf]
+                mins_ray = [(math.inf,False),(math.inf,False),(math.inf,False),(math.inf,False)]
                 for i in range(len(results)):
                     if i < 16 :
-                        if results[i][2]*RAY_LENGTH < mins_ray[0]:
-                            mins_ray[0] = results[i][2]*RAY_LENGTH
+                        if results[i][2]*RAY_LENGTH < mins_ray[0][0]:
+                            mins_ray[0] = (results[i][2]*RAY_LENGTH,results[i][0])
                     elif i < 32:
-                        if results[i][2]*RAY_LENGTH < mins_ray[1]:
-                            mins_ray[1] = results[i][2]*RAY_LENGTH
+                        if results[i][2]*RAY_LENGTH < mins_ray[1][0]:
+                            mins_ray[1] = (results[i][2]*RAY_LENGTH,results[i][0])
                     elif i < 48:
-                        if results[i][2]*RAY_LENGTH < mins_ray[2]:
-                            mins_ray[2] = results[i][2]*RAY_LENGTH
+                        if results[i][2]*RAY_LENGTH < mins_ray[2][0]:              
+                            mins_ray[2] = (results[i][2]*RAY_LENGTH,results[i][0])
                     elif i < 64:
-                        if results[i][2]*RAY_LENGTH < mins_ray[3]:
-                            mins_ray[3] = results[i][2]*RAY_LENGTH
-                    
-                
+                        if results[i][2]*RAY_LENGTH < mins_ray[3][0]:           
+                            mins_ray[3] = (results[i][2]*RAY_LENGTH,results[i][0])
+
                 drones[j].position = env.pos[j]
-                drones[j].process_lidar(mins_ray)
-                drones[j].execute()
-                vx_w, vy_w, vz_w, speed_frac, wz = drones[j].action
+                drones[j].rpy = env.rpy[j]
+                drones[j].step(mins_ray)
+                vx_w, vy_w, vz_w, speed_frac, wz = drones[j].move_drone
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
                 if v_norm < 1e-6:
                     # No translation; keep yaw rate
