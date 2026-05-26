@@ -30,7 +30,8 @@ class SituationState():
             Situation.CLOSE_TO_EXPLORED_BRANCH : False,
             Situation.GOOD_HEIGHT : False,
             Situation.CENTERED_IN_CORRIDOR : False,
-            Situation.COME_CLOSER_SENT : False
+            Situation.COME_CLOSER_SENT : False,
+            Situation.BACKWARD_TOO_FAR : False
             }
 
     @property
