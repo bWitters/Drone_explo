@@ -1,0 +1,19 @@
+name: Mirror GitLab to GitHub
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Permet de lancer manuellement
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Pull from GitLab
+        run: |
+          git remote add gitlab https://oauth2:GITLAB_TOKEN@gitlab.com/ton-user/ton-repo.git
+          git fetch gitlab
+          git checkout main
+          git merge gitlab/main --allow-unrelated-histories
+          git push origin main
