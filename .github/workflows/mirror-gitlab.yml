@@ -1,9 +1,7 @@
 name: Mirror GitLab to GitHub
 on:
   schedule:
-    - cron: '*/15 * * * *' 
-  workflow_dispatch: # Pour lancer manuellement
-
+    - cron: '*/15 * * * *'
 jobs:
   mirror:
     runs-on: ubuntu-latest
