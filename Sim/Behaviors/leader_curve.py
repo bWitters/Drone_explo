@@ -36,6 +36,7 @@ class LeaderCurve(Behavior):
             if self.situation[Situation.BACKWARD_TOO_CLOSE]:
                 #print("Step 4 move")
                 self.send("standby_stop")
+                self.send("standby_CenterInCurve")
                 self.send("do_GapDirectionDetermination")
                 self.send("do_rotation")
                 self.send("do_move")
