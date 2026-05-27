@@ -15,7 +15,7 @@ class LeaderCorridor(Behavior):
     def situation(self):
         return self.agent.situation.situation
     
-    def update_action(self): # TODO : ADD A 5m limit
+    def update_action(self):
         if LeaderCorridor.Active.Sub_Stop.Stop in self.configuration:
             self.send("standby_stop")
             self.situation[Situation.COME_CLOSER_SENT] = False

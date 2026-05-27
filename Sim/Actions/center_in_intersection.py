@@ -10,7 +10,7 @@ class CenterInIntersection(Action):
     def entrance_position(self):
         return self.agent.situation.intersection_entrance
 
-    def action(self): # TODO : Centrage dans une intersection.
+    def action(self):
         distance_x = 0
         distance_y = 0
         match self.agent.front:
