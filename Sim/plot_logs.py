@@ -68,8 +68,8 @@ def plot_velocities(csv_file_paths):
 # Exemple d'utilisation
 if __name__ == "__main__":
     csv_paths = [
-        "StateMachinesReorganised/logs/drone_1_2026-05-13-54-30.csv",
-        "StateMachinesReorganised/logs/drone_2_2026-05-13-54-30.csv",
-        "StateMachinesReorganised/logs/drone_3_2026-05-13-54-30.csv"
+        "Sim/logs/drone_1_2026-05-14-28-48.csv",
+        "Sim/logs/drone_2_2026-05-14-28-48.csv",
+        "Sim/logs/drone_3_2026-05-14-28-48.csv"
     ]
     plot_velocities(csv_paths)

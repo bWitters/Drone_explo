@@ -3,6 +3,8 @@ import argparse
 import numpy as np
 import math
 import pybullet as p
+from datetime import datetime
+import csv
 
 from gym_pybullet_drones.utils.enums import DroneModel, Physics
 from VelocityAviary import VelocityAviary
@@ -64,6 +66,11 @@ def run(
 
     p.loadURDF("Map/Multiple_corner/Multiple_corner.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
+    ### Log files 
+
+    files = []
+    log_writers = []
+
     #### ID drones ####
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
     env_id_drones = {}
@@ -102,11 +109,28 @@ def run(
                             truth+=1
                     if truth == 3:
                         env_id_drones[key]["drone_id"] = drone_i
+                #### Log files
+
+                
+                
                 if drone_i == 0:
                     drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA))
+                    nom_fichier = f"Sim/logs/drone_velocity_1_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
+                    files.append(open(nom_fichier,"w"))
+                    log_writers.append(csv.writer(files[-1]))
+                    log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
+                    files[-1].flush()
                 else:
                     drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA))
+                    nom_fichier = f"Sim/logs/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
+                    files.append(open(nom_fichier,"w"))
+                    log_writers.append(csv.writer(files[-1]))
+                    log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
+                    files[-1].flush()
                     unique_id +=1
+
+                
+                
             
             for i in range(unique_id-1):
                 if NUM_DRONES>0:
@@ -189,6 +213,14 @@ def run(
                     dir_z = vz_w / v_norm
                     speed_frac = min(1.0, v_norm / max(1e-6, 1.0))
                     action[j, :] = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
+                
+                for key in env_id_drones.keys():
+                    if env_id_drones[key]["drone_id"] == j:
+                        base_velocity = p.getBaseVelocity(key, physicsClientId=PYB_CLIENT)
+                        print(f"Current drone velocity : {base_velocity[0]} \nYaw velocity : {base_velocity[1][2]}")
+                        action_to_log = [base_velocity[0][0],base_velocity[0][1],base_velocity[0][2],base_velocity[1][2]]
+                        log_writers[j-1].writerow(action_to_log)
+                        files[j-1].flush()
                 
             except Exception as e:
                 print(f"Erreur drone n°{j}: {e}")
