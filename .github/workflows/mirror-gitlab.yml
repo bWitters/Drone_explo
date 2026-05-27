@@ -1,7 +1,7 @@
 name: Mirror GitLab to GitHub
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '5 9 * * *'
 jobs:
   mirror:
     runs-on: ubuntu-latest
