@@ -219,8 +219,8 @@ def run(
                         base_velocity = p.getBaseVelocity(key, physicsClientId=PYB_CLIENT)
                         print(f"Current drone velocity : {base_velocity[0]} \nYaw velocity : {base_velocity[1][2]}")
                         action_to_log = [base_velocity[0][0],base_velocity[0][1],base_velocity[0][2],base_velocity[1][2]]
-                        log_writers[j-1].writerow(action_to_log)
-                        files[j-1].flush()
+                        log_writers[j].writerow(action_to_log)
+                        files[j].flush()
                 
             except Exception as e:
                 print(f"Erreur drone n°{j}: {e}")
