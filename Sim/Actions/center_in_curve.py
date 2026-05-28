@@ -36,7 +36,7 @@ class CenterInCurve(Action):
         print(f"The action to center is : {act}")
         return act
 
-    def action(self): # FIXME When going north and curve to W it collide with de E wall
+    def action(self):
         #print("coucou")
         if self.agent.front == "N":
             i = 1

@@ -15,7 +15,7 @@ class LeaderCorridor(Behavior):
     def situation(self):
         return self.agent.situation.situation
     
-    def update_action(self): # TODO : ADD A 5m limit
+    def update_action(self):
         if LeaderCorridor.Active.Sub_Stop.Stop in self.configuration:
             self.send("standby_stop")
             self.situation[Situation.COME_CLOSER_SENT] = False
@@ -26,18 +26,18 @@ class LeaderCorridor(Behavior):
         elif LeaderCorridor.Active.Sub_Move.Move in self.configuration:
             self.send("standby_GapDirectionDetermination")
             self.send("standby_rotation")
-            if self.situation[Situation.BACKWARD_TOO_FAR][0]: # FIXME
+            if self.situation[Situation.BACKWARD_TOO_FAR][0]:
                 if self.situation[Situation.COME_CLOSER_SENT] == False:
                     self.send("do_send_come_closer")
                 if self.situation[Situation.BACKWARD_TOO_FAR][1] == 2:
-                    self.send("do_forced_waiting")
+                    self.send("do_ForcedWaiting")
                     self.send("standby_move")
-                if self.situation[Situation.BACKWARD_TOO_FAR][1] == 1:
-                    self.send("standby_force_waiting")
-                    self.send("do_move")
-            if LeaderCorridor.Active.Sub_ForcedWaiting.ForcedWaiting in self.configuration:
-                if self.situation[Situation.BACKWARD_TOO_FAR][0] == False:
-                    self.send("standby_force_waiting")
-                    self.send("do_move")
             if self.situation[Situation.CENTERED_IN_CORRIDOR]:
                 self.send("standby_CenterInCorridor")
+        elif LeaderCorridor.Active.Sub_ForcedWaiting.ForcedWaiting in self.configuration:
+            if self.situation[Situation.BACKWARD_TOO_FAR][0] == False:
+                self.send("do_move")
+                self.send("standby_ForcedWaiting")
+            if self.situation[Situation.BACKWARD_TOO_FAR][1] == 1:
+                self.send("do_move")
+                self.send("standby_ForcedWaiting")
