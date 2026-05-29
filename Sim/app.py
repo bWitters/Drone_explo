@@ -13,6 +13,13 @@ from gym_pybullet_drones.utils.utils import sync, str2bool
 from agents import Drones
 import yaml
 
+
+import cflib.crtp
+from cflib.crazyflie import Crazyflie
+from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
+from cflib.positioning.motion_commander import MotionCommander
+from cflib.utils.multiranger import Multiranger
+
 with open("Map/Multiple_corner/Multiple_corner.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
@@ -27,7 +34,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 500
 DEFAULT_CONTROL_FREQ_HZ = 25
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 3
+NUM_DRONES = 6
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 INIT_XYZ = np.array([[.0, 0 -.4*i, 0] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
@@ -37,6 +44,9 @@ RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
 print(INIT_XYZ)
+URIS = [
+    
+]
 
 def run(
         drone=DEFAULT_DRONES,
@@ -49,6 +59,15 @@ def run(
         num_drones=NUM_DRONES,
         output_folder=DEFAULT_OUTPUT_FOLDER,
         ):
+    
+    # Vérifie qu'il y a assez d'URIS associé aux drones simulé
+    if len(URIS) != NUM_DRONES and len(URIS) >= 1:
+        print("Entrer plus d'URIS pour démarrer")
+        return
+    else:
+        for i in range(NUM_DRONES):
+            URIS.append(None)
+
     #### Create the environment with or without video capture ##
     env = VelocityAviary(drone_model=drone,
                         num_drones=num_drones,
@@ -114,14 +133,14 @@ def run(
                 
                 
                 if drone_i == 0:
-                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA))
+                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,URIS[0]))
                     nom_fichier = f"Sim/logs/drone_velocity_1_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
                 else:
-                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA))
+                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,URIS[unique_id-1]))
                     nom_fichier = f"Sim/logs/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
@@ -133,7 +152,7 @@ def run(
                 
             
             for i in range(unique_id-1):
-                if NUM_DRONES>0:
+                if NUM_DRONES>1:
                     if i == 0:
                         drones[i].neighboring_agent_list["F"] = drones[i+1]
                     elif i == unique_id-2:
@@ -147,7 +166,7 @@ def run(
 
         p.removeAllUserDebugItems()
 
-        
+
         #### Exécuter le contrôle pour chaque drone (gérées par State Machines) ####
         for j in range(num_drones):
             try:

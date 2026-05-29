@@ -6,8 +6,9 @@ import csv
 class Drones():
     """The base class for the drones"""
 
-    def __init__(self,unique_id,drones,env_id_drones,stocking_area):
+    def __init__(self,unique_id,drones,env_id_drones,stocking_area,uri=None):
         self.front = "N"
+        #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
         self.unique_id = unique_id
@@ -26,7 +27,13 @@ class Drones():
         self.commands_logs.writerow(["vx","vy","vz","speed_frac","v_yaw"])
         self.file.flush()
 
-       
+        # from Controleur import Controleur
+
+        # print(self.uri)
+        # if self.uri != None:
+        #     self.controleur = Controleur(uri,self)
+        
+
         from state_machine import DroneStateMachine
         from analysis import Analyzer
         from situation import SituationState
@@ -257,6 +264,8 @@ class Drones():
         self.commands_logs_rt.writerow(self.move_drone)
         self.file_rt.flush()
 
+        #self.controleur.run()
+
 
     def initialize_agent(self):
         self.stock_behavior.send("activate")
@@ -270,6 +279,3 @@ class Drones():
 
     def __del__(self):  # Appelé à la suppression de l'objet (mais pas fiable à 100%)
         self.close()
-
-if __name__ == "__main__":
-    print("Lancement Statemachine seule")

@@ -171,10 +171,10 @@ class SituationState():
     def is_backward_too_far(self,neighbors_distance):
         if neighbors_distance["F"] != None:
             print(f"Distance with follower : {self.dist(neighbors_distance["F"])}")
-            if self.dist(neighbors_distance["F"]) > 4.7:
+            if self.dist(neighbors_distance["F"]) > 1.7:
                 print("Too long distance")
                 return (True, 2)
-            elif self.dist(neighbors_distance["F"]) > 4:
+            elif self.dist(neighbors_distance["F"]) > 1:
                 print("Long distance ok to continue")
                 return (True, 1)
             else:

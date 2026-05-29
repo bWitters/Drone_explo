@@ -15,14 +15,15 @@ class ChangeRole(Action):
     
     @property
     def role(self):
-        return self.agent.role.current_state.id
+        return self.agent.role.configuration_values
+    
     @property
     def state(self):
         return self.agent.state.configuration_values
     
     def new_role(self):
         if "Stock" in self.state:
-            if self.role == "stock":
+            if "stock" in self.role:
                 if self.agent.unique_id == 1:
                     return "leader"
                 else:

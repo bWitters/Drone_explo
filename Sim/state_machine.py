@@ -44,7 +44,8 @@ class DroneStateMachine(StateChart):
     
     @property
     def role(self):
-        return self.agent.role.current_state.id
+        return self.agent.role.configuration_values
+            
 
     def on_enter_state(self, state):
         # if state in DroneStateMachine.states:
@@ -52,11 +53,11 @@ class DroneStateMachine(StateChart):
 
 
     def update_behavior(self, situation):
-        if self.role == "stock":
+        if "stock" in self.role:
             if self.configuration == {DroneStateMachine.Stock}:
                 pass
 
-        elif self.role == "leader":
+        elif "leader" in self.role:
             if self.configuration == {DroneStateMachine.Stock}:
                 if situation[Situation.STOCK_HEIGHT]:
                     self.exploration()
@@ -76,7 +77,7 @@ class DroneStateMachine(StateChart):
                 if situation[Situation.CORRIDOR]:
                     self.exploration()
 
-        elif self.role == "follower":
+        elif "follower" in self.role:
             if self.configuration == {DroneStateMachine.Stock}:
                 if situation[Situation.STOCK_HEIGHT]:
                     self.follow()
