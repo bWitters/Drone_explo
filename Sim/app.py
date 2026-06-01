@@ -49,6 +49,7 @@ URIS = [
 ]
 
 def run(
+        queue = None,
         drone=DEFAULT_DRONES,
         physics=DEFAULT_PHYSICS,
         gui=DEFAULT_GUI,
@@ -224,14 +225,21 @@ def run(
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
                 if v_norm < 1e-3:
                     # No translation; keep yaw rate
-                    action[j, :] = [0.0, 0.0, 0.0, 0.0, float(wz)]
+                    commande = [0.0, 0.0, 0.0, 0.0, float(wz), True]
+                    queue.put(commande)
+                    action[j, :] = commande
                 else:
                     # Unit direction + speed fraction w.r.t. speed_limit
                     dir_x = vx_w / v_norm
                     dir_y = vy_w / v_norm
                     dir_z = vz_w / v_norm
                     speed_frac = min(1.0, v_norm / max(1e-3, 1.0))
-                    action[j, :] = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
+                    commande = [dir_x, dir_y, dir_z, float(speed_frac), float(wz), True]
+                    action[j, :] = commande
+                    if queue != None:
+                        queue.put(commande)
+                
+                
                 
                 for key in env_id_drones.keys():
                     if env_id_drones[key]["drone_id"] == j:
