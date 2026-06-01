@@ -31,12 +31,12 @@ DEFAULT_PHYSICS = Physics("pyb")
 DEFAULT_GUI = True
 DEFAULT_PLOT = True
 DEFAULT_USER_DEBUG_GUI = True
-DEFAULT_SIMULATION_FREQ_HZ = 500
-DEFAULT_CONTROL_FREQ_HZ = 25
+DEFAULT_SIMULATION_FREQ_HZ = 60
+DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
 NUM_DRONES = 6
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-INIT_XYZ = np.array([[.0, 0 -.4*i, 0] for i in range(NUM_DRONES)])
+INIT_XYZ = np.array([[.0, 0 -.4*i, 0.3] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
 INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
 RAY_LENGTH = 10
@@ -134,14 +134,14 @@ def run(
                 
                 if drone_i == 0:
                     drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,URIS[0]))
-                    nom_fichier = f"Sim/logs/drone_velocity_1_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
+                    nom_fichier = f"Sim/logs/drone_velocity_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
                 else:
                     drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,URIS[unique_id-1]))
-                    nom_fichier = f"Sim/logs/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
+                    nom_fichier = f"Sim/logs/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
@@ -222,7 +222,7 @@ def run(
                 drones[j].step(mins_ray)
                 vx_w, vy_w, vz_w, speed_frac, wz = drones[j].move_drone
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
-                if v_norm < 1e-6:
+                if v_norm < 1e-3:
                     # No translation; keep yaw rate
                     action[j, :] = [0.0, 0.0, 0.0, 0.0, float(wz)]
                 else:
@@ -230,7 +230,7 @@ def run(
                     dir_x = vx_w / v_norm
                     dir_y = vy_w / v_norm
                     dir_z = vz_w / v_norm
-                    speed_frac = min(1.0, v_norm / max(1e-6, 1.0))
+                    speed_frac = min(1.0, v_norm / max(1e-3, 1.0))
                     action[j, :] = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
                 
                 for key in env_id_drones.keys():

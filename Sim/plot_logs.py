@@ -82,18 +82,18 @@ def plot_drones_comparison(drones, real_alpha=0.7):
 if __name__ == "__main__":
     drones = [
         (
-            "Sim/logs/drone_1_2026-05-16-44-38.csv",
-            "Sim/logs/drone_velocity_1_2026-05-16-44-38.csv",
+            "Sim/logs/drone_1_2026-06-01-11-33-04.csv",
+            "Sim/logs/drone_velocity_1_2026-06-01-11-33-05.csv",
             "Drone 1"
         ),
         (
-            "Sim/logs/drone_2_2026-05-16-44-38.csv",
-            "Sim/logs/drone_velocity_2_2026-05-16-44-38.csv",
+            "Sim/logs/drone_2_2026-06-01-11-33-05.csv",
+            "Sim/logs/drone_velocity_2_2026-06-01-11-33-05.csv",
             "Drone 2"
         ),
         (
-            "Sim/logs/drone_3_2026-05-16-44-38.csv",
-            "Sim/logs/drone_velocity_3_2026-05-16-44-38.csv",
+            "Sim/logs/drone_3_2026-06-01-11-33-05.csv",
+            "Sim/logs/drone_velocity_3_2026-06-01-11-33-05.csv",
             "Drone 3"
         )
     ]

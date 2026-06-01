@@ -46,7 +46,7 @@ class SituationState():
         return self.position[2] > 0.95
     
     def is_stock_height(self):
-            return self.position[2] < 0.1
+            return self.position[2] < 0.45
 
     def is_in_stock(self):
         ok = 0
