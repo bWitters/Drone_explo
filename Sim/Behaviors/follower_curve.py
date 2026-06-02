@@ -41,5 +41,6 @@ class FollowerCurve(Behavior):
             self.send("standby_send_come_closer")
             self.send("standby_ComeCloserDirectionToGo")
             if self.situation[Situation.BACKWARD_TOO_CLOSE] or self.agent.neighboring_agent_list["F"] == None:
+                self.send("standby_CenterInCurve")
                 self.send("do_rotation")
         

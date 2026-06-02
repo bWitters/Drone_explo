@@ -184,8 +184,10 @@ class SituationState():
                 print("Long distance ok to continue")
                 return (True, 1)
             else:
+                print("Not too far")
                 return (False, 0)
         else:
+            print("Don't have follower")
             return (False, 0)
     
     @property
