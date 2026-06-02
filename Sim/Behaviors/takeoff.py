@@ -16,7 +16,7 @@ class Takeoff(Behavior):
     
     @property
     def role(self):
-        return self.agent.role.current_state.id 
+        return self.agent.role.configuration_values
 
     def update_action(self):
         if Takeoff.Active.Sub_Stop.Stop in self.configuration:

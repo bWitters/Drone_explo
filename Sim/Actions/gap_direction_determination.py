@@ -8,8 +8,8 @@ class GapDirectionDetermination(Action):
         super().__init__(self.name)
 
     @property
-    def role(self) -> str:
-        return self.agent.role.current_state.id
+    def role(self):
+        return self.agent.role.configuration_values
     @property
     def situation(self) -> Situation:
         return self.agent.situation.situation
@@ -33,12 +33,12 @@ class GapDirectionDetermination(Action):
         new_cell = None
         #print(self.graph_neighbors)
         #print(self.occupied_neighbors)
-        print("Determining gap to go")
-        print(f"Current front direction : {self.agent.front}")
-        print(f"Occupied gaps : {self.occupied_neighbors}")
+        # print("Determining gap to go")
+        # print(f"Current front direction : {self.agent.front}")
+        # print(f"Occupied gaps : {self.occupied_neighbors}")
         for dir, possible_direction in self.graph_neighbors.items():
-            print(f"Direction : {dir}")
+            # print(f"Direction : {dir}")
             if not self.occupied_neighbors[dir] and possible_direction:
                 new_cell = dir
-        print(f"Direction selected : {new_cell}")
+        # print(f"Direction selected : {new_cell}")
         self.agent.new_cell = new_cell

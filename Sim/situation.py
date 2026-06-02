@@ -1,6 +1,6 @@
 from agents import Drones
 from situation_dict import Situation
-from math import sqrt
+from math import sqrt, pi
 
 class SituationState():
     """Class representing the situation of an agent in the environment."""
@@ -40,7 +40,7 @@ class SituationState():
 
     @property
     def role(self):
-        return self.agent.role.current_state.id
+        return self.agent.role.configuration_values
     
     def is_good_height(self):
         return self.position[2] > 0.95
@@ -83,11 +83,16 @@ class SituationState():
         else:
             return False
         
-    def is_in_curve(self, graph_branch_counter :int, graph_neighborhood : dict) -> bool:
+    def is_in_curve(self, graph_branch_counter :int, graph_neighborhood : dict, occupied_gaps : dict) -> bool:
         #print(f"Number of branch : {graph_branch_counter}" )
         #print(f"Voisinage : {graph_neighborhood}" )
         if graph_branch_counter == 2:
             if graph_neighborhood["L"] or graph_neighborhood["R"]:
+                return True
+            else:
+                return False
+        elif graph_branch_counter == 1:
+            if (graph_neighborhood["L"] or graph_neighborhood["R"]) and occupied_gaps["B"] != False:
                 return True
             else:
                 return False
@@ -126,7 +131,7 @@ class SituationState():
             return True
         else:
             return False
-
+        
     def agent_detection(self, occupied_neighborhood: dict[str, list[int]]) -> tuple[bool, list]:
         DIR = []
         for dir, cells in occupied_neighborhood.items():
@@ -152,7 +157,7 @@ class SituationState():
             while not com_received.empty():
                 last_com = com_received.get()
                 if last_com[0] == "Come Closer":
-                    if self.role == "leader":
+                    if  "leader" in self.role:
                         self.situation[Situation.COME_CLOSER] = (False,last_com[1])
                     else:
                         self.situation[Situation.COME_CLOSER] = (True,last_com[1])
@@ -164,6 +169,7 @@ class SituationState():
             self.situation[Situation.COME_CLOSER] = (False,None)
     
     def is_centered_in_corridor(self):
+        print(f"Centering : {abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall)}")
         if abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall) < 0.1:
             return True
         return False
@@ -182,6 +188,27 @@ class SituationState():
         else:
             return (False, 0)
     
+    @property
+    def yaw_angle(self):
+        return self.agent.rpy[2]
+    
+    def is_rotation_completed(self):
+        match self.agent.front:
+            case "N":
+                angle = pi/2
+            case "S":
+                angle = -pi/2
+            case "E":
+                angle = 0
+            case "W":
+                if self.yaw_angle < 0:
+                    angle = -pi
+                else:
+                    angle = pi
+        print(f"Rotation to complete : {angle - self.yaw_angle}")
+        print(f"Rotation completed : {abs(angle - self.yaw_angle) < 0.1}")
+        return abs(angle - self.yaw_angle) < 0.1
+
     def update_situation(self, gaps_dir,
                          occupied_neighborhood,
                          graph_branch_counter_var,
@@ -195,7 +222,7 @@ class SituationState():
         self.situation[Situation.STOCK] = self.is_in_stock()
         self.situation[Situation.CORRIDOR] = self.is_in_corridor(graph_branch_counter_var, gaps_dir, occupied_neighborhood)
         self.situation[Situation.INTERSECTION] = self.is_in_intersection(graph_branch_counter_var)
-        self.situation[Situation.CURVE] = self.is_in_curve(graph_branch_counter_var, gaps_dir)
+        self.situation[Situation.CURVE] = self.is_in_curve(graph_branch_counter_var, gaps_dir, occupied_neighborhood)
         self.situation[Situation.TOO_CLOSE] = self.is_to_close(neighbors_distance)
         self.situation[Situation.BACKWARD_TOO_CLOSE] = self.backward_is_to_close()
         self.situation[Situation.FRONT_TOO_CLOSE] = self.front_is_to_close()
@@ -203,3 +230,4 @@ class SituationState():
         self.situation[Situation.AGENT_DETECTION] = self.agent_detection(occupied_neighborhood)
         self.situation[Situation.CENTERED_IN_CORRIDOR] = self.is_centered_in_corridor()
         self.situation[Situation.BACKWARD_TOO_FAR] = self.is_backward_too_far(neighbors_distance)
+        self.situation[Situation.ROTATION_COMPLETED] = self.is_rotation_completed()

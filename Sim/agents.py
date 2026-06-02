@@ -8,6 +8,7 @@ class Drones():
 
     def __init__(self,unique_id,drones,env_id_drones,stocking_area,uri=None):
         self.front = "N"
+        self.old_front = None
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
@@ -237,6 +238,7 @@ class Drones():
 
 
     def step(self, rays):
+        print(f"\nDrone {self.unique_id}")
         self.move_drone = [0,0,0,0,0]
         self.rays = rays
         self.sensor_data.neighborhood_analysis()

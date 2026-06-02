@@ -15,7 +15,7 @@ class FollowerCorridor(Behavior):
         return self.agent.situation.situation
     @property
     def role(self):
-        return self.agent.role.current_state.id 
+        return self.agent.role.configuration_values 
 
     def update_action(self):
         if FollowerCorridor.Active.Sub_Stop.Stop in self.configuration:
@@ -29,15 +29,22 @@ class FollowerCorridor(Behavior):
 
         elif FollowerCorridor.Active.Sub_Move.Move in self.configuration:
             self.send("standby_ComeCloserDirectionToGo")
+
             if self.situation[Situation.BACKWARD_TOO_FAR][0]:
                 if self.situation[Situation.COME_CLOSER_SENT] == False:
                     self.send("do_send_come_closer")
                 if self.situation[Situation.BACKWARD_TOO_FAR][1] == 2:
                     self.send("do_ForcedWaiting")
                     self.send("standby_move")
+
             if self.situation[Situation.CENTERED_IN_CORRIDOR]:
                 self.send("standby_CenterInCorridor")
+            
+            if self.situation[Situation.FRONT_TOO_CLOSE]:
+                self.send("do_ForcedWaiting")
         
+            elif not self.situation[Situation.FRONT_TOO_CLOSE]:
+                self.send("standby_ForcedWaiting")        
 
         elif FollowerCorridor.Active.Sub_ForcedWaiting.ForcedWaiting in self.configuration:
             if self.situation[Situation.BACKWARD_TOO_FAR][0] == False:

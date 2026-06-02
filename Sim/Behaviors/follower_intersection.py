@@ -15,7 +15,7 @@ class FollowerIntersection(Behavior):
         return self.agent.situation.situation
     @property
     def role(self):
-        return self.agent.role.current_state.id
+        return self.agent.role.configuration_values
 
     def update_action(self):
         print(f"Follower front direction : {self.agent.front}")

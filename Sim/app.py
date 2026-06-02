@@ -226,8 +226,9 @@ def run(
                 if v_norm < 1e-3:
                     # No translation; keep yaw rate
                     commande = [0.0, 0.0, 0.0, 0.0, float(wz), True]
-                    queue.put(commande)
-                    action[j, :] = commande
+                    if queue != None:
+                        queue.put(commande)
+                    action[j, :] = commande[:5]
                 else:
                     # Unit direction + speed fraction w.r.t. speed_limit
                     dir_x = vx_w / v_norm
@@ -235,7 +236,7 @@ def run(
                     dir_z = vz_w / v_norm
                     speed_frac = min(1.0, v_norm / max(1e-3, 1.0))
                     commande = [dir_x, dir_y, dir_z, float(speed_frac), float(wz), True]
-                    action[j, :] = commande
+                    action[j, :] = commande[:5]
                     if queue != None:
                         queue.put(commande)
                 

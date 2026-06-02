@@ -16,7 +16,7 @@ class LeaderIntersection(Behavior):
         return self.agent.situation.situation
     @property
     def role(self):
-        return self.agent.role.current_state.id
+        return self.agent.role.configuration_values
     
     def update_action(self):
         print(f"Leader front direction : {self.agent.front}")
@@ -24,7 +24,7 @@ class LeaderIntersection(Behavior):
             if LeaderIntersection.Active.Sub_ChangeRole.ChangeRole in self.configuration:
                 self.send("standby_change_role")
             else:
-                if self.role != "leader":
+                if "leader" not in self.role:
                     self.send("do_change_role")
             if LeaderIntersection.Active.Sub_CenterInIntersection.Idle_CenterInIntersection in self.configuration:
                 self.send("do_CenterInIntersection")

@@ -29,7 +29,7 @@ class ChangeRole(Action):
                 else:
                     return "follower"
         elif "LeaderIntersection" in self.state:
-            if self.role == "follower":
+            if "follower" in self.role:
                 return "leader"
 
     def action(self):
