@@ -8,6 +8,7 @@ class LeaderCurve(Behavior):
     def __init__(self, agent):
         self.agent: Drones = agent
         self.new_cell = None
+        self.waiting_rot = False
 
         super().__init__(name = self.name)
     
@@ -35,8 +36,12 @@ class LeaderCurve(Behavior):
             #print("Step 2 send message")
         
         elif LeaderCurve.Active.Sub_Rotation.Rotation in self.configuration:
+            self.send("standby_rotation")
+        
+        elif self.waiting_rot:
             if self.situation[Situation.ROTATION_COMPLETED]:
                 self.send("do_move")
+                self.waiting_rot = False
                 
         elif LeaderCurve.Active.Sub_SendComeCloser.Idle_SendComeCloser in self.configuration:
             #print("Step 3 Wait")
@@ -46,3 +51,4 @@ class LeaderCurve(Behavior):
                 self.send("standby_CenterInCurve")
                 self.send("do_GapDirectionDetermination")
                 self.send("do_rotation")
+                self.waiting_rot = True

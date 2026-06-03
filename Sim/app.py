@@ -13,13 +13,6 @@ from gym_pybullet_drones.utils.utils import sync, str2bool
 from agents import Drones
 import yaml
 
-
-import cflib.crtp
-from cflib.crazyflie import Crazyflie
-from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
-from cflib.positioning.motion_commander import MotionCommander
-from cflib.utils.multiranger import Multiranger
-
 with open("Map/Multiple_corner/Multiple_corner.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
@@ -38,7 +31,7 @@ NUM_DRONES = 5
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 INIT_XYZ = np.array([[.0, 0 -.4*i, 0.3] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
-INIT_RPY = np.array([[.0, .0, .0] for _ in range(NUM_DRONES)])
+INIT_RPY = np.array([[.0, .0, math.pi/2] for _ in range(NUM_DRONES)])
 RAY_LENGTH = 10
 RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
@@ -132,7 +125,7 @@ def run(
                 #### Log files
 
                 
-                
+            for drone_i in range(num_drones):    
                 if drone_i == 0:
                     drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,URIS[0]))
                     nom_fichier = f"Sim/logs/drone_velocity_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"

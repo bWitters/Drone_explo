@@ -37,9 +37,6 @@ class FollowerCorridor(Behavior):
                 if self.situation[Situation.BACKWARD_TOO_FAR][1] == 2:
                     self.send("do_ForcedWaiting")
                     self.send("standby_move")
-
-            if self.situation[Situation.CENTERED_IN_CORRIDOR]:
-                self.send("standby_CenterInCorridor")
             
             if self.situation[Situation.FRONT_TOO_CLOSE]:
                 self.send("do_ForcedWaiting")

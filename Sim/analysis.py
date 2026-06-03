@@ -98,7 +98,7 @@ class Analyzer:
         gaps_dir = {"N": False, "E":False, "S":False, "W":False}
         
         for i in range(len(self.rays)):
-            if self.rays[i] > 0.70:
+            if self.rays[i] > 0.7:
                 match i:
                     case 0:
                         gaps_dir["N"] = True

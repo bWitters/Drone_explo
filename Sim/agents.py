@@ -8,7 +8,6 @@ class Drones():
 
     def __init__(self,unique_id,drones,env_id_drones,stocking_area,uri=None):
         self.front = "N"
-        self.old_front = None
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
