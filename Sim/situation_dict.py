@@ -24,3 +24,4 @@ class Situation(Enum):
     CENTERED_IN_CORRIDOR = auto()
     COME_CLOSER_SENT = auto()
     BACKWARD_TOO_FAR = auto()
+    ROTATION_COMPLETED = auto()

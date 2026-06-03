@@ -10,7 +10,7 @@ class HeightControl(Action):
     def height(self):
         return self.agent.position[2]
 
-    def action(self):
+    def action(self): #FIXME
         self.agent.move_drone[2] += 1 - self.height
         if 1- self.height < 0.01:
             self.agent.move_drone[2] = 0

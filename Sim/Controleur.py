@@ -19,36 +19,28 @@ from cflib.crazyflie.syncCrazyflie import SyncCrazyflie
 from cflib.positioning.motion_commander import MotionCommander
 from cflib.utils.multiranger import Multiranger
 
-class Controleur:
-    def __init__(self,uri, agent):
-        self.URI = uri
-        self.agent = agent
-        cflib.crtp.init_drivers(enable_debug_driver=False)
-        self.cf = Crazyflie(rw_cache='./cache')
-        print(self.URI)
-        self.scf = SyncCrazyflie(self.URI, cf=self.cf)
-        self.motion_commander = MotionCommander(self.scf)
-        self.multi_ranger = Multiranger(self.scf)
-        self.scf.cf.platform.send_arming_request(True)
-        
+def run(queue):
+    keep_flying = True
+    URI = ""
+    # Initialize the low-level drivers (don't list the debug drivers)
+    cflib.crtp.init_drivers(enable_debug_driver=False)
 
-        while self.scf.cf.is_connected() != True:
-            print("waiting connection")
-    
-    @property
-    def velocity_x(self):
-        self.agent.move_drone[0]
-    
-    @property
-    def velocity_y(self):
-        self.agent.move_drone[1]
+    cf = Crazyflie(rw_cache='./cache')
+    with SyncCrazyflie(URI, cf=cf) as scf:
+        # Arm the Crazyflie
+        scf.cf.platform.send_arming_request(True)
+        time.sleep(1.0)
 
-    @property
-    def velocity_z(self):
-        self.agent.move_drone[2]
+        with MotionCommander as motion_commander:
+            with Multiranger(scf) as multi_ranger:
 
-    def run(self):
-        self.motion_commander.start_linear_motion(
-            self.velocity_x, self.velocity_y, self.velocity_z)
+                while keep_flying:
+                    if not queue.empty():
+                        commandes = queue.get()
+                        print("Consommateur : Liste reçue :", commandes)
+                        keep_flying = queue[5]
+                        motion_commander.start_linear_motion(
+                            queue[0], queue[1], queue[2])
+            
 
-        time.sleep(0.1)
+            print('Demo terminated!')

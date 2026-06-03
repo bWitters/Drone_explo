@@ -8,6 +8,7 @@ class Drones():
 
     def __init__(self,unique_id,drones,env_id_drones,stocking_area,uri=None):
         self.front = "N"
+        self.old_front = None
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
@@ -16,7 +17,7 @@ class Drones():
         self.position = [0,0,0]
         self.rpy = [0,0,0]
 
-        nom_fichier = f"Sim/logs/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%H-%M-%S')}.csv"
+        nom_fichier = f"Sim/logs/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
         nom_fichier_rt = f"Sim/real_time_logs/drone_{unique_id}.csv"
         self.file_rt = open(nom_fichier_rt,"w")
         self.commands_logs_rt = csv.writer(self.file_rt)
@@ -237,6 +238,7 @@ class Drones():
 
 
     def step(self, rays):
+        print(f"\nDrone {self.unique_id}")
         self.move_drone = [0,0,0,0,0]
         self.rays = rays
         self.sensor_data.neighborhood_analysis()

@@ -17,7 +17,7 @@ class Stock(Behavior):
     
     @property
     def role(self):
-        return self.agent.role.current_state.id
+        return self.agent.role.configuration_values
     
     @property
     def new_role(self):
@@ -25,7 +25,7 @@ class Stock(Behavior):
     
     def update_action(self):
         if Stock.Active.Sub_Stop.Stop in self.configuration:
-            if self.role == "stock":
+            if "stock" in self.role:
                 if self.agent.unique_id == 1:
                     self.send("standby_stop")
                     self.send("do_change_role")

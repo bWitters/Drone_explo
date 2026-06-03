@@ -98,7 +98,7 @@ class Analyzer:
         gaps_dir = {"N": False, "E":False, "S":False, "W":False}
         
         for i in range(len(self.rays)):
-            if self.rays[i] > 0.70: # Trouver la valeur pour laquelle dans un virage ça fait tout le temps 2 mais la direction change
+            if self.rays[i] > 0.70:
                 match i:
                     case 0:
                         gaps_dir["N"] = True
@@ -110,13 +110,13 @@ class Analyzer:
                         gaps_dir["W"] = True
         return gaps_dir
     
-    def gaps_type(self):
+    def gaps_type(self): #FIXME for the curve corridor transition
         unoccupied_gaps = {"F": False, "R":False, "B":False, "L":False}
         occupied_gaps = {"F": False, "R":False, "B":False, "L":False}
         maybe_corner = False
         print(f"Neighborhood of {self.agent.unique_id} : {self.neighborhood}")
         for key in self.neighborhood.keys():
-            if self.neighborhood[key][0] > 1: # Trouver la valeur pour laquelle dans un virage ça fait tout le temps 2 mais la direction change
+            if self.neighborhood[key][0] > 1:
                 match key:
                     case "F":
                         unoccupied_gaps["F"] = True
@@ -196,7 +196,7 @@ class Analyzer:
         gaps_drone_dir["L"] = gaps_dir[(i+3)%4]
         return gaps_drone_dir
 
-    def wolrd_to_drone_dict(self, gaps_dir):
+    def wolrd_to_drone_dict(self, gaps_dir): #FIXME for the curve corridor transition
         gaps_drone_dir = {"B":None, "R":None, "F":None, "L":None}
         dir = ["N","W","S","E"]
         if self.agent.front == "N":
@@ -247,6 +247,7 @@ class Analyzer:
     def neighborhood_analysis(self):
         self.gaps_dir_world = self.get_gap_direction()
         self.gaps_dir = self.wolrd_to_drone_dict(self.gaps_dir_world)
+        print(f"Gaps directions : {self.gaps_dir}")
         
         self.occupied_neighborhood, self.unoccupied_neighborhood,self.maybe_corner = self.gaps_type()
         

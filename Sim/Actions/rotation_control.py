@@ -11,8 +11,8 @@ class RotationControl(Action):
     def yaw_angle(self):
         return self.agent.rpy[2]
 
-    def action(self):
-        print(f"Current yaw angale : {self.yaw_angle}")
+    def action(self): #FIXME
+        print(f"Current yaw angle : {self.yaw_angle}")
         match self.agent.front:
             case "N":
                 angle = pi/2
