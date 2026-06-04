@@ -59,6 +59,7 @@ class SituationState():
             return False
         
     def is_in_intersection(self, graph_branch_counter: int) -> bool:
+        print(f"Number of branch : {graph_branch_counter}")
         if graph_branch_counter > 2:
             if self.entrance:
                 self.intersection_entrance = [self.agent.position[0], self.agent.position[1]]

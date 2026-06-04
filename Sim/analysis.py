@@ -136,9 +136,10 @@ class Analyzer:
                         occupied_gaps["B"] = self.neighborhood[key][1]
                     case "L":
                         occupied_gaps["L"] = self.neighborhood[key][1]
-            if self.neighborhood[key][0] > 0.5 and self.neighborhood[key][0] < 1:
+            if self.neighborhood[key][0] > 0.5 and self.neighborhood[key][0] < 1 and key != "B":
                 maybe_corner = True
         print(f"Occupied gaps of {self.agent.unique_id} : {occupied_gaps}")
+        print(f"Is it maybe a corner : {maybe_corner}")
         return occupied_gaps,unoccupied_gaps,maybe_corner
 
     def get_neighbors_distance(self):

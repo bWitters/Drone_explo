@@ -86,7 +86,7 @@ class DroneStateMachine(StateChart):
                     if situation[Situation.COME_CLOSER][0]:
                         self.follow()
             elif self.configuration == {DroneStateMachine.FollowerCorridor}:# FIXME : Going into corridor state while being in curve, but there is a drone at the entrance and the exit
-                #print("StateMachine : In Corridor mode")
+                print("StateMachine : In Corridor mode")
                 if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
                     self.follow()
                 elif situation[Situation.CURVE]:

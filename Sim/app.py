@@ -13,7 +13,7 @@ from gym_pybullet_drones.utils.utils import sync, str2bool
 from agents import Drones
 import yaml
 
-with open("Map/Multiple_corner/Multiple_corner.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
+with open("Map/Intersection/Intersection.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -27,7 +27,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 5
+NUM_DRONES = 3
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 INIT_XYZ = np.array([[.0, 0 -.4*i, 0.3] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
@@ -77,12 +77,14 @@ def run(
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
 
-    p.loadURDF("Map/Multiple_corner/Multiple_corner.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("Map/Intersection/Intersection.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     ### Log files 
 
     files = []
     log_writers = []
+    files_pos = []
+    log_pos = []
 
     #### ID drones ####
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
@@ -133,6 +135,11 @@ def run(
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
+                    nom_fichier = f"Sim/logs/drone_position_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_pos.append(open(nom_fichier,"w"))
+                    log_pos.append(csv.writer(files_pos[-1]))
+                    log_pos[-1].writerow(["x","y","z","yaw"])
+                    files_pos[-1].flush()
                 else:
                     drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,URIS[unique_id-1]))
                     nom_fichier = f"Sim/logs/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
@@ -140,6 +147,11 @@ def run(
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
+                    nom_fichier = f"Sim/logs/drone_position_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_pos.append(open(nom_fichier,"w"))
+                    log_pos.append(csv.writer(files_pos[-1]))
+                    log_pos[-1].writerow(["x","y","z","yaw"])
+                    files_pos[-1].flush()
                     unique_id +=1
 
                 
@@ -242,6 +254,10 @@ def run(
                         action_to_log = [base_velocity[0][0],base_velocity[0][1],base_velocity[0][2],base_velocity[1][2]]
                         log_writers[j].writerow(action_to_log)
                         files[j].flush()
+                        base_position = p.getBasePositionAndOrientation(key, physicsClientId=PYB_CLIENT)
+                        action_to_log = [base_position[0][0],base_position[0][1],base_position[0][2],p.getEulerFromQuaternion(base_position[1])[2]]
+                        log_pos[j].writerow(action_to_log)
+                        files_pos[j].flush()
                 
             except Exception as e:
                 print(f"Erreur drone n°{j}: {e}")
