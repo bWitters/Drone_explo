@@ -1,5 +1,6 @@
 # Files
 cache/
+positions/
 logs/
 real_time_logs/
 .vscode/
