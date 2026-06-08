@@ -6,6 +6,8 @@ import pybullet as p
 from datetime import datetime
 import csv
 
+import os
+
 from gym_pybullet_drones.utils.enums import DroneModel, Physics
 from VelocityAviary import VelocityAviary
 from gym_pybullet_drones.utils.utils import sync, str2bool
@@ -85,6 +87,8 @@ def run(
     log_writers = []
     files_pos = []
     log_pos = []
+    files_behavior = []
+    log_behavior = []
 
     #### ID drones ####
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
@@ -124,34 +128,54 @@ def run(
                             truth+=1
                     if truth == 3:
                         env_id_drones[key]["drone_id"] = drone_i
-                #### Log files
-
                 
+            #### Log files
+            directory_name = f"Sim_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+            try:
+                os.mkdir(directory_name)
+                print(f"Directory '{directory_name}' created successfully.")
+            except FileExistsError:
+                print(f"Directory '{directory_name}' already exists.")
+            except PermissionError:
+                print(f"Permission denied: Unable to create '{directory_name}'.")
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
             for drone_i in range(num_drones):    
                 if drone_i == 0:
-                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,URIS[0]))
-                    nom_fichier = f"Sim/logs/drone_velocity_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,directory_name,URIS[0]))
+                    nom_fichier = f"{directory_name}/drone_velocity_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
-                    nom_fichier = f"Sim/logs/drone_position_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    nom_fichier = f"{directory_name}/drone_position_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files_pos.append(open(nom_fichier,"w"))
                     log_pos.append(csv.writer(files_pos[-1]))
                     log_pos[-1].writerow(["x","y","z","yaw"])
                     files_pos[-1].flush()
+                    nom_fichier = f"{directory_name}/drone_behavior_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_behavior.append(open(nom_fichier,"w"))
+                    log_behavior.append(csv.writer(files_behavior[-1]))
+                    log_behavior[-1].writerow(["Behavior"])
+                    files_behavior[-1].flush()
                 else:
-                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,URIS[unique_id-1]))
-                    nom_fichier = f"Sim/logs/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,URIS[unique_id-1]))
+                    nom_fichier = f"{directory_name}/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
-                    nom_fichier = f"Sim/logs/drone_position_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    nom_fichier = f"{directory_name}/drone_position_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files_pos.append(open(nom_fichier,"w"))
                     log_pos.append(csv.writer(files_pos[-1]))
                     log_pos[-1].writerow(["x","y","z","yaw"])
                     files_pos[-1].flush()
+                    nom_fichier = f"{directory_name}/drone_behavior_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_behavior.append(open(nom_fichier,"w"))
+                    log_behavior.append(csv.writer(files_behavior[-1]))
+                    log_behavior[-1].writerow(["Behavior"])
+                    files_behavior[-1].flush()
                     unique_id +=1
 
                 
@@ -245,6 +269,10 @@ def run(
                     if queue != None:
                         queue.put(commande)
                 
+
+                behavior = drones[j].active_sm_behavior.name
+                log_behavior[j].writerow([behavior])
+                files_behavior[j].flush()
                 
                 
                 for key in env_id_drones.keys():

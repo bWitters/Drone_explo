@@ -6,7 +6,7 @@ import csv
 class Drones():
     """The base class for the drones"""
 
-    def __init__(self,unique_id,drones,env_id_drones,stocking_area,uri=None):
+    def __init__(self,unique_id,drones,env_id_drones,stocking_area,log_directory,uri=None):
         self.front = "N"
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
@@ -15,8 +15,9 @@ class Drones():
         self.move_drone = [0,0,0,0,0]
         self.position = [0,0,0]
         self.rpy = [0,0,0]
+        self.log_directory = log_directory
 
-        nom_fichier = f"Sim/logs/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        nom_fichier = f"{self.log_directory}/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
         nom_fichier_rt = f"Sim/real_time_logs/drone_{unique_id}.csv"
         self.file_rt = open(nom_fichier_rt,"w")
         self.commands_logs_rt = csv.writer(self.file_rt)
