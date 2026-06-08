@@ -43,10 +43,10 @@ class SituationState():
         return self.agent.role.configuration_values
     
     def is_good_height(self):
-        return self.position[2] > 0.95
+        return self.position[2] > 0.45
     
     def is_stock_height(self):
-            return self.position[2] < 0.45
+            return self.position[2] < 0.30
 
     def is_in_stock(self):
         ok = 0
@@ -69,18 +69,16 @@ class SituationState():
             return False
     
     def is_in_corridor(self, graph_branch_counter: int, graph_neighborhood : dict, occupied_gaps : dict) -> bool:
-        if graph_branch_counter == 2:
+        if graph_branch_counter == 2 or graph_branch_counter == 1:
             if graph_neighborhood["B"] and graph_neighborhood["F"]:
                 self.entrance = True
                 return True
-            else:
-                return False
-        elif graph_branch_counter == 1:
-            if occupied_gaps["B"] != False and graph_neighborhood["F"]:
+            elif occupied_gaps["B"] != False and graph_neighborhood["F"]:
                 self.entrance = True
                 return True
-            else:
-                return False
+            elif occupied_gaps["F"] != False and graph_neighborhood["B"]:
+                self.entrance = True
+                return True
         else:
             return False
         
@@ -114,7 +112,7 @@ class SituationState():
         DIR = []
         for dir, distances in neighborhood_distances.items():
             if distances != None:
-                if self.dist(distances) < 0.6:
+                if self.dist(distances) < 0.4:
                     DIR.append(dir)
         if DIR:
             return (True, DIR)
@@ -178,10 +176,10 @@ class SituationState():
     def is_backward_too_far(self,neighbors_distance):
         if neighbors_distance["F"] != None:
             print(f"Distance with follower : {self.dist(neighbors_distance["F"])}")
-            if self.dist(neighbors_distance["F"]) > 1.7:
+            if self.dist(neighbors_distance["F"]) > 1.2:
                 print("Too long distance")
                 return (True, 2)
-            elif self.dist(neighbors_distance["F"]) > 1:
+            elif self.dist(neighbors_distance["F"]) > 0.8:
                 print("Long distance ok to continue")
                 return (True, 1)
             else:

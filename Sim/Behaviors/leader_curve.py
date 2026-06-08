@@ -32,8 +32,15 @@ class LeaderCurve(Behavior):
             #print("Step 5 going to next environnement")
 
         elif LeaderCurve.Active.Sub_SendComeCloser.SendComeCloser in self.configuration:
-            self.send("standby_send_come_closer")
-            #print("Step 2 send message")
+            if self.situation[Situation.BACKWARD_TOO_CLOSE]:
+                #print("Step 4 move")
+                self.send("standby_send_come_closer")
+                self.send("standby_stop")
+                self.send("standby_CenterInCurve")
+                self.send("do_GapDirectionDetermination")
+                self.send("do_rotation")
+                self.waiting_rot = True
+                #print("Step 2 send message")
         
         elif LeaderCurve.Active.Sub_Rotation.Rotation in self.configuration:
             self.send("standby_rotation")
@@ -42,13 +49,4 @@ class LeaderCurve(Behavior):
             if self.situation[Situation.ROTATION_COMPLETED]:
                 self.send("do_move")
                 self.waiting_rot = False
-                
-        elif LeaderCurve.Active.Sub_SendComeCloser.Idle_SendComeCloser in self.configuration:
-            #print("Step 3 Wait")
-            if self.situation[Situation.BACKWARD_TOO_CLOSE]:
-                #print("Step 4 move")
-                self.send("standby_stop")
-                self.send("standby_CenterInCurve")
-                self.send("do_GapDirectionDetermination")
-                self.send("do_rotation")
-                self.waiting_rot = True
+            

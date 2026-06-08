@@ -16,12 +16,12 @@ class Move(Action):
         #print(self.front)
         #print(self.agent.move_drone)
         if self.front == "E":
-            self.agent.move_drone[0] = 0.5
+            self.agent.move_drone[0] = 0.2
         elif self.front == "N":
-            self.agent.move_drone[1] = 0.5
+            self.agent.move_drone[1] = 0.2
         elif self.front == "W":
-            self.agent.move_drone[0] = -0.5
+            self.agent.move_drone[0] = -0.2
         elif self.front == "S":
-            self.agent.move_drone[1] = -0.5
+            self.agent.move_drone[1] = -0.2
 
 
