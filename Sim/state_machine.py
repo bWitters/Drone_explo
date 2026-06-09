@@ -8,6 +8,7 @@ class DroneStateMachine(StateChart):
     LeaderCorridor = State("LeaderCorridor")
     LeaderCurve = State("LeaderCurve")
     LeaderIntersection = State("LeaderIntersection")
+    LeaderDeadEnd = State("LeaderDeadEnd", final=True)
     FollowerCorridor = State("FollowerCorridor")
     FollowerCurve = State("FollowerCurve")
     FollowerIntersection = State("FollowerIntersection")
@@ -41,6 +42,8 @@ class DroneStateMachine(StateChart):
     
     forced_wait = (FollowerCorridor.to(ForcedWait))
 
+    end_exploration = (LeaderCorridor.to(LeaderDeadEnd))
+
     
     @property
     def role(self):
@@ -70,6 +73,8 @@ class DroneStateMachine(StateChart):
                     self.reach_intersection()
                 elif situation[Situation.CURVE]:
                     self.exploration()
+                elif situation[Situation.DEAD_END]:
+                    self.end_exploration()
             elif self.configuration == {DroneStateMachine.LeaderCurve}:
                 if situation[Situation.CORRIDOR]:
                     self.exploration()

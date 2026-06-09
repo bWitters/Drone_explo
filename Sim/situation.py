@@ -31,7 +31,8 @@ class SituationState():
             Situation.GOOD_HEIGHT : False,
             Situation.CENTERED_IN_CORRIDOR : False,
             Situation.COME_CLOSER_SENT : False,
-            Situation.BACKWARD_TOO_FAR : False
+            Situation.BACKWARD_TOO_FAR : False,
+            Situation.DEAD_END : False,
             }
 
     @property
@@ -98,9 +99,9 @@ class SituationState():
         else:
             return False
     
-    def is_in_dead_end(self, graph_branch_counter: int) -> bool:
+    def is_in_dead_end(self, graph_neighborhood : dict) -> bool:
         if not self.is_in_stock():
-            if graph_branch_counter == 1:
+            if not graph_neighborhood["F"] and not graph_neighborhood["L"] and not graph_neighborhood["R"]:
                 return True
             else:
                 return False
@@ -232,3 +233,4 @@ class SituationState():
         self.situation[Situation.CENTERED_IN_CORRIDOR] = self.is_centered_in_corridor()
         self.situation[Situation.BACKWARD_TOO_FAR] = self.is_backward_too_far(neighbors_distance)
         self.situation[Situation.ROTATION_COMPLETED] = self.is_rotation_completed()
+        self.situation[Situation.DEAD_END] = self.is_in_dead_end(gaps_dir)

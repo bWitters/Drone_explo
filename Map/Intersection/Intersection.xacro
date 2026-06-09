@@ -641,4 +641,48 @@
     height="${H}"
     thk="${thk}"
     rgba="${color}"/>
+  
+  <xacro:corridor
+    name="11"
+    x="0.5"
+    y="-0.5"
+    yaw="${0}"
+    length="${L}"
+    width="${W}"
+    height="${H}"
+    thk="${thk}"
+    rgba="${color}"/>
+  
+  <xacro:corridor
+    name="12"
+    x="0.5"
+    y="-1"
+    yaw="${0}"
+    length="${L}"
+    width="${W}"
+    height="${H}"
+    thk="${thk}"
+    rgba="${color}"/>
+  
+  <xacro:corridor
+    name="13"
+    x="0.5"
+    y="-1.5"
+    yaw="${0}"
+    length="${L}"
+    width="${W}"
+    height="${H}"
+    thk="${thk}"
+    rgba="${color}"/>
+  
+  <xacro:corridor
+    name="14"
+    x="0.5"
+    y="-2"
+    yaw="${0}"
+    length="${L}"
+    width="${W}"
+    height="${H}"
+    thk="${thk}"
+    rgba="${color}"/>
 </robot>

@@ -53,12 +53,14 @@ class Drones():
         from Behaviors.follower_intersection import FollowerIntersection
         from Behaviors.leader_curve import LeaderCurve
         from Behaviors.follower_curve import FollowerCurve
+        from Behaviors.leader_dead_end import LeaderDeadEnd
 
         self.stock_behavior = Stock(agent = self)
         self.takeoff_behavior = Takeoff(agent = self)
         self.leader_corridor_behavior = LeaderCorridor(agent = self)    
         self.leader_intersection_behavior = LeaderIntersection(agent = self)
         self.leader_curve_behavior = LeaderCurve(agent = self)
+        self.leader_dead_end_behavior = LeaderDeadEnd(agent = self)
         self.follower_corridor_behavior = FollowerCorridor(agent = self)
         self.follower_intersection_behavior = FollowerIntersection(agent = self)
         self.follower_curve_behavior = FollowerCurve(agent = self)
@@ -69,6 +71,7 @@ class Drones():
                                  "Leader Corridor" : self.leader_corridor_behavior,
                                  "Leader Intersection" : self.leader_intersection_behavior,
                                  "Leader Curve" : self.leader_curve_behavior,
+                                 "Leader Dead End" : self.leader_dead_end_behavior,
                                  "Follower Corridor" : self.follower_corridor_behavior,
                                  "Follower Intersection" : self.follower_intersection_behavior,
                                  "Follower Curve" : self.follower_curve_behavior,
@@ -79,6 +82,7 @@ class Drones():
                                 self.leader_corridor_behavior,
                                 self.leader_intersection_behavior,
                                 self.leader_curve_behavior,
+                                self.leader_dead_end_behavior,
                                 self.follower_corridor_behavior,
                                 self.follower_intersection_behavior,
                                 self.follower_curve_behavior,
@@ -183,6 +187,8 @@ class Drones():
                                                 self.center_in_curve_action
                                                 )
 
+        self.leader_dead_end_behavior.add_listener(self.stop_action,
+                                                   )
         
         self.follower_corridor_behavior.add_listener(self.stop_action,
                                                      self.new_cell_to_follow_action,

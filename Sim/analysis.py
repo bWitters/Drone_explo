@@ -284,5 +284,4 @@ class Analyzer:
         self.occupied_branch_counter_var = self.occupied_gaps_counter(self.occupied_neighborhood)
 
         self.centered_in_corner = self.get_centered_in_corner()
-        print(f"Is centered in corner analysis : {self.centered_in_corner}")
         self.centered_in_intersection = self.get_centered_in_intersection()
