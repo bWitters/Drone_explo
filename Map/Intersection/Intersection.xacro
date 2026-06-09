@@ -479,11 +479,52 @@
 
   </xacro:macro>
 
+  <!-- Map limit -->
+  <xacro:wall
+      name="Limit 1"
+      x="1.70"
+      y="0"
+      yaw="0"
+      length="4.6"
+      thk="0.04"
+      height="1"
+      rgba="${color}"/>
+  
+  <xacro:wall
+      name="Limit 2"
+      x="-1.70"
+      y="0"
+      yaw="0"
+      length="4.6"
+      thk="0.04"
+      height="1"
+      rgba="${color}"/>
+  
+  <xacro:wall
+      name="Limit 3"
+      x="0"
+      y="2.3"
+      yaw="${PI/2}"
+      length="3.4"
+      thk="0.04"
+      height="1"
+      rgba="${color}"/>
+  
+  <xacro:wall
+      name="Limit 4"
+      x="0"
+      y="-2.3"
+      yaw="${PI/2}"
+      length="3.4"
+      thk="0.04"
+      height="1"
+      rgba="${color}"/>
+
   <!-- corridors (positionnés pour que l'intérieur fasse width) -->
   <xacro:corridor
   name="0"
-  x="0.0"
-  y="-2.0"
+  x="0.5"
+  y="-0.5"
   yaw="${0}"
   length="${L}"
   width="${W}"
@@ -493,7 +534,7 @@
 
   <xacro:corridor
   name="1"
-  x="0.0"
+  x="0.5"
   y="0.0"
   yaw="${0}"
   length="${L}"
@@ -504,8 +545,8 @@
 
   <xacro:C_intersection
   name="2"
-  x="0.0"
-  y="2.0"
+  x="0.5"
+  y="0.5"
   yaw="${PI/2}"
   length="${L}"
   width="${W}"
@@ -515,8 +556,8 @@
 
   <xacro:u_corridor
   name="3"
-  x="0.0"
-  y="4.0"
+  x="0.5"
+  y="1.0"
   yaw="${PI}"
   length="${L}"
   width="${W}"
@@ -526,8 +567,8 @@
 
   <xacro:u_corridor
   name="4"
-  x="2.0"
-  y="2.0"
+  x="1.0"
+  y="0.5"
   yaw="${PI/2}"
   length="${L}"
   width="${W}"
@@ -537,8 +578,8 @@
 
   <xacro:corridor
   name="5"
-  x="-2.0"
-  y="2.0"
+  x="0.0"
+  y="0.5"
   yaw="${PI*3/2}"
   length="${L}"
   width="${W}"
@@ -548,8 +589,8 @@
 
   <xacro:corridor
   name="6"
-  x="-4.0"
-  y="2.0"
+  x="-0.5"
+  y="0.5"
   yaw="${PI*3/2}"
   length="${L}"
   width="${W}"
@@ -559,8 +600,8 @@
 
   <xacro:corner
   name="7"
-  x="-6.0"
-  y="2.0"
+  x="-1.0"
+  y="0.5"
   yaw="${PI/2}"
   length="${L}"
   width="${W}"
@@ -570,8 +611,8 @@
 
     <xacro:corridor
   name="8"
-  x="-6.0"
-  y="4.0"
+  x="-1.0"
+  y="1.0"
   yaw="${0}"
   length="${L}"
   width="${W}"
@@ -581,8 +622,8 @@
 
   <xacro:corner
     name="9"
-    x="-6.0"
-    y="6.0"
+    x="-1.0"
+    y="1.5"
     yaw="${PI*3/2}"
     length="${L}"
     width="${W}"
@@ -592,8 +633,8 @@
 
   <xacro:corridor
     name="10"
-    x="-8.0"
-    y="6.0"
+    x="-1.5"
+    y="1.5"
     yaw="${pi/2}"
     length="${L}"
     width="${W}"

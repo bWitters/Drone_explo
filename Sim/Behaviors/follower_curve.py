@@ -21,11 +21,12 @@ class FollowerCurve(Behavior):
 
     def update_action(self):
         if FollowerCurve.Active.Sub_Stop.Stop in self.configuration:
+            self.ready_to_continue = False
+            self.dir_to_follow = None
             self.send("do_CenterInCurve")
             if self.agent.sensor_data.centered_in_corner:
                 self.ready_to_continue = True
                 self.send("standby_stop")
-                
         
         elif self.ready_to_continue:
             if self.situation[Situation.COME_CLOSER][0]:
@@ -39,7 +40,6 @@ class FollowerCurve(Behavior):
             self.send("standby_ComeCloserDirectionToGo")
             if self.situation[Situation.FRONT_TOO_CLOSE]:
                 self.send("do_stop")
-        
 
         elif FollowerCurve.Active.Sub_Rotation.Rotation in self.configuration:
             if self.situation[Situation.ROTATION_COMPLETED]:

@@ -27,7 +27,7 @@ class Analyzer:
         self.occupied_branch_counter_var = None
         
         self.centered_in_corner = False
-
+        self.centered_in_intersection = False
 
 
     @property
@@ -94,6 +94,27 @@ class Analyzer:
         return centered_in_corner
                 
     #Intersection
+    def get_centered_in_corner(self):
+        if self.agent.situation.intersection_entrance != None:
+            match self.agent.front:
+                case "N":
+                    objectif = self.agent.situation.intersection_entrance[1] + 0.2
+                    i=1
+                case "S":
+                    objectif = self.agent.situation.intersection_entrance[1] - 0.2
+                    i=1
+                case "E":
+                    objectif = self.agent.situation.intersection_entrance[0] + 0.2
+                    i=0
+                case "W":
+                    objectif = self.agent.situation.intersection_entrance[0] - 0.2
+                    i=0
+
+            if abs(objectif - self.agent.position[i]) < 0.03:
+                return True
+            return False
+        else:
+            return False
 
     #### Gaps ####
     def get_gap_direction(self):
@@ -139,7 +160,7 @@ class Analyzer:
                         occupied_gaps["B"] = self.neighborhood[key][1]
                     case "L":
                         occupied_gaps["L"] = self.neighborhood[key][1]
-            if self.neighborhood[key][0] > 0.25 and self.neighborhood[key][0] < 0.7 and key != "B":
+            if self.neighborhood[key][0] > 0.25 and self.neighborhood[key][0] < 0.7 and key != "B" and not self.neighborhood[key][1] in self.env_id_drones.keys():
                 maybe_corner = True
         print(f"Occupied gaps of {self.agent.unique_id} : {occupied_gaps}")
         print(f"Is it maybe a corner : {maybe_corner}")
@@ -263,3 +284,4 @@ class Analyzer:
         self.occupied_branch_counter_var = self.occupied_gaps_counter(self.occupied_neighborhood)
 
         self.centered_in_corner = self.get_centered_in_corner()
+        self.centered_in_intersection = self.get_centered_in_corner()
