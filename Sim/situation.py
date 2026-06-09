@@ -168,7 +168,7 @@ class SituationState():
             self.situation[Situation.COME_CLOSER] = (False,None)
     
     def is_centered_in_corridor(self):
-        print(f"Centering : {abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall)}")
+        print(f"Centering in corridor: {abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall)}")
         if abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall) < 0.1:
             return True
         return False
