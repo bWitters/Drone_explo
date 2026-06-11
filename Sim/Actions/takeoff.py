@@ -14,8 +14,9 @@ class Takeoff(Action):
         return self.agent.position
 
     def distance(self):
-        return 1 - self.position[2]
+        return 0.45 - self.position[2]
     
     def action(self):
+        print(f"Current Height : {self.position[2]}")
         self.agent.move_drone[2] = self.distance()
         #print("Increasing height")

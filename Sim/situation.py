@@ -31,7 +31,8 @@ class SituationState():
             Situation.GOOD_HEIGHT : False,
             Situation.CENTERED_IN_CORRIDOR : False,
             Situation.COME_CLOSER_SENT : False,
-            Situation.BACKWARD_TOO_FAR : False
+            Situation.BACKWARD_TOO_FAR : False,
+            Situation.DEAD_END : False,
             }
 
     @property
@@ -43,10 +44,10 @@ class SituationState():
         return self.agent.role.configuration_values
     
     def is_good_height(self):
-        return self.position[2] > 0.95
+        return self.position[2] > 0.42
     
     def is_stock_height(self):
-            return self.position[2] < 0.45
+            return self.position[2] < 0.30
 
     def is_in_stock(self):
         ok = 0
@@ -59,6 +60,7 @@ class SituationState():
             return False
         
     def is_in_intersection(self, graph_branch_counter: int) -> bool:
+        print(f"Number of branch : {graph_branch_counter}")
         if graph_branch_counter > 2:
             if self.entrance:
                 self.intersection_entrance = [self.agent.position[0], self.agent.position[1]]
@@ -68,18 +70,16 @@ class SituationState():
             return False
     
     def is_in_corridor(self, graph_branch_counter: int, graph_neighborhood : dict, occupied_gaps : dict) -> bool:
-        if graph_branch_counter == 2:
+        if graph_branch_counter == 2 or graph_branch_counter == 1:
             if graph_neighborhood["B"] and graph_neighborhood["F"]:
                 self.entrance = True
                 return True
-            else:
-                return False
-        elif graph_branch_counter == 1:
-            if occupied_gaps["B"] != False and graph_neighborhood["F"]:
+            elif occupied_gaps["B"] != False and graph_neighborhood["F"]:
                 self.entrance = True
                 return True
-            else:
-                return False
+            elif occupied_gaps["F"] != False and graph_neighborhood["B"]:
+                self.entrance = True
+                return True
         else:
             return False
         
@@ -99,9 +99,9 @@ class SituationState():
         else:
             return False
     
-    def is_in_dead_end(self, graph_branch_counter: int) -> bool:
+    def is_in_dead_end(self, graph_neighborhood : dict) -> bool:
         if not self.is_in_stock():
-            if graph_branch_counter == 1:
+            if not graph_neighborhood["F"] and not graph_neighborhood["L"] and not graph_neighborhood["R"]:
                 return True
             else:
                 return False
@@ -113,7 +113,7 @@ class SituationState():
         DIR = []
         for dir, distances in neighborhood_distances.items():
             if distances != None:
-                if self.dist(distances) < 0.6:
+                if self.dist(distances) < 0.4:
                     DIR.append(dir)
         if DIR:
             return (True, DIR)
@@ -165,11 +165,13 @@ class SituationState():
                     self.situation[Situation.COME_CLOSER] = (False,last_com[1])
                 if last_com[0] == "Stop forced wait":
                     self.situation[Situation.FORCED_WAIT] = (False,last_com[1])
+                if last_com[0] == "Current Direction":
+                    self.situation[Situation.PRECEDING_DIRECTION] = last_com[1]
         else:
             self.situation[Situation.COME_CLOSER] = (False,None)
     
     def is_centered_in_corridor(self):
-        print(f"Centering : {abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall)}")
+        print(f"Centering in corridor: {abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall)}")
         if abs(self.agent.sensor_data.dist_R_wall - self.agent.sensor_data.dist_L_wall) < 0.1:
             return True
         return False
@@ -177,10 +179,10 @@ class SituationState():
     def is_backward_too_far(self,neighbors_distance):
         if neighbors_distance["F"] != None:
             print(f"Distance with follower : {self.dist(neighbors_distance["F"])}")
-            if self.dist(neighbors_distance["F"]) > 1.7:
+            if self.dist(neighbors_distance["F"]) > 1.2:
                 print("Too long distance")
                 return (True, 2)
-            elif self.dist(neighbors_distance["F"]) > 1:
+            elif self.dist(neighbors_distance["F"]) > 0.8:
                 print("Long distance ok to continue")
                 return (True, 1)
             else:
@@ -233,3 +235,4 @@ class SituationState():
         self.situation[Situation.CENTERED_IN_CORRIDOR] = self.is_centered_in_corridor()
         self.situation[Situation.BACKWARD_TOO_FAR] = self.is_backward_too_far(neighbors_distance)
         self.situation[Situation.ROTATION_COMPLETED] = self.is_rotation_completed()
+        self.situation[Situation.DEAD_END] = self.is_in_dead_end(gaps_dir)

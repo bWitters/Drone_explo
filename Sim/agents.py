@@ -6,9 +6,8 @@ import csv
 class Drones():
     """The base class for the drones"""
 
-    def __init__(self,unique_id,drones,env_id_drones,stocking_area,uri=None):
-        self.front = "N"
-        self.old_front = None
+    def __init__(self,unique_id,drones,env_id_drones,stocking_area,log_directory,uri=None):
+        self.front = "W"
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
@@ -16,8 +15,9 @@ class Drones():
         self.move_drone = [0,0,0,0,0]
         self.position = [0,0,0]
         self.rpy = [0,0,0]
+        self.log_directory = log_directory
 
-        nom_fichier = f"Sim/logs/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+        nom_fichier = f"{self.log_directory}/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
         nom_fichier_rt = f"Sim/real_time_logs/drone_{unique_id}.csv"
         self.file_rt = open(nom_fichier_rt,"w")
         self.commands_logs_rt = csv.writer(self.file_rt)
@@ -53,12 +53,14 @@ class Drones():
         from Behaviors.follower_intersection import FollowerIntersection
         from Behaviors.leader_curve import LeaderCurve
         from Behaviors.follower_curve import FollowerCurve
+        from Behaviors.leader_dead_end import LeaderDeadEnd
 
         self.stock_behavior = Stock(agent = self)
         self.takeoff_behavior = Takeoff(agent = self)
         self.leader_corridor_behavior = LeaderCorridor(agent = self)    
         self.leader_intersection_behavior = LeaderIntersection(agent = self)
         self.leader_curve_behavior = LeaderCurve(agent = self)
+        self.leader_dead_end_behavior = LeaderDeadEnd(agent = self)
         self.follower_corridor_behavior = FollowerCorridor(agent = self)
         self.follower_intersection_behavior = FollowerIntersection(agent = self)
         self.follower_curve_behavior = FollowerCurve(agent = self)
@@ -69,6 +71,7 @@ class Drones():
                                  "Leader Corridor" : self.leader_corridor_behavior,
                                  "Leader Intersection" : self.leader_intersection_behavior,
                                  "Leader Curve" : self.leader_curve_behavior,
+                                 "Leader Dead End" : self.leader_dead_end_behavior,
                                  "Follower Corridor" : self.follower_corridor_behavior,
                                  "Follower Intersection" : self.follower_intersection_behavior,
                                  "Follower Curve" : self.follower_curve_behavior,
@@ -79,6 +82,7 @@ class Drones():
                                 self.leader_corridor_behavior,
                                 self.leader_intersection_behavior,
                                 self.leader_curve_behavior,
+                                self.leader_dead_end_behavior,
                                 self.follower_corridor_behavior,
                                 self.follower_intersection_behavior,
                                 self.follower_curve_behavior,
@@ -102,6 +106,7 @@ class Drones():
         from Actions.center_in_intersection import CenterInIntersection
         from Actions.rotation_control import RotationControl
         from Actions.forced_waiting import ForcedWaiting
+        from Actions.send_current_direction import SendCurrentDirection
 
         self.stop_action = Stop(self)
         self.change_role_action = ChangeRole(self)
@@ -121,6 +126,7 @@ class Drones():
         self.center_in_intersection_action = CenterInIntersection(self)
         self.rotation_conrol_action = RotationControl(self)
         self.forced_waiting_action = ForcedWaiting(self)
+        self.send_current_direction_action = SendCurrentDirection(self)
 
         self.actions_dict = {"Stop" : self.stop_action,
                              "Change Role" : self.change_role_action,
@@ -138,7 +144,8 @@ class Drones():
                              "Height control" : self.height_control_action,
                              "Center in intersection" : self.center_in_intersection_action,
                              "Rotation control" : self.rotation_conrol_action,
-                             "Forced waiting" : self.forced_waiting_action
+                             "Forced waiting" : self.forced_waiting_action,
+                             "Send Current Direction" : self.send_current_direction_action,
                              }
 
 
@@ -160,7 +167,8 @@ class Drones():
                                                    self.center_in_corridor_action,
                                                    self.height_control_action,
                                                    self.rotation_conrol_action,
-                                                   self.forced_waiting_action
+                                                   self.forced_waiting_action,
+                                                   self.send_current_direction_action
                                                    )
         
         self.leader_intersection_behavior.add_listener(self.stop_action,
@@ -183,6 +191,8 @@ class Drones():
                                                 self.center_in_curve_action
                                                 )
 
+        self.leader_dead_end_behavior.add_listener(self.stop_action,
+                                                   )
         
         self.follower_corridor_behavior.add_listener(self.stop_action,
                                                      self.new_cell_to_follow_action,
@@ -194,7 +204,8 @@ class Drones():
                                                      self.center_in_corridor_action,
                                                      self.height_control_action,
                                                      self.rotation_conrol_action,
-                                                     self.forced_waiting_action
+                                                     self.forced_waiting_action,
+                                                     self.send_current_direction_action
                                                      )
         
         self.follower_intersection_behavior.add_listener(self.stop_action,

@@ -1,5 +1,6 @@
 # Files
 cache/
+positions/
 logs/
 real_time_logs/
 .vscode/
@@ -18,6 +19,8 @@ worlds/
 ignoredfiles/
 Usefull/
 Images/
+Sim_*
+Controleur_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

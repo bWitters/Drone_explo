@@ -25,3 +25,5 @@ class Situation(Enum):
     COME_CLOSER_SENT = auto()
     BACKWARD_TOO_FAR = auto()
     ROTATION_COMPLETED = auto()
+    DEAD_END = auto()
+    PRECEDING_DIRECTION = auto()

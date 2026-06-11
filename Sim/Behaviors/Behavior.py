@@ -45,6 +45,13 @@ class Behavior(StateChart):
             do_RotationControl = Idle_RotationControl.to(RotationControl)
             standby_RotationControl = RotationControl.to(Idle_RotationControl)
         
+        class Sub_SendCurrentDirection(State.Compound):
+            Idle_SendCurrentDirection = State(initial=True)
+            SendCurrentDirection = State()
+
+            do_SendCurrentDirection = Idle_SendCurrentDirection.to(SendCurrentDirection)
+            standby_SendCurrentDirection = SendCurrentDirection.to(Idle_SendCurrentDirection)
+        
         class Sub_ForcedWaiting(State.Compound):
             Idle_ForcedWaiting = State(initial=True)
             ForcedWaiting = State()

@@ -30,9 +30,9 @@ class CenterInCurve(Action):
         act = 0
         side = self.determine_wall_dir()
         if side == "R":
-            act = self.d_R_wall-0.5
+            act = self.d_R_wall-0.25
         elif side == "L":
-            act = 0.5-self.d_L_wall
+            act = 0.25-self.d_L_wall
         print(f"The action to center is : {act}")
         return act
 
@@ -54,5 +54,5 @@ class CenterInCurve(Action):
             i = 0
             k = -1
             j = 1
-        self.agent.move_drone[i] += k*(self.d_F_wall-0.5)
+        self.agent.move_drone[i] += k*(self.d_F_wall-0.25)
         self.agent.move_drone[(i+1)%2] += j*self.side_wall_action()

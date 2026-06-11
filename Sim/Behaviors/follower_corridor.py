@@ -26,6 +26,7 @@ class FollowerCorridor(Behavior):
             self.send("do_ComeCloserDirectionToGo")
             self.send("do_move")
             self.send("do_rotation")
+            #self.send("do_SendCurrentDirection")
             self.situation[Situation.COME_CLOSER_SENT] = False
 
         elif FollowerCorridor.Active.Sub_Move.Move in self.configuration:
@@ -37,9 +38,6 @@ class FollowerCorridor(Behavior):
                 if self.situation[Situation.BACKWARD_TOO_FAR][1] == 2:
                     self.send("do_ForcedWaiting")
                     self.send("standby_move")
-
-            if self.situation[Situation.CENTERED_IN_CORRIDOR]:
-                self.send("standby_CenterInCorridor")
             
             if self.situation[Situation.FRONT_TOO_CLOSE]:
                 self.send("do_ForcedWaiting")

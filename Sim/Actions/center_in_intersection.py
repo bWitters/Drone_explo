@@ -15,12 +15,12 @@ class CenterInIntersection(Action):
         distance_y = 0
         match self.agent.front:
             case "N":
-                distance_x = self.entrance_position[1] + 0.3 - self.agent.position[1]
+                distance_x = self.entrance_position[1] + 0.2 - self.agent.position[1]
             case "S":
-                distance_x = self.entrance_position[1] - 0.3 - self.agent.position[1]
+                distance_x = self.entrance_position[1] - 0.2 - self.agent.position[1]
             case "E":
-                distance_y = self.entrance_position[0] + 0.3 - self.agent.position[0]
+                distance_y = self.entrance_position[0] + 0.2 - self.agent.position[0]
             case "W":
-                distance_y = self.entrance_position[0] - 0.3 - self.agent.position[0]
+                distance_y = self.entrance_position[0] - 0.2 - self.agent.position[0]
         self.agent.move_drone[1] += distance_x
         self.agent.move_drone[0] += distance_y

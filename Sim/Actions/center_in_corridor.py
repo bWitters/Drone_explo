@@ -27,4 +27,5 @@ class CenterInCorridor(Action):
         elif self.agent.front == "W":
             i = 1
             k = 1
-        self.agent.move_drone[i] += k*-(self.d_L_wall-self.d_R_wall)
+        if abs(self.d_L_wall-self.d_R_wall) <0.15:
+            self.agent.move_drone[i] += k*-(self.d_L_wall-self.d_R_wall)

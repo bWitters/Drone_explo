@@ -8,6 +8,7 @@ class FollowerCurve(Behavior):
     def __init__(self, agent):
         self.agent: Drones = agent
         self.dir_to_follow = None
+        self.ready_to_continue = False
         super().__init__(name=self.name)
 
     @property
@@ -20,17 +21,25 @@ class FollowerCurve(Behavior):
 
     def update_action(self):
         if FollowerCurve.Active.Sub_Stop.Stop in self.configuration:
+            self.ready_to_continue = False
+            self.dir_to_follow = None
             self.send("do_CenterInCurve")
+            if self.agent.sensor_data.centered_in_corner:
+                self.ready_to_continue = True
+                self.send("standby_stop")
+        
+        elif self.ready_to_continue:
             if self.situation[Situation.COME_CLOSER][0]:
                 self.dir_to_follow = self.situation[Situation.COME_CLOSER][1]
-                self.send("standby_stop")
                 if self.agent.neighboring_agent_list["F"] != None:
                     self.send("do_send_come_closer")
                 self.send("do_ComeCloserDirectionToGo")
+                self.ready_to_continue = False
 
         elif FollowerCurve.Active.Sub_Move.Move in self.configuration:
             self.send("standby_ComeCloserDirectionToGo")
-        
+            if self.situation[Situation.FRONT_TOO_CLOSE]:
+                self.send("do_stop")
 
         elif FollowerCurve.Active.Sub_Rotation.Rotation in self.configuration:
             if self.situation[Situation.ROTATION_COMPLETED]:
