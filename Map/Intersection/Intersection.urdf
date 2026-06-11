@@ -10,7 +10,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 4.6 1"/>
+        <box size="0.04 3.4 1"/>
       </geometry>
       <material name="Limit 1_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
@@ -19,7 +19,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 4.6 1"/>
+        <box size="0.04 3.4 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -28,7 +28,7 @@
     </inertial>
   </link>
   <joint name="Limit 1_world" type="fixed">
-    <origin rpy="0 0 0" xyz="1.7 0 0"/>
+    <origin rpy="0 0 0" xyz="2.3 0 0"/>
     <parent link="world"/>
     <child link="Limit 1"/>
   </joint>
@@ -36,7 +36,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 4.6 1"/>
+        <box size="0.04 3.4 1"/>
       </geometry>
       <material name="Limit 2_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
@@ -45,7 +45,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 4.6 1"/>
+        <box size="0.04 3.4 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -54,7 +54,7 @@
     </inertial>
   </link>
   <joint name="Limit 2_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-1.7 0 0"/>
+    <origin rpy="0 0 0" xyz="-2.3 0 0"/>
     <parent link="world"/>
     <child link="Limit 2"/>
   </joint>
@@ -62,7 +62,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 3.4 1"/>
+        <box size="0.04 4.6 1"/>
       </geometry>
       <material name="Limit 3_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
@@ -71,7 +71,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 3.4 1"/>
+        <box size="0.04 4.6 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -80,7 +80,7 @@
     </inertial>
   </link>
   <joint name="Limit 3_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0 2.3 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="0 1.7 0"/>
     <parent link="world"/>
     <child link="Limit 3"/>
   </joint>
@@ -88,7 +88,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 3.4 1"/>
+        <box size="0.04 4.6 1"/>
       </geometry>
       <material name="Limit 4_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
@@ -97,7 +97,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.5"/>
       <geometry>
-        <box size="0.04 3.4 1"/>
+        <box size="0.04 4.6 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -106,7 +106,7 @@
     </inertial>
   </link>
   <joint name="Limit 4_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0 -2.3 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="0 -1.7 0"/>
     <parent link="world"/>
     <child link="Limit 4"/>
   </joint>
@@ -132,7 +132,7 @@
     </inertial>
   </link>
   <joint name="0_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 -0.5 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="2.0 0.77 0"/>
     <parent link="world"/>
     <child link="0_left"/>
   </joint>
@@ -158,7 +158,7 @@
     </inertial>
   </link>
   <joint name="0_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 -0.5 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="2.0 0.22999999999999998 0"/>
     <parent link="world"/>
     <child link="0_right"/>
   </joint>
@@ -184,7 +184,7 @@
     </inertial>
   </link>
   <joint name="1_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 0.0 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="1.5 0.77 0"/>
     <parent link="world"/>
     <child link="1_left"/>
   </joint>
@@ -210,24 +210,24 @@
     </inertial>
   </link>
   <joint name="1_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 0.0 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="1.5 0.22999999999999998 0"/>
     <parent link="world"/>
     <child link="1_right"/>
   </joint>
-  <link name="2_gauche_h_h">
+  <link name="2_left">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.0 0.5"/>
+        <box size="0.04 0.5 0.5"/>
       </geometry>
-      <material name="2_gauche_h_h_mat">
+      <material name="2_left_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.0 0.5"/>
+        <box size="0.04 0.5 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -235,25 +235,25 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
-  <joint name="2_gauche_h_h_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.22999999999999998 0.25 0"/>
+  <joint name="2_left_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="1.0 0.77 0"/>
     <parent link="world"/>
-    <child link="2_gauche_h_h"/>
+    <child link="2_left"/>
   </joint>
-  <link name="2_gauche_v_h">
+  <link name="2_right">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.0 0.5"/>
+        <box size="0.04 0.5 0.5"/>
       </geometry>
-      <material name="2_gauche_v_h_mat">
+      <material name="2_right_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.0 0.5"/>
+        <box size="0.04 0.5 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -261,166 +261,10 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
-  <joint name="2_gauche_v_h_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0.25 0.23 0"/>
+  <joint name="2_right_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="1.0 0.22999999999999998 0"/>
     <parent link="world"/>
-    <child link="2_gauche_v_h"/>
-  </joint>
-  <link name="2_droit_h_h">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-      <material name="2_droit_h_h_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="2_droit_h_h_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.22999999999999998 0.75 0"/>
-    <parent link="world"/>
-    <child link="2_droit_h_h"/>
-  </joint>
-  <link name="2_droit_v_h">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-      <material name="2_droit_v_h_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="2_droit_v_h_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0.25 0.77 0"/>
-    <parent link="world"/>
-    <child link="2_droit_v_h"/>
-  </joint>
-  <link name="2_gauche_h">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-      <material name="2_gauche_h_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="2_gauche_h_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.77 0.24999999999999997 0"/>
-    <parent link="world"/>
-    <child link="2_gauche_h"/>
-  </joint>
-  <link name="2_gauche_v">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-      <material name="2_gauche_v_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="2_gauche_v_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0.75 0.22999999999999995 0"/>
-    <parent link="world"/>
-    <child link="2_gauche_v"/>
-  </joint>
-  <link name="2_droit_h">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-      <material name="2_droit_h_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="2_droit_h_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.77 0.75 0"/>
-    <parent link="world"/>
-    <child link="2_droit_h"/>
-  </joint>
-  <link name="2_droit_v">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-      <material name="2_droit_v_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="2_droit_v_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0.75 0.77 0"/>
-    <parent link="world"/>
-    <child link="2_droit_v"/>
+    <child link="2_right"/>
   </joint>
   <link name="3_left">
     <visual>
@@ -444,7 +288,7 @@
     </inertial>
   </link>
   <joint name="3_left_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.22999999999999998 1.0 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="0.5 0.77 0"/>
     <parent link="world"/>
     <child link="3_left"/>
   </joint>
@@ -470,24 +314,24 @@
     </inertial>
   </link>
   <joint name="3_right_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.77 1.0 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="0.5 0.22999999999999998 0"/>
     <parent link="world"/>
     <child link="3_right"/>
   </joint>
-  <link name="3_back">
+  <link name="4_gauche_h_h">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
-      <material name="3_back_mat">
+      <material name="4_gauche_h_h_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -495,25 +339,25 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
-  <joint name="3_back_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="0.5 1.27 0"/>
+  <joint name="4_gauche_h_h_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.25 0.77 0"/>
     <parent link="world"/>
-    <child link="3_back"/>
+    <child link="4_gauche_h_h"/>
   </joint>
-  <link name="4_left">
+  <link name="4_gauche_v_h">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
-      <material name="4_left_mat">
+      <material name="4_gauche_v_h_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -521,25 +365,25 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
-  <joint name="4_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.0 0.77 0"/>
+  <joint name="4_gauche_v_h_world" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.27 0.75 0"/>
     <parent link="world"/>
-    <child link="4_left"/>
+    <child link="4_gauche_v_h"/>
   </joint>
-  <link name="4_right">
+  <link name="4_droit_h_h">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
-      <material name="4_right_mat">
+      <material name="4_droit_h_h_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -547,25 +391,25 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
-  <joint name="4_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.0 0.22999999999999998 0"/>
+  <joint name="4_droit_h_h_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="0.25 0.77 0"/>
     <parent link="world"/>
-    <child link="4_right"/>
+    <child link="4_droit_h_h"/>
   </joint>
-  <link name="4_back">
+  <link name="4_droit_v_h">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
-      <material name="4_back_mat">
+      <material name="4_droit_v_h_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -573,10 +417,114 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
-  <joint name="4_back_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="1.27 0.5 0"/>
+  <joint name="4_droit_v_h_world" type="fixed">
+    <origin rpy="0 0 0" xyz="0.27 0.75 0"/>
     <parent link="world"/>
-    <child link="4_back"/>
+    <child link="4_droit_v_h"/>
+  </joint>
+  <link name="4_gauche_h">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+      <material name="4_gauche_h_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="4_gauche_h_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.25 0.22999999999999998 0"/>
+    <parent link="world"/>
+    <child link="4_gauche_h"/>
+  </joint>
+  <link name="4_gauche_v">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+      <material name="4_gauche_v_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="4_gauche_v_world" type="fixed">
+    <origin rpy="0 0 0" xyz="-0.27 0.25 0"/>
+    <parent link="world"/>
+    <child link="4_gauche_v"/>
+  </joint>
+  <link name="4_droit_h">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+      <material name="4_droit_h_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="4_droit_h_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="0.25 0.22999999999999998 0"/>
+    <parent link="world"/>
+    <child link="4_droit_h"/>
+  </joint>
+  <link name="4_droit_v">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+      <material name="4_droit_v_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="4_droit_v_world" type="fixed">
+    <origin rpy="0 0 0" xyz="0.27 0.25 0"/>
+    <parent link="world"/>
+    <child link="4_droit_v"/>
   </joint>
   <link name="5_left">
     <visual>
@@ -600,7 +548,7 @@
     </inertial>
   </link>
   <joint name="5_left_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-4.9598195365467806e-17 0.22999999999999998 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-0.5 0.22999999999999998 0"/>
     <parent link="world"/>
     <child link="5_left"/>
   </joint>
@@ -626,9 +574,35 @@
     </inertial>
   </link>
   <joint name="5_right_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="4.9598195365467806e-17 0.77 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-0.49999999999999994 0.77 0"/>
     <parent link="world"/>
     <child link="5_right"/>
+  </joint>
+  <link name="5_back">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.5 0.5"/>
+      </geometry>
+      <material name="5_back_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.5 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="5_back_world" type="fixed">
+    <origin rpy="0 0 6.283185307179586" xyz="-0.77 0.5 0"/>
+    <parent link="world"/>
+    <child link="5_back"/>
   </joint>
   <link name="6_left">
     <visual>
@@ -652,7 +626,7 @@
     </inertial>
   </link>
   <joint name="6_left_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-0.5 0.22999999999999998 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="-0.27 1.0 0"/>
     <parent link="world"/>
     <child link="6_left"/>
   </joint>
@@ -678,15 +652,41 @@
     </inertial>
   </link>
   <joint name="6_right_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-0.49999999999999994 0.77 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="0.27 1.0 0"/>
     <parent link="world"/>
     <child link="6_right"/>
+  </joint>
+  <link name="6_back">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.5 0.5"/>
+      </geometry>
+      <material name="6_back_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.5 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="6_back_world" type="fixed">
+    <origin rpy="0 0 4.71238898038469" xyz="3.306546357697854e-17 1.27 0"/>
+    <parent link="world"/>
+    <child link="6_back"/>
   </joint>
   <link name="7_left">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.0 0.5"/>
+        <box size="0.04 0.5 0.5"/>
       </geometry>
       <material name="7_left_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
@@ -695,7 +695,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.0 0.5"/>
+        <box size="0.04 0.5 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -704,7 +704,7 @@
     </inertial>
   </link>
   <joint name="7_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-0.75 0.77 0"/>
+    <origin rpy="0 0 0" xyz="0.27 0.0 0"/>
     <parent link="world"/>
     <child link="7_left"/>
   </joint>
@@ -730,61 +730,9 @@
     </inertial>
   </link>
   <joint name="7_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 0.22999999999999998 0"/>
+    <origin rpy="0 0 0" xyz="-0.27 0.0 0"/>
     <parent link="world"/>
     <child link="7_right"/>
-  </joint>
-  <link name="7_front_up">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-      <material name="7_front_up_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="7_front_up_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-1.27 0.5 0"/>
-    <parent link="world"/>
-    <child link="7_front_up"/>
-  </joint>
-  <link name="7_front_down">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-      <material name="7_front_down_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.0 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="7_front_down_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-0.73 0.75 0"/>
-    <parent link="world"/>
-    <child link="7_front_down"/>
   </joint>
   <link name="8_left">
     <visual>
@@ -808,7 +756,7 @@
     </inertial>
   </link>
   <joint name="8_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.73 1.0 0"/>
+    <origin rpy="0 0 0" xyz="0.27 -0.5 0"/>
     <parent link="world"/>
     <child link="8_left"/>
   </joint>
@@ -834,7 +782,7 @@
     </inertial>
   </link>
   <joint name="8_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-1.27 1.0 0"/>
+    <origin rpy="0 0 0" xyz="-0.27 -0.5 0"/>
     <parent link="world"/>
     <child link="8_right"/>
   </joint>
@@ -860,7 +808,7 @@
     </inertial>
   </link>
   <joint name="9_left_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-1.25 1.23 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="-0.26999999999999996 -0.75 0"/>
     <parent link="world"/>
     <child link="9_left"/>
   </joint>
@@ -886,7 +834,7 @@
     </inertial>
   </link>
   <joint name="9_right_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-1.0 1.77 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="0.27 -1.0 0"/>
     <parent link="world"/>
     <child link="9_right"/>
   </joint>
@@ -912,7 +860,7 @@
     </inertial>
   </link>
   <joint name="9_front_up_world" type="fixed">
-    <origin rpy="0 0 6.283185307179586" xyz="-0.73 1.5 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-3.306546357697854e-17 -1.27 0"/>
     <parent link="world"/>
     <child link="9_front_up"/>
   </joint>
@@ -938,7 +886,7 @@
     </inertial>
   </link>
   <joint name="9_front_down_world" type="fixed">
-    <origin rpy="0 0 6.283185307179586" xyz="-1.27 1.25 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-0.24999999999999997 -0.73 0"/>
     <parent link="world"/>
     <child link="9_front_down"/>
   </joint>
@@ -964,7 +912,7 @@
     </inertial>
   </link>
   <joint name="10_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-1.5 1.77 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.5 -0.73 0"/>
     <parent link="world"/>
     <child link="10_left"/>
   </joint>
@@ -990,7 +938,7 @@
     </inertial>
   </link>
   <joint name="10_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-1.5 1.23 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.5 -1.27 0"/>
     <parent link="world"/>
     <child link="10_right"/>
   </joint>
@@ -998,7 +946,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
       <material name="11_left_mat">
         <color rgba="0.85 0.85 0.9 0.6"/>
@@ -1007,7 +955,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.25"/>
       <geometry>
-        <box size="0.04 0.5 0.5"/>
+        <box size="0.04 0.0 0.5"/>
       </geometry>
     </collision>
     <inertial>
@@ -1016,7 +964,7 @@
     </inertial>
   </link>
   <joint name="11_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 -0.5 0"/>
+    <origin rpy="0 0 0" xyz="-0.73 -1.25 0"/>
     <parent link="world"/>
     <child link="11_left"/>
   </joint>
@@ -1042,9 +990,61 @@
     </inertial>
   </link>
   <joint name="11_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 -0.5 0"/>
+    <origin rpy="0 0 0" xyz="-1.27 -1.0 0"/>
     <parent link="world"/>
     <child link="11_right"/>
+  </joint>
+  <link name="11_front_up">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.5 0.5"/>
+      </geometry>
+      <material name="11_front_up_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.5 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="11_front_up_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 -0.73 0"/>
+    <parent link="world"/>
+    <child link="11_front_up"/>
+  </joint>
+  <link name="11_front_down">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+      <material name="11_front_down_mat">
+        <color rgba="0.85 0.85 0.9 0.6"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <box size="0.04 0.0 0.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="11_front_down_world" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.75 -1.27 0"/>
+    <parent link="world"/>
+    <child link="11_front_down"/>
   </joint>
   <link name="12_left">
     <visual>
@@ -1068,7 +1068,7 @@
     </inertial>
   </link>
   <joint name="12_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 -1.0 0"/>
+    <origin rpy="0 0 0" xyz="-0.73 -1.5 0"/>
     <parent link="world"/>
     <child link="12_left"/>
   </joint>
@@ -1094,112 +1094,8 @@
     </inertial>
   </link>
   <joint name="12_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 -1.0 0"/>
+    <origin rpy="0 0 0" xyz="-1.27 -1.5 0"/>
     <parent link="world"/>
     <child link="12_right"/>
-  </joint>
-  <link name="13_left">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-      <material name="13_left_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="13_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 -1.5 0"/>
-    <parent link="world"/>
-    <child link="13_left"/>
-  </joint>
-  <link name="13_right">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-      <material name="13_right_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="13_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 -1.5 0"/>
-    <parent link="world"/>
-    <child link="13_right"/>
-  </joint>
-  <link name="14_left">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-      <material name="14_left_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="14_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 -2.0 0"/>
-    <parent link="world"/>
-    <child link="14_left"/>
-  </joint>
-  <link name="14_right">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-      <material name="14_right_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="14_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 -2.0 0"/>
-    <parent link="world"/>
-    <child link="14_right"/>
   </joint>
 </robot>

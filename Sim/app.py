@@ -11,11 +11,11 @@ import os
 from gym_pybullet_drones.utils.enums import DroneModel, Physics
 from VelocityAviary import VelocityAviary
 from gym_pybullet_drones.utils.utils import sync, str2bool
-
+from multiprocessing import Queue
 from agents import Drones
 import yaml
 
-with open("Map/Multiple_corner/Multiple_corner.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
+with open("Map/Intersection/Intersection.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -29,9 +29,9 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 2
+NUM_DRONES = 5
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-INIT_XYZ = np.array([[.4 +.4*i, 0, 0.2] for i in range(NUM_DRONES)])
+INIT_XYZ = np.array([[.4 +.4*i, 0.5, 0.2] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
 INIT_RPY = np.array([[.0, .0, math.pi] for _ in range(NUM_DRONES)])
 RAY_LENGTH = 10
@@ -44,9 +44,9 @@ URIS = [
 ]
 
 def go(
-        queues = None,
-        queue_etat_reel = None,
-        queues_position_simu = None,
+        queues:list[Queue]|None = None,
+        queues_etat_reel:list[Queue]|None = None,
+        queues_position_simu:list[Queue]|None = None,
         drone=DEFAULT_DRONES,
         physics=DEFAULT_PHYSICS,
         gui=DEFAULT_GUI,
@@ -81,7 +81,7 @@ def go(
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
 
-    p.loadURDF("Map/Multiple_corner/Multiple_corner.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("Map/Intersection/Intersection.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     ### Log files 
 
@@ -106,13 +106,13 @@ def go(
             queues_position_simu[i].put([INIT_XYZ[i][0],INIT_XYZ[i][1],INIT_XYZ[i][2],INIT_RPY[i][2]])
 
     #### Waiting for takeoff ####
-    if queues != None:
+    if queues != None and queues_etat_reel != None:
         ready = False
         while ready != True:
             print("Waiting take off")
-            taille = len(queue_etat_reel)
+            taille = len(queues_etat_reel)
             compte = 0
-            for queue_drone in queue_etat_reel:
+            for queue_drone in queues_etat_reel:
                 if not queue_drone.empty():
                     commande = queue_drone.get()
                     if commande[0] == True:
