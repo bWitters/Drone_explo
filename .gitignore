@@ -20,6 +20,7 @@ ignoredfiles/
 Usefull/
 Images/
 Sim_*
+Controleur_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

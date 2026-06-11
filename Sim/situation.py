@@ -44,7 +44,7 @@ class SituationState():
         return self.agent.role.configuration_values
     
     def is_good_height(self):
-        return self.position[2] > 0.45
+        return self.position[2] > 0.42
     
     def is_stock_height(self):
             return self.position[2] < 0.30
@@ -165,6 +165,8 @@ class SituationState():
                     self.situation[Situation.COME_CLOSER] = (False,last_com[1])
                 if last_com[0] == "Stop forced wait":
                     self.situation[Situation.FORCED_WAIT] = (False,last_com[1])
+                if last_com[0] == "Current Direction":
+                    self.situation[Situation.PRECEDING_DIRECTION] = last_com[1]
         else:
             self.situation[Situation.COME_CLOSER] = (False,None)
     

@@ -23,36 +23,38 @@ class LeaderIntersection(Behavior):
     def update_action(self):
         print(f"Leader front direction : {self.agent.front}")
         if LeaderIntersection.Active.Sub_Stop.Stop in self.configuration:
-            if LeaderIntersection.Active.Sub_ChangeRole.ChangeRole in self.configuration:
-                self.send("standby_change_role")
-            else:
-                if "leader" not in self.role:
-                    self.send("do_change_role")
+            self.send("standby_stop")
+            self.situation[Situation.COME_CLOSER_SENT] = False
 
-            if LeaderIntersection.Active.Sub_CenterInIntersection.Idle_CenterInIntersection in self.configuration and not self.stop_centering:
-                self.send("do_CenterInIntersection")
+        if LeaderIntersection.Active.Sub_ChangeRole.ChangeRole in self.configuration:
+            self.send("standby_change_role")
+        else:
+            if "leader" not in self.role:
+                self.send("do_change_role")
 
-            if LeaderIntersection.Active.Sub_SendComeCloser.SendComeCloser in self.configuration:
-                self.send("standby_send_come_closer")
+        if LeaderIntersection.Active.Sub_CenterInIntersection.Idle_CenterInIntersection in self.configuration and not self.stop_centering:
+            self.send("do_CenterInIntersection")
 
-            elif self.situation[Situation.COME_CLOSER_SENT]:
-                if self.situation[Situation.BACKWARD_TOO_CLOSE]:
-                    #if self.situation[Situation.CLOSE_TO_EXPLORED_BRANCH]:
-                    self.send("standby_stop")
-                    self.send("standby_CenterInIntersection")
-                    self.send("do_GapDirectionDetermination")
-                    self.send("do_rotation")
-                    self.waiting_rot = True
-                    self.stop_centering = True
-
-            elif LeaderIntersection.Active.Sub_SendComeCloser.Idle_SendComeCloser in self.configuration:
-                self.send("do_send_come_closer")
-
-        elif LeaderIntersection.Active.Sub_GapDirectionDetermination.GapDirectionDetermination in self.configuration:
+        if LeaderIntersection.Active.Sub_GapDirectionDetermination.GapDirectionDetermination in self.configuration:
             self.send("standby_GapDirectionDetermination")
             self.send("standby_rotation")
-        
+
         elif self.waiting_rot:
             if self.situation[Situation.ROTATION_COMPLETED]:
                 self.send("do_move")
                 self.waiting_rot = False
+
+        elif LeaderIntersection.Active.Sub_SendComeCloser.SendComeCloser in self.configuration:
+            self.send("standby_send_come_closer")
+
+        elif self.situation[Situation.COME_CLOSER_SENT]:
+            if self.situation[Situation.BACKWARD_TOO_CLOSE]:
+                #if self.situation[Situation.CLOSE_TO_EXPLORED_BRANCH]:
+                self.send("standby_CenterInIntersection")
+                self.send("do_GapDirectionDetermination")
+                self.send("do_rotation")
+                self.waiting_rot = True
+                self.stop_centering = True
+
+        elif LeaderIntersection.Active.Sub_SendComeCloser.Idle_SendComeCloser in self.configuration:
+            self.send("do_send_come_closer")

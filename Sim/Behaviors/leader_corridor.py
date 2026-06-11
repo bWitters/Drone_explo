@@ -23,13 +23,16 @@ class LeaderCorridor(Behavior):
             self.send("do_RotationControl")
             self.send("do_CenterInCorridor")
             self.send("do_explore")
+            #self.send("do_SendCurrentDirection")
 
         elif LeaderCorridor.Active.Sub_Move.Move in self.configuration:
             self.send("standby_GapDirectionDetermination")
             self.send("standby_rotation")
-            self.send("do_send_come_closer")
             if self.situation[Situation.BACKWARD_TOO_FAR][0]:
+                if not self.situation[Situation.COME_CLOSER_SENT]:
+                    self.send("do_send_come_closer")
                 if self.situation[Situation.BACKWARD_TOO_FAR][1] == 2:
+                    self.send("do_send_come_closer")
                     self.send("do_ForcedWaiting")
                     self.send("standby_move")
                 

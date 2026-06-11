@@ -12,6 +12,7 @@ class FollowerIntersection(Behavior):
         self.centered = False
         self.need_standby = False
         self.waiting_rot = False
+        self.come_closer_received = False
         super().__init__(name=self.name)
 
     @property
@@ -39,6 +40,7 @@ class FollowerIntersection(Behavior):
                 self.waiting_come_closer = True
                 self.dir_to_follow = None
                 self.waiting_rot = False
+                self.come_closer_received = False
                 self.send("do_CenterInIntersection")
                 self.send("standby_stop")
 
@@ -46,6 +48,7 @@ class FollowerIntersection(Behavior):
             self.send("standby_send_come_closer")
 
         elif self.situation[Situation.COME_CLOSER][0] and self.waiting_come_closer:
+            self.come_closer_received = True
             self.dir_to_follow = self.situation[Situation.COME_CLOSER][1]
             self.waiting_come_closer = False
             if self.agent.neighboring_agent_list["F"] != None:
@@ -53,18 +56,19 @@ class FollowerIntersection(Behavior):
                 #print("trying to get direction")
             self.send("do_ComeCloserDirectionToGo")
             
-        elif self.situation[Situation.COME_CLOSER_SENT] or self.agent.neighboring_agent_list["F"] == None:
-            self.send("standby_ComeCloserDirectionToGo")
-            if self.need_standby:
-                self.send("standby_GapDirectionDetermination")
-                self.send("standby_rotation")
-                self.waiting_rot = True
-            if self.centered_in_intersection:
-                self.send("standby_CenterInIntersection")
-                self.send("do_GapDirectionDetermination")
-                self.send("do_rotation")
-                self.need_standby = True
-            if self.situation[Situation.BACKWARD_TOO_CLOSE] or self.agent.neighboring_agent_list["F"] == None:
-                #if self.situation[Situation.CLOSE_TO_EXPLORED_BRANCH]:
-                if self.waiting_rot and self.situation[Situation.ROTATION_COMPLETED]:
-                    self.send("do_move")
+        elif self.come_closer_received:
+            if self.situation[Situation.COME_CLOSER_SENT] or self.agent.neighboring_agent_list["F"] == None:
+                self.send("standby_ComeCloserDirectionToGo")
+                if self.need_standby:
+                    self.send("standby_GapDirectionDetermination")
+                    self.send("standby_rotation")
+                    self.waiting_rot = True
+                if self.centered_in_intersection:
+                    self.send("standby_CenterInIntersection")
+                    self.send("do_GapDirectionDetermination")
+                    self.send("do_rotation")
+                    self.need_standby = True
+                if self.situation[Situation.BACKWARD_TOO_CLOSE] or self.agent.neighboring_agent_list["F"] == None:
+                    #if self.situation[Situation.CLOSE_TO_EXPLORED_BRANCH]:
+                    if self.waiting_rot and self.situation[Situation.ROTATION_COMPLETED]:
+                        self.send("do_move")

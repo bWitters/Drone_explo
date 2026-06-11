@@ -7,7 +7,7 @@ class Drones():
     """The base class for the drones"""
 
     def __init__(self,unique_id,drones,env_id_drones,stocking_area,log_directory,uri=None):
-        self.front = "N"
+        self.front = "W"
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
@@ -106,6 +106,7 @@ class Drones():
         from Actions.center_in_intersection import CenterInIntersection
         from Actions.rotation_control import RotationControl
         from Actions.forced_waiting import ForcedWaiting
+        from Actions.send_current_direction import SendCurrentDirection
 
         self.stop_action = Stop(self)
         self.change_role_action = ChangeRole(self)
@@ -125,6 +126,7 @@ class Drones():
         self.center_in_intersection_action = CenterInIntersection(self)
         self.rotation_conrol_action = RotationControl(self)
         self.forced_waiting_action = ForcedWaiting(self)
+        self.send_current_direction_action = SendCurrentDirection(self)
 
         self.actions_dict = {"Stop" : self.stop_action,
                              "Change Role" : self.change_role_action,
@@ -142,7 +144,8 @@ class Drones():
                              "Height control" : self.height_control_action,
                              "Center in intersection" : self.center_in_intersection_action,
                              "Rotation control" : self.rotation_conrol_action,
-                             "Forced waiting" : self.forced_waiting_action
+                             "Forced waiting" : self.forced_waiting_action,
+                             "Send Current Direction" : self.send_current_direction_action,
                              }
 
 
@@ -164,7 +167,8 @@ class Drones():
                                                    self.center_in_corridor_action,
                                                    self.height_control_action,
                                                    self.rotation_conrol_action,
-                                                   self.forced_waiting_action
+                                                   self.forced_waiting_action,
+                                                   self.send_current_direction_action
                                                    )
         
         self.leader_intersection_behavior.add_listener(self.stop_action,
@@ -200,7 +204,8 @@ class Drones():
                                                      self.center_in_corridor_action,
                                                      self.height_control_action,
                                                      self.rotation_conrol_action,
-                                                     self.forced_waiting_action
+                                                     self.forced_waiting_action,
+                                                     self.send_current_direction_action
                                                      )
         
         self.follower_intersection_behavior.add_listener(self.stop_action,
