@@ -29,7 +29,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 5
+NUM_DRONES = 2
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 INIT_XYZ = np.array([[.4 +.4*i, 0.5, 0.2] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
@@ -43,10 +43,9 @@ URIS = [
     
 ]
 
-def go(
-        queues:list[Queue]|None = None,
-        queues_etat_reel:list[Queue]|None = None,
-        queues_position_simu:list[Queue]|None = None,
+def go( queues = None,
+        queues_etat_reel = None,
+        queues_position_simu = None,
         drone=DEFAULT_DRONES,
         physics=DEFAULT_PHYSICS,
         gui=DEFAULT_GUI,
@@ -106,7 +105,7 @@ def go(
             queues_position_simu[i].put([INIT_XYZ[i][0],INIT_XYZ[i][1],INIT_XYZ[i][2],INIT_RPY[i][2]])
 
     #### Waiting for takeoff ####
-    if queues != None and queues_etat_reel != None:
+    if queues_etat_reel != None:
         ready = False
         while ready != True:
             print("Waiting take off")
@@ -278,7 +277,7 @@ def go(
                     # No translation; keep yaw rate
                     commande = [0.0, 0.0, 0.0, 0.0, float(wz)]
                     if queues != None:
-                        add_to_queue = [0, 0, 0, 0, wz, True]
+                        add_to_queue = [0, 0, 0, 0, wz, True, sim_steps]
                         queues[j].put(add_to_queue)
                     action[j, :] = commande
                 else:
@@ -291,7 +290,7 @@ def go(
                     commande = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
                     action[j, :] = commande
                     if queues != None:
-                        add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True]
+                        add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True, sim_steps]
                         queues[j].put(add_to_queue)
                 
 
@@ -326,7 +325,7 @@ def go(
     fin = time.time()
     for j in range(NUM_DRONES):
         if queues != None:
-            queues[j].put([0,0,0,0,0,False])
+            queues[j].put([0,0,0,0,0,False,sim_steps])
     print(f"Total duration = {fin-debut}")
     input("Press enter to continue...")
     #### Close the environment #################################

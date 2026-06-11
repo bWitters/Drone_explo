@@ -1,6 +1,7 @@
 from multiprocessing import Process, Queue
 import app
 import Controleur
+import tests.test_real_time_log
 
 NUM_DRONES = 2
 if __name__ == "__main__":
