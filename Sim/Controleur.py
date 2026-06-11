@@ -55,7 +55,7 @@ def go(queues, queue_etat_reel,queues_position_simu):
     cflib.crtp.init_drivers()
 
     ### Log files
-    directory_name = f"Controleur_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+    directory_name = f"logs/Controleur/Controleur_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
     try:
         os.mkdir(directory_name)
         print(f"Directory '{directory_name}' created successfully.")

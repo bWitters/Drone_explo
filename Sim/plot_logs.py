@@ -10,8 +10,9 @@ def read_csv_data(csv_file_path):
         reader = csv.DictReader(file)
         required_columns = ['vx', 'vy', 'vz', 'v_yaw']
         for col in required_columns:
-            if col not in reader.fieldnames:
-                raise ValueError(f"Colonne '{col}' manquante dans {csv_file_path}.")
+            if reader.fieldnames != None:
+                if col not in reader.fieldnames:
+                    raise ValueError(f"Colonne '{col}' manquante dans {csv_file_path}.")
         for row in reader:
             data['vx'].append(float(row['vx']))
             data['vy'].append(float(row['vy']))
@@ -24,8 +25,9 @@ def read_behaviors(behavior_file_path):
     behaviors = []
     with open(behavior_file_path, mode='r') as file:
         reader = csv.DictReader(file)
-        if 'Behavior' not in reader.fieldnames:
-            raise ValueError(f"Colonne 'Behavior' manquante dans {behavior_file_path}.")
+        if reader.fieldnames != None:
+            if 'Behavior' not in reader.fieldnames:
+                raise ValueError(f"Colonne 'Behavior' manquante dans {behavior_file_path}.")
         lines = [row['Behavior'] for row in reader]
 
     if not lines:
@@ -137,6 +139,6 @@ def plot_drones_comparison(drones, real_alpha=0.7):
     plt.show()
 
 if __name__ == "__main__":
-    folder_path = "Sim_2026-06-10-11-33-08"  # Remplace par ton dossier
+    folder_path = "logs/Simu/Sim_2026-06-10-11-33-08"
     drones = get_drone_files(folder_path)
     plot_drones_comparison(drones, real_alpha=0.7)
