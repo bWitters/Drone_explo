@@ -169,9 +169,9 @@ class SituationState():
                 if last_com[0] == "Current Direction":
                     self.situation[Situation.PRECEDING_DIRECTION] = last_com[1]
                 if last_com[0] == "Reconfig":
-                    self.situation[Situation.RECONFIG] = True
+                    self.situation[Situation.RECONFIG_RECEIVED] = True
                 else:
-                    self.situation[Situation.RECONFIG] = False
+                    self.situation[Situation.RECONFIG_RECEIVED] = False
         else:
             self.situation[Situation.COME_CLOSER] = (False,None)
     

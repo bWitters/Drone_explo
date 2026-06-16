@@ -13,6 +13,8 @@ class DroneStateMachine(StateChart):
     FollowerCurve = State("FollowerCurve")
     FollowerIntersection = State("FollowerIntersection")
     ForcedWait = State("Forced Wait")
+    ReconfigFollower = State("ReconfigFollower")
+
     
     stock = Stock.to.itself()
 
@@ -47,6 +49,11 @@ class DroneStateMachine(StateChart):
 
     reach_dead_end = (LeaderCorridor.to(LeaderDeadEnd)|
                       LeaderDeadEnd.to.itself())
+    
+    reconfig = (LeaderDeadEnd.to(ReconfigFollower)|
+                FollowerCorridor.to(ReconfigFollower)|
+                FollowerCurve.to(ReconfigFollower)|
+                FollowerIntersection.to(ReconfigFollower))
 
     
     @property
@@ -86,7 +93,8 @@ class DroneStateMachine(StateChart):
                 if situation[Situation.CORRIDOR]:
                     self.exploration()
             elif self.configuration == {DroneStateMachine.LeaderDeadEnd}:
-                pass
+                if situation[Situation.RECONFIG]:
+                    self.reconfig()
 
         elif "follower" in self.role:
             if self.configuration == {DroneStateMachine.Stock}:
@@ -104,12 +112,18 @@ class DroneStateMachine(StateChart):
                     self.follow()
                 elif situation[Situation.CURVE]:
                     self.follow_curve()
+                if situation[Situation.RECONFIG]:
+                    self.reconfig()
             elif self.configuration == {DroneStateMachine.FollowerCurve}:
                 if situation[Situation.CORRIDOR]:
                     self.follow_curve()
+                if situation[Situation.RECONFIG]:
+                    self.reconfig()
             elif self.configuration == {DroneStateMachine.FollowerIntersection}:
                 if situation[Situation.CORRIDOR]:
                     self.follow()
+                if situation[Situation.RECONFIG]:
+                    self.reconfig()
             elif self.configuration == {DroneStateMachine.ForcedWait}:
                 if situation[Situation.CORRIDOR]:
                     if not situation[Situation.FORCED_WAIT]:

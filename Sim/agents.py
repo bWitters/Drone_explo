@@ -63,6 +63,7 @@ class Drones():
         from Behaviors.leader_curve import LeaderCurve
         from Behaviors.follower_curve import FollowerCurve
         from Behaviors.leader_dead_end import LeaderDeadEnd
+        from Behaviors.reconfig_follower import ReconfigFollower
 
         self.stock_behavior = Stock(agent = self)
         self.takeoff_behavior = Takeoff(agent = self)
@@ -73,6 +74,7 @@ class Drones():
         self.follower_corridor_behavior = FollowerCorridor(agent = self)
         self.follower_intersection_behavior = FollowerIntersection(agent = self)
         self.follower_curve_behavior = FollowerCurve(agent = self)
+        self.reconfig_follower_behavior = ReconfigFollower(agent = self)
 
 
         self.sm_behavior_dict = {"Stock" : self.stock_behavior,
@@ -84,6 +86,7 @@ class Drones():
                                  "Follower Corridor" : self.follower_corridor_behavior,
                                  "Follower Intersection" : self.follower_intersection_behavior,
                                  "Follower Curve" : self.follower_curve_behavior,
+                                 "Reconfig Follower": self.reconfig_follower_behavior,
                                  }
 
         self.state.add_listener(self.stock_behavior,
@@ -95,6 +98,7 @@ class Drones():
                                 self.follower_corridor_behavior,
                                 self.follower_intersection_behavior,
                                 self.follower_curve_behavior,
+                                self.reconfig_follower_behavior,
                                 )
         
         from Actions.stop import Stop
@@ -249,6 +253,9 @@ class Drones():
                                                   self.rotation_conrol_action,
                                                   self.height_control_action
                                                   )
+
+        self.reconfig_follower_behavior.add_listener(self.stop_action,
+                                                     )
 
         self.initialize_agent()
 

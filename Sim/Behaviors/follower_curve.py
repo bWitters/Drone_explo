@@ -20,7 +20,7 @@ class FollowerCurve(Behavior):
 
 
     def update_action(self):
-        if self.situation[Situation.RECONFIG]:
+        if self.situation[Situation.RECONFIG_RECEIVED]:
             print("Reconfig received")
             print("Sending Reconfig")
             self.send("do_SendReconfig")            

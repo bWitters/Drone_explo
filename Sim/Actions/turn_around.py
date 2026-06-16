@@ -23,5 +23,5 @@ class TurnAround(Action):
         """
         new_cell = None
         if self.graph_neighbors["B"]:
-            new_cell = self.graph_neighbors["B"][0]
+            new_cell = "B"
         self.agent.new_cell = new_cell

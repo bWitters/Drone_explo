@@ -2,7 +2,7 @@ from situation_dict import Situation
 from agents import Drones
 from Behaviors.Behavior import Behavior
 
-class FollowerCorridor(Behavior):
+class ReconfigFollower(Behavior):
     """State machine for the Corridor behavior of Drones"""
 
     def __init__(self, agent):
@@ -23,7 +23,7 @@ class FollowerCorridor(Behavior):
             print("Sending Reconfig")
             self.send("do_SendReconfig")
 
-        if FollowerCorridor.Active.Sub_Stop.Stop in self.configuration:
+        if ReconfigFollower.Active.Sub_Stop.Stop in self.configuration:
             self.send("do_CenterInCorridor")
             self.send("do_HeightControl")
             self.send("do_RotationControl")
@@ -34,7 +34,7 @@ class FollowerCorridor(Behavior):
             #self.send("do_SendCurrentDirection")
             self.situation[Situation.COME_CLOSER_SENT] = False
 
-        elif FollowerCorridor.Active.Sub_Move.Move in self.configuration:
+        elif ReconfigFollower.Active.Sub_Move.Move in self.configuration:
             self.send("standby_ComeCloserDirectionToGo")
 
             if self.situation[Situation.BACKWARD_TOO_FAR][0]:
@@ -51,7 +51,7 @@ class FollowerCorridor(Behavior):
             if not self.situation[Situation.FRONT_TOO_CLOSE] and not self.situation[Situation.BACKWARD_TOO_FAR][0]:
                 self.send("standby_ForcedWaiting")        
 
-        elif FollowerCorridor.Active.Sub_ForcedWaiting.ForcedWaiting in self.configuration:
+        elif ReconfigFollower.Active.Sub_ForcedWaiting.ForcedWaiting in self.configuration:
             if self.situation[Situation.BACKWARD_TOO_FAR][0] == False:
                 self.send("do_move")
                 self.send("standby_ForcedWaiting")
