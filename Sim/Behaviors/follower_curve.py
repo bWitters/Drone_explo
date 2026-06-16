@@ -20,6 +20,11 @@ class FollowerCurve(Behavior):
 
 
     def update_action(self):
+        if self.situation[Situation.RECONFIG]:
+            print("Reconfig received")
+            print("Sending Reconfig")
+            self.send("do_SendReconfig")            
+
         if FollowerCurve.Active.Sub_Stop.Stop in self.configuration:
             self.ready_to_continue = False
             self.dir_to_follow = None

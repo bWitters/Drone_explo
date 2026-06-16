@@ -19,4 +19,4 @@ class LeaderDeadEnd(Behavior):
 
     def update_action(self):
         if LeaderDeadEnd.Active.Sub_Stop.Stop in self.configuration:
-            print("Reached a dead end")
+            self.send("do_SendReconfig")

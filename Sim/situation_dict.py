@@ -27,3 +27,4 @@ class Situation(Enum):
     ROTATION_COMPLETED = auto()
     DEAD_END = auto()
     PRECEDING_DIRECTION = auto()
+    RECONFIG = auto()

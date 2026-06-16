@@ -44,6 +44,13 @@ class Behavior(StateChart):
 
             do_RotationControl = Idle_RotationControl.to(RotationControl)
             standby_RotationControl = RotationControl.to(Idle_RotationControl)
+
+        class Sub_SendReconfig(State.Compound):
+            Idle_SendReconfig = State(initial=True)
+            SendReconfig = State()
+
+            do_SendReconfig = Idle_SendReconfig.to(SendReconfig)
+            standby_SendReconfig = SendReconfig.to(Idle_SendReconfig)
         
         class Sub_SendCurrentDirection(State.Compound):
             Idle_SendCurrentDirection = State(initial=True)

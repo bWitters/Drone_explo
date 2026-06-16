@@ -34,6 +34,12 @@ class FollowerIntersection(Behavior):
         # 4 : Stop select direction + Stop come closer
         # 5 : Wait backward close
         # 6 : Go
+        if self.situation[Situation.RECONFIG]:
+            print("Reconfig received")
+            print("Sending Reconfig")
+            self.send("do_SendReconfig")
+            self.send("")
+
         if FollowerIntersection.Active.Sub_Stop.Stop in self.configuration:
                 self.need_standby = False
                 self.centered = False

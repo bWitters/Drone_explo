@@ -1,7 +1,7 @@
 from multiprocessing import Process, Queue
 import app
 import Controleur
-import tests.test_real_time_log
+import real_time_log
 
 NUM_DRONES = 2
 if __name__ == "__main__":
@@ -15,11 +15,14 @@ if __name__ == "__main__":
 
     p1 = Process(target=app.go, args=(queues_commande,queues_etat_reel,queues_position_simu,))
     p2 = Process(target=Controleur.go, args=(queues_commande,queues_etat_reel,queues_position_simu,))
+    p3 = Process(target=real_time_log.go, args=(queues_commande[0],))
     
     p1.start()
     p2.start()
+    p3.start()
 
     p1.join()
     p2.join()
+    p3.join()
 
     print("End of flight")

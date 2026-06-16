@@ -18,6 +18,11 @@ class FollowerCorridor(Behavior):
         return self.agent.role.configuration_values 
 
     def update_action(self):
+        if self.situation[Situation.RECONFIG]:
+            print("Reconfig received")
+            print("Sending Reconfig")
+            self.send("do_SendReconfig")
+
         if FollowerCorridor.Active.Sub_Stop.Stop in self.configuration:
             self.send("do_CenterInCorridor")
             self.send("do_HeightControl")
