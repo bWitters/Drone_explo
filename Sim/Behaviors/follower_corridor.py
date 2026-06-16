@@ -30,7 +30,7 @@ class FollowerCorridor(Behavior):
             self.send("standby_stop")
             self.send("do_ComeCloserDirectionToGo")
             self.send("do_move")
-            self.send("do_rotation")
+            #self.send("do_rotation")
             #self.send("do_SendCurrentDirection")
             self.situation[Situation.COME_CLOSER_SENT] = False
 

@@ -33,9 +33,9 @@ NUM_DRONES = 10
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
 INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
-
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
-INIT_RPY = np.array([[.0, .0, math.pi] for _ in range(NUM_DRONES)])
+LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
+INIT_RPY = np.array([LIST_RPY[i] for i in range(NUM_DRONES)])
 RAY_LENGTH = 10
 RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
@@ -166,7 +166,7 @@ def go( queues = None,
 
             for drone_i in range(num_drones):    
                 if drone_i == 0:
-                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,directory_name,URIS[0]))
+                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,directory_name,LIST_RPY[drone_i],URIS[0]))
                     nom_fichier = f"{directory_name}/drone_velocity_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
@@ -183,7 +183,7 @@ def go( queues = None,
                     log_behavior[-1].writerow(["Behavior"])
                     files_behavior[-1].flush()
                 else:
-                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,URIS[unique_id-1]))
+                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,LIST_RPY[drone_i],URIS[unique_id-1]))
                     nom_fichier = f"{directory_name}/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))

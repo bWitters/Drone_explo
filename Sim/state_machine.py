@@ -33,6 +33,9 @@ class DroneStateMachine(StateChart):
               FollowerCorridor.to(FollowerIntersection)|
               FollowerIntersection.to(FollowerCorridor)|
               ForcedWait.to(FollowerCorridor))
+
+    take_off_curve = (Takeoff.to(FollowerCurve)|
+                      FollowerCurve.to(FollowerCorridor))
     
     follow_curve = (FollowerCorridor.to(FollowerCurve)|
                     FollowerCurve.to(FollowerCorridor))
@@ -92,7 +95,10 @@ class DroneStateMachine(StateChart):
             if self.configuration == {DroneStateMachine.Takeoff}:
                 if situation[Situation.GOOD_HEIGHT]:
                     if situation[Situation.COME_CLOSER][0]:
-                        self.follow()
+                        if situation[Situation.CORRIDOR]:
+                            self.follow()
+                        if situation[Situation.CURVE]:
+                            self.take_off_curve()
             elif self.configuration == {DroneStateMachine.FollowerCorridor}:
                 if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
                     self.follow()

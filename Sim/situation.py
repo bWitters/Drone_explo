@@ -71,6 +71,7 @@ class SituationState():
     
     def is_in_corridor(self, graph_branch_counter: int, graph_neighborhood : dict, occupied_gaps : dict) -> bool:
         if graph_branch_counter == 2 or graph_branch_counter == 1:
+            print(occupied_gaps["F"])
             if graph_neighborhood["B"] and graph_neighborhood["F"]:
                 self.entrance = True
                 return True

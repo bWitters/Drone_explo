@@ -2,12 +2,21 @@ from Behaviors.Behavior import Behavior
 from Actions.Action import Action
 from datetime import datetime
 import csv
-
+import math
 class Drones():
     """The base class for the drones"""
 
-    def __init__(self,unique_id,drones,env_id_drones,stocking_area,log_directory,uri=None):
-        self.front = "W"
+    def __init__(self,unique_id,drones,env_id_drones,stocking_area,log_directory,init_dir,uri=None,):
+        angles = [0,math.pi / 2,math.pi,math.pi * 3/2]
+        if init_dir[2] == angles[0]:
+            direction = "E"
+        elif init_dir[2] == angles[1]:
+            direction = "N"
+        elif init_dir[2] == angles[2]:
+            direction = "W"
+        elif init_dir[2] == angles[3]:
+            direction = "S"
+        self.front = direction
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
@@ -236,7 +245,9 @@ class Drones():
                                                   self.change_role_action,
                                                   self.center_in_corridor_action,
                                                   self.center_in_curve_action,
-                                                  self.send_reconfig_message
+                                                  self.send_reconfig_message,
+                                                  self.rotation_conrol_action,
+                                                  self.height_control_action
                                                   )
 
         self.initialize_agent()

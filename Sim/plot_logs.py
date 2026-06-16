@@ -139,6 +139,6 @@ def plot_drones_comparison(drones, real_alpha=0.7):
     plt.show()
 
 if __name__ == "__main__":
-    folder_path = "Sim_2026-06-16-10-58-54"
+    folder_path = "logs/Simu/Sim_2026-06-16-12-03-53"
     drones = get_drone_files(folder_path)
     plot_drones_comparison(drones, real_alpha=0.7)
