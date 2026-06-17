@@ -15,7 +15,7 @@ from multiprocessing import Queue
 from agents import Drones
 import yaml
 
-with open("Map/Intersection/Intersection.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
+with open("Map/Demo_soft_stock/Demo_soft_stock.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -29,11 +29,13 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 5
+NUM_DRONES = 10
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-INIT_XYZ = np.array([[.4 +.4*i, 0.5, 0.2] for i in range(NUM_DRONES)])
+LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
+INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
-INIT_RPY = np.array([[.0, .0, math.pi] for _ in range(NUM_DRONES)])
+LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
+INIT_RPY = np.array([LIST_RPY[i] for i in range(NUM_DRONES)])
 RAY_LENGTH = 10
 RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
@@ -43,10 +45,9 @@ URIS = [
     
 ]
 
-def go(
-        queues:list[Queue]|None = None,
-        queues_etat_reel:list[Queue]|None = None,
-        queues_position_simu:list[Queue]|None = None,
+def go( queues = None,
+        queues_etat_reel = None,
+        queues_position_simu = None,
         drone=DEFAULT_DRONES,
         physics=DEFAULT_PHYSICS,
         gui=DEFAULT_GUI,
@@ -81,7 +82,7 @@ def go(
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
 
-    p.loadURDF("Map/Intersection/Intersection.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("Map/Demo_soft_stock/Demo_soft_stock.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     ### Log files 
 
@@ -106,7 +107,7 @@ def go(
             queues_position_simu[i].put([INIT_XYZ[i][0],INIT_XYZ[i][1],INIT_XYZ[i][2],INIT_RPY[i][2]])
 
     #### Waiting for takeoff ####
-    if queues != None and queues_etat_reel != None:
+    if queues_etat_reel != None:
         ready = False
         while ready != True:
             print("Waiting take off")
@@ -152,7 +153,7 @@ def go(
                         env_id_drones[key]["drone_id"] = drone_i
                 
             #### Log files
-            directory_name = f"Sim_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+            directory_name = f"logs/Simu/Sim_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
             try:
                 os.mkdir(directory_name)
                 print(f"Directory '{directory_name}' created successfully.")
@@ -165,7 +166,7 @@ def go(
 
             for drone_i in range(num_drones):    
                 if drone_i == 0:
-                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,directory_name,URIS[0]))
+                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,directory_name,LIST_RPY[drone_i],URIS[0]))
                     nom_fichier = f"{directory_name}/drone_velocity_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
@@ -182,7 +183,7 @@ def go(
                     log_behavior[-1].writerow(["Behavior"])
                     files_behavior[-1].flush()
                 else:
-                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,URIS[unique_id-1]))
+                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,LIST_RPY[drone_i],URIS[unique_id-1]))
                     nom_fichier = f"{directory_name}/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
@@ -278,7 +279,7 @@ def go(
                     # No translation; keep yaw rate
                     commande = [0.0, 0.0, 0.0, 0.0, float(wz)]
                     if queues != None:
-                        add_to_queue = [0, 0, 0, 0, wz, True]
+                        add_to_queue = [0, 0, 0, 0, wz, True, sim_steps]
                         queues[j].put(add_to_queue)
                     action[j, :] = commande
                 else:
@@ -291,7 +292,7 @@ def go(
                     commande = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
                     action[j, :] = commande
                     if queues != None:
-                        add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True]
+                        add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True, sim_steps]
                         queues[j].put(add_to_queue)
                 
 
@@ -326,7 +327,7 @@ def go(
     fin = time.time()
     for j in range(NUM_DRONES):
         if queues != None:
-            queues[j].put([0,0,0,0,0,False])
+            queues[j].put([0,0,0,0,0,False,sim_steps])
     print(f"Total duration = {fin-debut}")
     input("Press enter to continue...")
     #### Close the environment #################################

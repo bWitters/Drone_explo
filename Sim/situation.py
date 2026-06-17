@@ -71,6 +71,7 @@ class SituationState():
     
     def is_in_corridor(self, graph_branch_counter: int, graph_neighborhood : dict, occupied_gaps : dict) -> bool:
         if graph_branch_counter == 2 or graph_branch_counter == 1:
+            print(occupied_gaps["F"])
             if graph_neighborhood["B"] and graph_neighborhood["F"]:
                 self.entrance = True
                 return True
@@ -167,6 +168,10 @@ class SituationState():
                     self.situation[Situation.FORCED_WAIT] = (False,last_com[1])
                 if last_com[0] == "Current Direction":
                     self.situation[Situation.PRECEDING_DIRECTION] = last_com[1]
+                if last_com[0] == "Reconfig":
+                    self.situation[Situation.RECONFIG_RECEIVED] = True
+                else:
+                    self.situation[Situation.RECONFIG_RECEIVED] = False
         else:
             self.situation[Situation.COME_CLOSER] = (False,None)
     

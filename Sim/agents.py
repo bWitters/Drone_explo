@@ -2,12 +2,21 @@ from Behaviors.Behavior import Behavior
 from Actions.Action import Action
 from datetime import datetime
 import csv
-
+import math
 class Drones():
     """The base class for the drones"""
 
-    def __init__(self,unique_id,drones,env_id_drones,stocking_area,log_directory,uri=None):
-        self.front = "W"
+    def __init__(self,unique_id,drones,env_id_drones,stocking_area,log_directory,init_dir,uri=None,):
+        angles = [0,math.pi / 2,math.pi,math.pi * 3/2]
+        if init_dir[2] == angles[0]:
+            direction = "E"
+        elif init_dir[2] == angles[1]:
+            direction = "N"
+        elif init_dir[2] == angles[2]:
+            direction = "W"
+        elif init_dir[2] == angles[3]:
+            direction = "S"
+        self.front = direction
         #self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
@@ -54,6 +63,7 @@ class Drones():
         from Behaviors.leader_curve import LeaderCurve
         from Behaviors.follower_curve import FollowerCurve
         from Behaviors.leader_dead_end import LeaderDeadEnd
+        from Behaviors.reconfig_follower import ReconfigFollower
 
         self.stock_behavior = Stock(agent = self)
         self.takeoff_behavior = Takeoff(agent = self)
@@ -64,6 +74,7 @@ class Drones():
         self.follower_corridor_behavior = FollowerCorridor(agent = self)
         self.follower_intersection_behavior = FollowerIntersection(agent = self)
         self.follower_curve_behavior = FollowerCurve(agent = self)
+        self.reconfig_follower_behavior = ReconfigFollower(agent = self)
 
 
         self.sm_behavior_dict = {"Stock" : self.stock_behavior,
@@ -75,6 +86,7 @@ class Drones():
                                  "Follower Corridor" : self.follower_corridor_behavior,
                                  "Follower Intersection" : self.follower_intersection_behavior,
                                  "Follower Curve" : self.follower_curve_behavior,
+                                 "Reconfig Follower": self.reconfig_follower_behavior,
                                  }
 
         self.state.add_listener(self.stock_behavior,
@@ -86,6 +98,7 @@ class Drones():
                                 self.follower_corridor_behavior,
                                 self.follower_intersection_behavior,
                                 self.follower_curve_behavior,
+                                self.reconfig_follower_behavior,
                                 )
         
         from Actions.stop import Stop
@@ -107,6 +120,7 @@ class Drones():
         from Actions.rotation_control import RotationControl
         from Actions.forced_waiting import ForcedWaiting
         from Actions.send_current_direction import SendCurrentDirection
+        from Actions.send_reconfig_message import SendReconfig
 
         self.stop_action = Stop(self)
         self.change_role_action = ChangeRole(self)
@@ -127,6 +141,7 @@ class Drones():
         self.rotation_conrol_action = RotationControl(self)
         self.forced_waiting_action = ForcedWaiting(self)
         self.send_current_direction_action = SendCurrentDirection(self)
+        self.send_reconfig_message = SendReconfig(self)
 
         self.actions_dict = {"Stop" : self.stop_action,
                              "Change Role" : self.change_role_action,
@@ -146,6 +161,7 @@ class Drones():
                              "Rotation control" : self.rotation_conrol_action,
                              "Forced waiting" : self.forced_waiting_action,
                              "Send Current Direction" : self.send_current_direction_action,
+                             "Send Reconfig Message" : self.send_reconfig_message,
                              }
 
 
@@ -192,6 +208,7 @@ class Drones():
                                                 )
 
         self.leader_dead_end_behavior.add_listener(self.stop_action,
+                                                   self.send_reconfig_message
                                                    )
         
         self.follower_corridor_behavior.add_listener(self.stop_action,
@@ -205,7 +222,8 @@ class Drones():
                                                      self.height_control_action,
                                                      self.rotation_conrol_action,
                                                      self.forced_waiting_action,
-                                                     self.send_current_direction_action
+                                                     self.send_current_direction_action,
+                                                     self.send_reconfig_message
                                                      )
         
         self.follower_intersection_behavior.add_listener(self.stop_action,
@@ -217,7 +235,8 @@ class Drones():
                                                          self.change_role_action,
                                                          self.send_come_closer_action,
                                                          self.center_in_corridor_action,
-                                                         self.center_in_intersection_action
+                                                         self.center_in_intersection_action,
+                                                         self.send_reconfig_message
                                                          )
         
         self.follower_curve_behavior.add_listener(self.stop_action,
@@ -229,8 +248,14 @@ class Drones():
                                                   self.send_come_closer_action,
                                                   self.change_role_action,
                                                   self.center_in_corridor_action,
-                                                  self.center_in_curve_action
+                                                  self.center_in_curve_action,
+                                                  self.send_reconfig_message,
+                                                  self.rotation_conrol_action,
+                                                  self.height_control_action
                                                   )
+
+        self.reconfig_follower_behavior.add_listener(self.stop_action,
+                                                     )
 
         self.initialize_agent()
 

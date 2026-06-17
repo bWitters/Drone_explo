@@ -20,10 +20,17 @@ class FollowerCurve(Behavior):
 
 
     def update_action(self):
+        if self.situation[Situation.RECONFIG_RECEIVED]:
+            print("Reconfig received")
+            print("Sending Reconfig")
+            self.send("do_SendReconfig")            
+
         if FollowerCurve.Active.Sub_Stop.Stop in self.configuration:
             self.ready_to_continue = False
             self.dir_to_follow = None
             self.send("do_CenterInCurve")
+            self.send("do_HeightControl")
+            self.send("do_RotationControl")
             if self.agent.sensor_data.centered_in_corner:
                 self.ready_to_continue = True
                 self.send("standby_stop")
@@ -40,6 +47,7 @@ class FollowerCurve(Behavior):
             self.send("standby_ComeCloserDirectionToGo")
             if self.situation[Situation.FRONT_TOO_CLOSE]:
                 self.send("do_stop")
+                pass
 
         elif FollowerCurve.Active.Sub_Rotation.Rotation in self.configuration:
             if self.situation[Situation.ROTATION_COMPLETED]:

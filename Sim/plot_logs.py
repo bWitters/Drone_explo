@@ -94,7 +94,7 @@ def plot_drones_comparison(drones, real_alpha=0.7):
         'FollowerCorridor': '#b6ade6',
         'FollowerCurve': '#90e0ef',
         'FollowerIntersection': '#dda0dd',
-        'Forced Wait': '#f08080',
+        'LeaderDeadEnd': '#f08080',
     }
 
     def set_ylim(ax, data1, data2):
@@ -139,6 +139,6 @@ def plot_drones_comparison(drones, real_alpha=0.7):
     plt.show()
 
 if __name__ == "__main__":
-    folder_path = "logs/Simu/Sim_2026-06-10-11-33-08"
+    folder_path = "logs/Simu/Sim_2026-06-16-12-03-53"
     drones = get_drone_files(folder_path)
     plot_drones_comparison(drones, real_alpha=0.7)
