@@ -7,7 +7,8 @@ class ReconfigFollower(Behavior):
 
     def __init__(self, agent):
         self.agent: Drones = agent
-
+        self.rotate = True
+        self.change_neighborhood = True
         super().__init__(name = self.name)
     
     @property
@@ -18,43 +19,23 @@ class ReconfigFollower(Behavior):
         return self.agent.role.configuration_values 
 
     def update_action(self):
-        if self.situation[Situation.RECONFIG_RECEIVED]:
-            print("Reconfig received")
-            print("Sending Reconfig")
-            self.send("do_SendReconfig")
-
-        if ReconfigFollower.Active.Sub_Stop.Stop in self.configuration:
-            self.send("do_CenterInCorridor")
-            self.send("do_HeightControl")
-            self.send("do_RotationControl")
-            self.send("standby_stop")
-            self.send("do_ComeCloserDirectionToGo")
-            self.send("do_move")
-            #self.send("do_rotation")
-            #self.send("do_SendCurrentDirection")
-            self.situation[Situation.COME_CLOSER_SENT] = False
-
-        elif ReconfigFollower.Active.Sub_Move.Move in self.configuration:
-            self.send("standby_ComeCloserDirectionToGo")
-
-            if self.situation[Situation.BACKWARD_TOO_FAR][0]:
-                if self.situation[Situation.COME_CLOSER_SENT] == False:
-                    self.send("do_send_come_closer")
-                if self.situation[Situation.BACKWARD_TOO_FAR][1] == 2:
-                    self.send("do_ForcedWaiting")
-                    self.send("standby_move")
-            
-            if self.situation[Situation.FRONT_TOO_CLOSE]:
-                self.send("do_ForcedWaiting")
-
-
-            if not self.situation[Situation.FRONT_TOO_CLOSE] and not self.situation[Situation.BACKWARD_TOO_FAR][0]:
-                self.send("standby_ForcedWaiting")        
-
-        elif ReconfigFollower.Active.Sub_ForcedWaiting.ForcedWaiting in self.configuration:
-            if self.situation[Situation.BACKWARD_TOO_FAR][0] == False:
-                self.send("do_move")
-                self.send("standby_ForcedWaiting")
-            if self.situation[Situation.BACKWARD_TOO_FAR][1] == 1:
-                self.send("do_move")
-                self.send("standby_ForcedWaiting")
+        if self.role == "leader":
+            if self.change_neighborhood:
+                self.send("standby_turn_around")
+                self.send("standby_rotate")
+                self.agent.neighboring_agent_list["P"] = self.agent.neighboring_agent_list["F"]
+                self.agent.neighboring_agent_list["F"] = None
+                self.rotate = False
+                self.change_neighborhood = False
+        else:
+            if self.rotate:
+                self.send("do_turn_around")
+                self.send("do_rotate")
+                self.rotate = False
+            if self.change_neighborhood:
+                self.send("standby_turn_around")
+                self.send("standby_rotate")
+                old_preceding = self.agent.neighboring_agent_list["P"]
+                self.agent.neighboring_agent_list["P"] = self.agent.neighboring_agent_list["F"]
+                self.agent.neighboring_agent_list["F"] = old_preceding
+                self.change_neighborhood = False

@@ -208,7 +208,8 @@ class Drones():
                                                 )
 
         self.leader_dead_end_behavior.add_listener(self.stop_action,
-                                                   self.send_reconfig_message
+                                                   self.send_reconfig_message,
+                                                   self.turn_around_action
                                                    )
         
         self.follower_corridor_behavior.add_listener(self.stop_action,
@@ -255,6 +256,17 @@ class Drones():
                                                   )
 
         self.reconfig_follower_behavior.add_listener(self.stop_action,
+                                                     self.send_cell_action,
+                                                     self.new_cell_to_follow_action,
+                                                     self.come_closer_cell_to_follow_action,
+                                                     self.rotation_action,
+                                                     self.move_action,
+                                                     self.send_come_closer_action,
+                                                     self.change_role_action,
+                                                     self.center_in_corridor_action,
+                                                     self.center_in_curve_action,
+                                                     self.send_reconfig_message,
+                                                     self.turn_around_action,
                                                      )
 
         self.initialize_agent()
@@ -275,6 +287,7 @@ class Drones():
 
     def step(self, rays):
         print(f"\nDrone {self.unique_id}")
+        print(f"Current role : {self.role.configuration_values}")
         self.move_drone = [0,0,0,0,0]
         self.rays = rays
         self.sensor_data.neighborhood_analysis()

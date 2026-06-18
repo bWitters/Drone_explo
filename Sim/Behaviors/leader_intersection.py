@@ -38,17 +38,22 @@ class LeaderIntersection(Behavior):
         if LeaderIntersection.Active.Sub_GapDirectionDetermination.GapDirectionDetermination in self.configuration:
             self.send("standby_GapDirectionDetermination")
             self.send("standby_rotation")
+        
+        elif LeaderIntersection.Active.Sub_Move.Move in self.configuration:
+            pass
 
         elif self.waiting_rot:
             if self.situation[Situation.ROTATION_COMPLETED]:
+                self.send("standby_GapDirectionDetermination")
+                self.send("standby_rotation")
                 self.send("do_move")
                 self.waiting_rot = False
 
-        elif LeaderIntersection.Active.Sub_SendComeCloser.SendComeCloser in self.configuration:
+        elif LeaderIntersection.Active.Sub_SendComeCloser.SendComeCloser in self.configuration or self.agent.neighboring_agent_list["F"] == None:
             self.send("standby_send_come_closer")
 
-        elif self.situation[Situation.COME_CLOSER_SENT]:
-            if self.situation[Situation.BACKWARD_TOO_CLOSE]:
+        elif self.situation[Situation.COME_CLOSER_SENT] or self.agent.neighboring_agent_list["F"] == None:
+            if self.situation[Situation.BACKWARD_TOO_CLOSE] or self.agent.neighboring_agent_list["F"] == None:
                 #if self.situation[Situation.CLOSE_TO_EXPLORED_BRANCH]:
                 self.send("standby_CenterInIntersection")
                 self.send("do_GapDirectionDetermination")

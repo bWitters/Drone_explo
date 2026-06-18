@@ -14,6 +14,7 @@ import numpy as np
 
 import cflib.crtp
 from cflib.crazyflie.commander import Commander
+from cflib.positioning.motion_commander import MotionCommander
 from cflib.utils.multiranger import Multiranger
 from cflib.crazyflie.swarm import CachedCfFactory, Swarm
 from cflib.crazyflie.log import LogConfig
@@ -25,8 +26,9 @@ import os
 # === CONFIGURATION ===
 
 URIS = [
-    'radio://0/80/2M/1',
-    'radio://0/80/2M/2'
+    'radio://0/20/2M/1',
+    #'radio://0/80/2M/5',
+    'radio://0/80/2M/6',
 ]
 
 MAX_X, MIN_X = 1, -1
@@ -153,6 +155,7 @@ def go(queues, queue_etat_reel,queues_position_simu):
         my_args = {
             URIS[0]: [queues[0], directory_name, queue_etat_reel[0],queues_position_simu[0]],
             URIS[1]: [queues[1], directory_name, queue_etat_reel[1],queues_position_simu[1]],
+            #URIS[2]: [queues[2], directory_name, queue_etat_reel[2],queues_position_simu[2]],
         }
 
         swarm.parallel_safe(start_states_log)
@@ -168,6 +171,7 @@ def fly_sequence(scf, queue, directory_name, queue_etat_reel,queue_position_simu
 
     print("Controler running")
     uri = scf.cf.link_uri
+    cf = scf.cf
     split_uri = uri.split("/")
     nom_fichier = f"{directory_name}/drone_control_{split_uri[-1]}.csv"
     file = open(nom_fichier,"w")
@@ -184,39 +188,30 @@ def fly_sequence(scf, queue, directory_name, queue_etat_reel,queue_position_simu
     keep_flying = True
     time.sleep(1.0)
 
-    while queue_position_simu.empty():
-        print("waiting for sim to send positions")
-    init_pos = queue_position_simu.get()
-    initialised = False
+    # while queue_position_simu.empty():
+    #     print("waiting for sim to send positions")
+    # init_pos = queue_position_simu.get()
+    # initialised = False
 
-    commander = Commander(scf)
-    with Multiranger(scf) as multi_ranger:
-        compte = 0
-        while not initialised:
-            commande_init = {"x":.0,"y":.0,"z":.0}
-            for direction in "xyz":
-                if abs(pos_dict[scf.cf.link_uri][direction] - init_pos[0]) > 0.1:
-                    commande_init[direction] = 0.1
-                else:
-                    compte +=1
-                if compte == 3:
-                    initialised = True
-            commander.send_velocity_world_setpoint(commande_init["x"],commande_init["y"],commande_init["z"],0)
-            log_writer_log.writerow([pos_dict["x"],pos_dict["y"],pos_dict["z"],commande_init["x"],commande_init["y"],commande_init["z"],compte])
-            file_log.flush()
-        while keep_flying:
-            queue_etat_reel.put([True])
-            if not queue.empty():
-                commandes = queue.get()
-                print(f"Consommateur : Liste reçue pour {scf.cf.link_uri}: {commandes}")
-                keep_flying = commandes[5]
-                commander.send_velocity_world_setpoint(commandes[0],commandes[1],commandes[2],commandes[4])
-                log_writer.writerow(commandes)
-                file.flush()
+    #commander = Commander(scf)
+    commandes = [0,0,0,0,0]   
+    delta_z = 0.45 - pos_dict[uri][2]
+    while keep_flying:
+        while delta_z > 0.1:
+            delta_z = 0.45 - pos_dict[uri][2]
+            cf.commander.send_velocity_world_setpoint(0,0,delta_z,0)
+        queue_etat_reel.put([True])
+        if not queue.empty():
+            commandes = queue.get()
+        print(f"Consommateur : Liste reçue pour {scf.cf.link_uri}: {commandes}")
+        keep_flying = commandes[5]
+        cf.commander.send_velocity_world_setpoint(commandes[0],commandes[1],commandes[2],commandes[4])
+        log_writer.writerow(commandes)
+        file.flush()
 
                     
         
 
-        print('Demo terminated!')
+    print('Demo terminated!')
 
     

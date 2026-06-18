@@ -33,6 +33,7 @@ class SituationState():
             Situation.COME_CLOSER_SENT : False,
             Situation.BACKWARD_TOO_FAR : False,
             Situation.DEAD_END : False,
+            Situation.RECONFIG : False,
             }
 
     @property

@@ -53,7 +53,8 @@ class DroneStateMachine(StateChart):
     reconfig = (LeaderDeadEnd.to(ReconfigFollower)|
                 FollowerCorridor.to(ReconfigFollower)|
                 FollowerCurve.to(ReconfigFollower)|
-                FollowerIntersection.to(ReconfigFollower))
+                FollowerIntersection.to(ReconfigFollower)|
+                ReconfigFollower.to.itself())
 
     
     @property
@@ -77,8 +78,7 @@ class DroneStateMachine(StateChart):
                     self.exploration()
             if self.configuration == {DroneStateMachine.Takeoff}:
                 if situation[Situation.GOOD_HEIGHT]:
-                    if situation[Situation.CORRIDOR]:
-                        self.exploration()
+                    self.exploration()
             elif self.configuration == {DroneStateMachine.LeaderCorridor}:
                 if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
                     self.reach_intersection()

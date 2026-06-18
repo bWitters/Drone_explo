@@ -12,7 +12,7 @@ class TurnAround(Action):
         return self.agent.situation.situation
     @property
     def graph_neighbors(self) -> dict:
-        return self.agent.sensor_data.graph_neighborhood
+        return self.agent.sensor_data.gaps_dir
     @property
     def occupied_neighbors(self) -> dict:
         return self.agent.sensor_data.occupied_neighborhood
@@ -21,7 +21,5 @@ class TurnAround(Action):
         """ 
         Retourne la nouvelle cellule derrière l'agent
         """
-        new_cell = None
-        if self.graph_neighbors["B"]:
-            new_cell = "B"
+        new_cell = "B"
         self.agent.new_cell = new_cell
