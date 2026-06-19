@@ -20,6 +20,10 @@ class Rotation(Action):
         return self.agent.sensor_data.gaps_dir
     
     @property
+    def occupied_gaps(self):
+        return self.agent.sensor_data.occupied_neighborhood
+    
+    @property
     def new_direction(self):
         #print(f"coucou voici la cell {self.agent.new_cell}")
         return self.agent.new_cell
@@ -57,7 +61,7 @@ class Rotation(Action):
     def action(self) -> None:
         #print(self.new_direction)
         for dir, is_available in self.graph_neighbors.items():
-            if self.new_direction == dir and is_available:
+            if self.new_direction == dir and (is_available or self.occupied_gaps[dir] != False):
                 if dir == "B":
                     self.rotate("turn around")
                 elif dir == "R":

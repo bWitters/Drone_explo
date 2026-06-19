@@ -29,7 +29,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 10
+NUM_DRONES = 2
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
 INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
@@ -42,12 +42,15 @@ RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
 print(INIT_XYZ)
 URIS = [
-    
+    'radio://0/20/2M/1',
+    'radio://0/100/2M/12',
+    #'radio://0/100/2M/13',
 ]
 
 def go( queues = None,
         queues_etat_reel = None,
         queues_position_simu = None,
+        queues_commandes_for_display = None,
         drone=DEFAULT_DRONES,
         physics=DEFAULT_PHYSICS,
         gui=DEFAULT_GUI,
@@ -109,8 +112,10 @@ def go( queues = None,
     #### Waiting for takeoff ####
     if queues_etat_reel != None:
         ready = False
+        i = 0
         while ready != True:
-            print("Waiting take off")
+            i+=1
+            #print("Waiting take off")
             taille = len(queues_etat_reel)
             compte = 0
             for queue_drone in queues_etat_reel:
@@ -118,7 +123,8 @@ def go( queues = None,
                     commande = queue_drone.get()
                     if commande[0] == True:
                         compte += 1
-            print(f"Number of drone ready : {compte}")
+            if i%2000==0:
+                print(f"Number of drone ready : {compte}")
             if compte == taille:
                 ready = True
 
@@ -281,6 +287,9 @@ def go( queues = None,
                     if queues != None:
                         add_to_queue = [0, 0, 0, 0, wz, True, sim_steps]
                         queues[j].put(add_to_queue)
+                    if queues_commandes_for_display != None:
+                        add_to_queue = [0, 0, 0, 0, wz, True, sim_steps]
+                        queues_commandes_for_display[j].put(add_to_queue)
                     action[j, :] = commande
                 else:
                     # Unit direction + speed fraction w.r.t. speed_limit
@@ -294,6 +303,9 @@ def go( queues = None,
                     if queues != None:
                         add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True, sim_steps]
                         queues[j].put(add_to_queue)
+                    if queues_commandes_for_display != None:
+                        add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True, sim_steps]
+                        queues_commandes_for_display[j].put(add_to_queue)
                 
 
                 behavior = drones[j].active_sm_behavior.name
@@ -328,6 +340,8 @@ def go( queues = None,
     for j in range(NUM_DRONES):
         if queues != None:
             queues[j].put([0,0,0,0,0,False,sim_steps])
+        if queues_commandes_for_display != None:
+            queues_commandes_for_display[j].put([0,0,0,0,0,False,sim_steps])
     print(f"Total duration = {fin-debut}")
     input("Press enter to continue...")
     #### Close the environment #################################
