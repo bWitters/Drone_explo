@@ -29,22 +29,31 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 2
+NUM_DRONES = 1
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
-INIT_XYZ = np.array([LIST_POS[i-2] for i in range(NUM_DRONES)])
+INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
 LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
-INIT_RPY = np.array([LIST_RPY[i-2] for i in range(NUM_DRONES)])
+INIT_RPY = np.array([LIST_RPY[i] for i in range(NUM_DRONES)])
 RAY_LENGTH = 10
 RAY_HIT_COLOR = [1, 0, 0]
 RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
 print(INIT_XYZ)
 URIS = [
-    'radio://0/20/2M/1',
-    'radio://0/100/2M/12',
-    #'radio://0/100/2M/13',
+    # 'radio://0/20/2M/1',
+    # 'radio://0/20/2M/2',
+    # 'radio://0/20/2M/4',
+
+    # 'radio://0/60/2M/10',
+    # 'radio://0/60/2M/7',
+
+    # 'radio://1/80/2M/6',
+
+    # 'radio://1/100/2M/11',
+    # 'radio://1/100/2M/12',
+    'radio://1/100/2M/14',
 ]
 
 def go( queues = None,
