@@ -29,7 +29,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 2
+NUM_DRONES = 1
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
 INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
@@ -42,14 +42,22 @@ RAY_MISS_COLOR = [0, 1, 0]
 SHOW_LIDAR = False
 print(INIT_XYZ)
 URIS = [
-    'radio://0/20/2M/1',
-    'radio://0/100/2M/12',
-    #'radio://0/100/2M/13',
+    # 'radio://0/20/2M/1',
+    # 'radio://0/20/2M/2',
+    # 'radio://0/20/2M/4',
+
+    # 'radio://0/60/2M/10',
+    # 'radio://0/60/2M/7',
+
+    # 'radio://1/80/2M/6',
+
+    # 'radio://1/100/2M/11',
+    # 'radio://1/100/2M/12',
+    'radio://1/100/2M/14',
 ]
 
 def go( queues = None,
         queues_etat_reel = None,
-        queues_position_simu = None,
         queues_commandes_for_display = None,
         drone=DEFAULT_DRONES,
         physics=DEFAULT_PHYSICS,
@@ -104,10 +112,6 @@ def go( queues = None,
         pos = p.getBasePositionAndOrientation(bid, physicsClientId=PYB_CLIENT)
         if info[1] == b'cf2' :
             env_id_drones[bid] = {"env_position" : pos, "drone_id" : None}
-    
-    for i in range(num_drones):
-        if queues_position_simu != None:
-            queues_position_simu[i].put([INIT_XYZ[i][0],INIT_XYZ[i][1],INIT_XYZ[i][2],INIT_RPY[i][2]])
 
     #### Waiting for takeoff ####
     if queues_etat_reel != None:
@@ -172,34 +176,40 @@ def go( queues = None,
 
             for drone_i in range(num_drones):    
                 if drone_i == 0:
-                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,directory_name,LIST_RPY[drone_i],URIS[0]))
+                    drones.append(Drones(1,drones,env_id_drones,STOCKING_AREA,directory_name,INIT_RPY[drone_i],URIS[0]))
+
                     nom_fichier = f"{directory_name}/drone_velocity_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
+
                     nom_fichier = f"{directory_name}/drone_position_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files_pos.append(open(nom_fichier,"w"))
                     log_pos.append(csv.writer(files_pos[-1]))
                     log_pos[-1].writerow(["x","y","z","yaw"])
                     files_pos[-1].flush()
+
                     nom_fichier = f"{directory_name}/drone_behavior_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files_behavior.append(open(nom_fichier,"w"))
                     log_behavior.append(csv.writer(files_behavior[-1]))
                     log_behavior[-1].writerow(["Behavior"])
                     files_behavior[-1].flush()
                 else:
-                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,LIST_RPY[drone_i],URIS[unique_id-1]))
+                    drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,INIT_RPY[drone_i],URIS[unique_id-1]))
+
                     nom_fichier = f"{directory_name}/drone_velocity_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files.append(open(nom_fichier,"w"))
                     log_writers.append(csv.writer(files[-1]))
                     log_writers[-1].writerow(["vx","vy","vz","v_yaw"])
                     files[-1].flush()
+
                     nom_fichier = f"{directory_name}/drone_position_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files_pos.append(open(nom_fichier,"w"))
                     log_pos.append(csv.writer(files_pos[-1]))
                     log_pos[-1].writerow(["x","y","z","yaw"])
                     files_pos[-1].flush()
+
                     nom_fichier = f"{directory_name}/drone_behavior_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
                     files_behavior.append(open(nom_fichier,"w"))
                     log_behavior.append(csv.writer(files_behavior[-1]))
@@ -284,12 +294,6 @@ def go( queues = None,
                 if v_norm < 1e-3:
                     # No translation; keep yaw rate
                     commande = [0.0, 0.0, 0.0, 0.0, float(wz)]
-                    if queues != None:
-                        add_to_queue = [0, 0, 0, 0, wz, True, sim_steps]
-                        queues[j].put(add_to_queue)
-                    if queues_commandes_for_display != None:
-                        add_to_queue = [0, 0, 0, 0, wz, True, sim_steps]
-                        queues_commandes_for_display[j].put(add_to_queue)
                     action[j, :] = commande
                 else:
                     # Unit direction + speed fraction w.r.t. speed_limit
@@ -300,17 +304,17 @@ def go( queues = None,
                     speed_frac = min(1.0, v_norm / max(1e-3, 1.0))
                     commande = [dir_x, dir_y, dir_z, float(speed_frac), float(wz)]
                     action[j, :] = commande
-                    if queues != None:
-                        add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True, sim_steps]
-                        queues[j].put(add_to_queue)
-                    if queues_commandes_for_display != None:
-                        add_to_queue = [vx_w, vy_w, vz_w, speed_frac, wz, True, sim_steps]
-                        queues_commandes_for_display[j].put(add_to_queue)
                 
 
                 behavior = drones[j].active_sm_behavior.name
                 log_behavior[j].writerow([behavior])
                 files_behavior[j].flush()
+                if queues != None:
+                    add_to_queue = [drones[j].position[0],drones[j].position[1],drones[j].position[2],drones[j].rpy[2], True, sim_steps]
+                    queues[j].put(add_to_queue)
+                if queues_commandes_for_display != None:
+                    add_to_queue = [drones[j].position[0],drones[j].position[1],drones[j].position[2],drones[j].rpy[2], True, sim_steps]
+                    queues_commandes_for_display[j].put(add_to_queue)
                 
                 
                 for key in env_id_drones.keys():
@@ -339,9 +343,9 @@ def go( queues = None,
     fin = time.time()
     for j in range(NUM_DRONES):
         if queues != None:
-            queues[j].put([0,0,0,0,0,False,sim_steps])
+            queues[j].put([0,0,0,0,False,sim_steps])
         if queues_commandes_for_display != None:
-            queues_commandes_for_display[j].put([0,0,0,0,0,False,sim_steps])
+            queues_commandes_for_display[j].put([0,0,0,0,False,sim_steps])
     print(f"Total duration = {fin-debut}")
     input("Press enter to continue...")
     #### Close the environment #################################

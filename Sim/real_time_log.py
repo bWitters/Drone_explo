@@ -18,7 +18,7 @@ def go(queue_commande):
     def update(frame):
         # Récupérer toutes les commandes disponibles dans la queue
         while not queue_commande.empty():
-            vx,vy,vz,_,v_yaw,_,sim_step = queue_commande.get()
+            vx,vy,vz,v_yaw,_,sim_step = queue_commande.get()
             vx_data.append(vx)
             vy_data.append(vy)
             vz_data.append(vz)
