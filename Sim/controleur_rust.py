@@ -11,19 +11,17 @@ from cflib2.toc_cache import FileTocCache
 # === CONFIGURATION ===
 
 URIS = [
-    'radio://0/20/2M/1',
-    'radio://0/20/2M/2',
-    'radio://0/20/2M/4',
+    # 'radio://0/20/2M/1',
+    # 'radio://0/20/2M/2',
+    # 'radio://0/20/2M/4',
 
-    #'radio://1/80/2M/5',
-    #'radio://1/80/2M/6',
+    # 'radio://0/60/2M/10',
+    # 'radio://0/60/2M/7',
 
-    'radio://0/60/2M/7',
-    'radio://1/60/2M/10',
+    # 'radio://1/80/2M/6',
 
-
-    'radio://1/100/2M/11',
-    'radio://1/100/2M/12',
+    # 'radio://1/100/2M/11',
+    # 'radio://1/100/2M/12',
     'radio://1/100/2M/14',
 ]
 
@@ -51,10 +49,61 @@ running = True
 log_files = {}
 log_writers = {}
 
+ranger_file = {}
+ranger_writers = {}
+
 
 # === LOGGING FILES ===
 
 flight_log_dir: str | None = None
+
+
+def init_csv_logs() -> None:
+    global flight_log_dir
+
+    # Un dossier par vol
+    flight_id = datetime.now().strftime("logs/Controleur/Controleur_%m-%d_%Hh%Mm%S%f")
+    flight_log_dir = flight_id
+    os.makedirs(flight_log_dir, exist_ok=True)
+
+    print(f"[LOG] Flight logs directory: {flight_log_dir}")
+
+    for uri in URIS:
+        split_uri = uri.split("/")
+        filename = flight_log_dir + "/" + f"{split_uri[-1]}.csv"
+        filename_ranger = flight_log_dir + "/" + "ranger_" + f"{split_uri[-1]}.csv"
+
+        outfile = open(filename, "w", newline="")
+        outfile_ranger = open(filename_ranger, "w", newline="")
+        writer = csv.writer(outfile)
+        writer_ranger = csv.writer(outfile_ranger)
+
+        writer.writerow([
+            "t",
+            "x", "y", "z",
+            "vx", "vy", "vz",
+            "Vx_cmd", "Vy_cmd", "Vz_cmd"
+        ])
+
+        writer_ranger.writerow([
+            "timestamp", "Ranger_left", "Ranger_front", "Ranger_right", "Ranger_back"
+        ])
+
+        log_files[uri] = outfile
+        log_writers[uri] = writer
+        ranger_file[uri] = outfile_ranger
+        ranger_writers[uri] = writer_ranger
+        cmd_dict[uri] = np.array([0.0, 0.0, 0.0])
+        e_stops[uri] = False
+        pm_state_last[uri] = -1
+
+        outfile.flush()
+        outfile_ranger.flush()
+
+
+def close_csv_logs() -> None:
+    for f in log_files.values():
+        f.close()
 
 def wrapper_sync(queues, queue_etat_reel):
     asyncio.run(go(queues, queue_etat_reel))
@@ -64,6 +113,8 @@ async def go(queues, queue_etat_reel):
     context = LinkContext()
     cache = FileTocCache("./cache")
     running = True
+
+    init_csv_logs()
 
     print(f"Connecting to {len(URIS)} Crazyflies...")
 
@@ -75,6 +126,11 @@ async def go(queues, queue_etat_reel):
     )
 
     print("Connected to Crazyflies")
+
+    log_tasks = [
+            asyncio.create_task(start_states_log(cf))
+            for cf in cfs
+        ]
     
     try:
         await asyncio.sleep(0.5)
@@ -88,6 +144,10 @@ async def go(queues, queue_etat_reel):
 
     finally:
         running = False
+        for task in log_tasks:
+            task.cancel()
+
+        await asyncio.gather(*log_tasks, return_exceptions=True)
 
         print("Disconnecting...")
 
@@ -98,7 +158,8 @@ async def go(queues, queue_etat_reel):
             ],
             return_exceptions=True,
         )
-
+        
+        close_csv_logs()
         print("Done")
         
 async def fly_sequence(cf: Crazyflie, queue, queue_etat_reel):
@@ -121,7 +182,7 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
 
     platform = cf.platform()
     hlc = cf.high_level_commander()
-    if cf.uri == 'radio://0/20/2M/1':
+    if cf.uri == 'radio://1/100/2M/14':
         pygame.init()
         pygame.display.set_mode((600, 400))
         pygame.display.set_caption("Leader Control - AZER / U/P (W = EMERGENCY STOP)")
@@ -135,7 +196,7 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         await asyncio.sleep(3.0)
         
         while running:
-            if cf.uri == 'radio://0/20/2M/1':
+            if cf.uri == 'radio://1/100/2M/14':
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
@@ -159,6 +220,8 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
                     False,
                     0
                 )
+
+                print(f"Ranger data {ranger_dict[cf.uri]}")
 
             await asyncio.sleep(0)
             if cf.uri == 'radio://0/20/2M/1':
@@ -223,3 +286,125 @@ async def land_drone_velocity(cf: Crazyflie, uri: str) -> None:
         await cf.platform().send_arming_request(do_arm=False)
     except Exception as e:
         print(f"[LAND] disarm failed for {uri}: {e}")
+
+
+# === CRAZYFLIE LOG STREAM ===
+
+async def read_state_log(uri: str, stream) -> None:
+    while running and not e_stops.get(uri, False):
+        sample = await stream.next()
+        data = sample.data
+        timestamp = sample.timestamp
+
+        pos_dict[uri] = np.array(
+            [
+                data["stateEstimate.x"],
+                data["stateEstimate.y"],
+                data["stateEstimate.z"],
+            ],
+            dtype=float,
+        )
+
+        vel_dict[uri] = np.array(
+            [
+                data["stateEstimate.vx"],
+                data["stateEstimate.vy"],
+                data["stateEstimate.vz"],
+            ],
+            dtype=float,
+        )
+
+        cmd = cmd_dict.get(uri, np.array([0.0, 0.0, 0.0]))
+        row = [timestamp, *pos_dict[uri], *vel_dict[uri], *cmd]
+        log_writers[uri].writerow(row)
+        log_files[uri].flush()
+
+async def read_ranger_log(uri: str, stream) -> None:
+    while running and not e_stops.get(uri, False):
+        sample = await stream.next()
+        data = sample.data
+        timestamp = sample.timestamp
+
+        ranger_dict[uri] = np.array(
+            [
+                data[LEFT],
+                data[FRONT],
+                data[RIGHT],
+                data[BACK],
+            ],
+            dtype=float,
+        )
+
+        row = [timestamp, *ranger_dict[uri]]
+        ranger_writers[uri].writerow(row)
+        ranger_file[uri].flush()
+
+async def read_status_log(uri: str, stream) -> None:
+    global running
+
+    while running and not e_stops.get(uri, False):
+        sample = await stream.next()
+        data = sample.data
+
+        pm_state = int(data["pm.state"])
+        last = pm_state_last.get(uri)
+        pm_state_last[uri] = pm_state
+
+
+def convert_log_to_distance(data):
+        if data >= 8000:
+            return None
+        else:
+            return data / 1000.0
+        
+async def start_states_log(cf: Crazyflie) -> None:
+    uri = cf.uri
+    log = cf.log()
+
+    # Bloc 1 : 6 variables max
+    state_block = await log.create_block()
+    for var in [
+        "stateEstimate.x",
+        "stateEstimate.y",
+        "stateEstimate.z",
+        "stateEstimate.vx",
+        "stateEstimate.vy",
+        "stateEstimate.vz",
+    ]:
+        await state_block.add_variable(var)
+
+    ranger_block = await log.create_block()
+    await ranger_block.add_variable(FRONT)
+    await ranger_block.add_variable(BACK)
+    await ranger_block.add_variable(LEFT)
+    await ranger_block.add_variable(RIGHT)
+
+    status_block = await log.create_block()
+    for var in [
+        "stateEstimate.yaw",
+        "pm.state",
+    ]:
+        await status_block.add_variable(var)
+
+    ranger_stream = await ranger_block.start(STATE_LOG_PERIOD_MS)
+    state_stream = await state_block.start(STATE_LOG_PERIOD_MS)
+    status_stream = await status_block.start(STATE_LOG_PERIOD_MS)
+
+    print(f"[{uri}] Logging started with split blocks")
+
+    try:
+        await asyncio.gather(
+            read_state_log(uri, state_stream),
+            read_ranger_log(uri,ranger_stream),
+            read_status_log(uri, status_stream),
+        )
+    except asyncio.CancelledError:
+        raise
+    except Exception as e:
+        print(f"[{uri}] log task error: {e}")
+    finally:
+        for stream in [state_stream, status_stream, ranger_stream]:
+            try:
+                await stream.stop()
+            except Exception:
+                pass
