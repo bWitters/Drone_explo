@@ -6,7 +6,7 @@ import real_time_log
 import os
 import sys
 
-NUM_DRONES = 10
+NUM_DRONES = 8
 
 if __name__ == "__main__":
     queues_commande = []
