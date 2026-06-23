@@ -35,7 +35,7 @@ class FollowerIntersection(Behavior):
         # 5 : Wait backward close
         # 6 : Go
         if self.situation[Situation.RECONFIG_RECEIVED]:
-            self.situation[Situation.RECONFIG]
+            self.situation[Situation.RECONFIG] = True
 
         if FollowerIntersection.Active.Sub_Stop.Stop in self.configuration:
                 self.need_standby = False

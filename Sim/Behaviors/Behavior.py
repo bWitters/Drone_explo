@@ -66,6 +66,12 @@ class Behavior(StateChart):
             do_ForcedWaiting = Idle_ForcedWaiting.to(ForcedWaiting)
             standby_ForcedWaiting = ForcedWaiting.to(Idle_ForcedWaiting)
         
+        class Sub_CenterInDeadEnd(State.Compound):
+            Idle_CenterInDeadEnd = State(initial=True)
+            CenterInDeadEnd = State()
+
+            do_CenterInDeadEnd = Idle_CenterInDeadEnd.to(CenterInDeadEnd)
+            standby_CenterInDeadEnd = CenterInDeadEnd.to(Idle_CenterInDeadEnd)
         class Sub_CenterInIntersection(State.Compound):
             Idle_CenterInIntersection = State(initial=True)
             CenterInIntersection = State()
@@ -178,9 +184,6 @@ class Behavior(StateChart):
         
         standby_come_closer = (Sub_Rotation.Rotation.to(Sub_Rotation.Idle_Rotation)|
                                Sub_Move.Move.to(Sub_Move.Idle_Move))
-        
-        do_turn_around = (Sub_TurnAround.Idle_TurnAround.to(Sub_TurnAround.TurnAround)|
-                          Sub_Rotation.Idle_Rotation.to(Sub_Rotation.Rotation))
         
         standby_turn_around = (Sub_TurnAround.TurnAround.to(Sub_TurnAround.Idle_TurnAround)|
                                Sub_Rotation.Rotation.to(Sub_Rotation.Idle_Rotation))

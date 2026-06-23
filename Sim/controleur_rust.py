@@ -11,18 +11,20 @@ from cflib2.toc_cache import FileTocCache
 # === CONFIGURATION ===
 
 URIS = [
-    # 'radio://0/20/2M/1',
-    # 'radio://0/20/2M/2',
-    # 'radio://0/20/2M/4',
+    'radio://0/20/2M/1',
+    'radio://0/20/2M/2',
+    'radio://0/20/2M/4',
 
-    # 'radio://0/60/2M/10',
-    # 'radio://0/60/2M/7',
+    'radio://1/80/2M/5',
+    'radio://1/80/2M/6',
 
-    # 'radio://1/80/2M/6',
+    'radio://1/60/2M/7',
+    'radio://1/60/2M/10',
 
-    # 'radio://1/100/2M/11',
-    # 'radio://1/100/2M/12',
-    'radio://1/100/2M/14',
+
+    'radio://2/100/2M/11',
+    'radio://2/100/2M/12',
+    'radio://2/100/2M/14',
 ]
 
 STATE_LOG_PERIOD_MS = 100
@@ -67,9 +69,9 @@ def init_csv_logs() -> None:
 
     for uri in URIS:
         split_uri = uri.split("/")
-        filename = flight_log_dir + f"{split_uri[-1]}.csv"
+        filename = "drone_" + f"{split_uri[-1]}.csv"
 
-        outfile = open(filename, "w", newline="")
+        outfile = open(flight_log_dir+"/"+filename, "w", newline="")
         writer = csv.writer(outfile)
 
         writer.writerow([
@@ -102,7 +104,7 @@ async def go(queues, queue_etat_reel):
     cache = FileTocCache("./cache")
     running = True
 
-    init_csv_logs()
+    #init_csv_logs()
 
     print(f"Connecting to {len(URIS)} Crazyflies...")
 
@@ -115,10 +117,10 @@ async def go(queues, queue_etat_reel):
 
     print("Connected to Crazyflies")
 
-    log_tasks = [
-            asyncio.create_task(start_states_log(cf))
-            for cf in cfs
-        ]
+    # log_tasks = [
+    #         asyncio.create_task(start_states_log(cf))
+    #         for cf in cfs
+    #     ]
     
     try:
         await asyncio.sleep(0.5)
@@ -132,10 +134,10 @@ async def go(queues, queue_etat_reel):
 
     finally:
         running = False
-        for task in log_tasks:
-            task.cancel()
+        # for task in log_tasks:
+        #     task.cancel()
 
-        await asyncio.gather(*log_tasks, return_exceptions=True)
+        # await asyncio.gather(*log_tasks, return_exceptions=True)
 
         print("Disconnecting...")
 
@@ -147,7 +149,7 @@ async def go(queues, queue_etat_reel):
             return_exceptions=True,
         )
         
-        close_csv_logs()
+        # close_csv_logs()
         print("Done")
         
 async def fly_sequence(cf: Crazyflie, queue, queue_etat_reel):
@@ -209,7 +211,9 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
                     0
                 )
 
-                print(f"Ranger data {ranger_dict[cf.uri]}")
+            #     print(f"Ranger data {ranger_dict[cf.uri]}")
+            
+            # print(f"Logs = {ranger_dict}")
 
             await asyncio.sleep(0)
             if cf.uri == 'radio://0/20/2M/1':
@@ -337,6 +341,7 @@ def convert_log_to_distance(data):
             return data / 1000.0
         
 async def start_states_log(cf: Crazyflie) -> None:
+    print("Starting logs")
     uri = cf.uri
     log = cf.log()
 

@@ -121,6 +121,7 @@ class Drones():
         from Actions.forced_waiting import ForcedWaiting
         from Actions.send_current_direction import SendCurrentDirection
         from Actions.send_reconfig_message import SendReconfig
+        from Actions.center_in_dead_end import CenterInDeadEnd
 
         self.stop_action = Stop(self)
         self.change_role_action = ChangeRole(self)
@@ -142,6 +143,7 @@ class Drones():
         self.forced_waiting_action = ForcedWaiting(self)
         self.send_current_direction_action = SendCurrentDirection(self)
         self.send_reconfig_message = SendReconfig(self)
+        self.center_in_dead_end_action = CenterInDeadEnd(self)
 
         self.actions_dict = {"Stop" : self.stop_action,
                              "Change Role" : self.change_role_action,
@@ -162,6 +164,7 @@ class Drones():
                              "Forced waiting" : self.forced_waiting_action,
                              "Send Current Direction" : self.send_current_direction_action,
                              "Send Reconfig Message" : self.send_reconfig_message,
+                             "Center in Dead End" : self.center_in_dead_end_action,
                              }
 
 
@@ -209,7 +212,9 @@ class Drones():
 
         self.leader_dead_end_behavior.add_listener(self.stop_action,
                                                    self.send_reconfig_message,
-                                                   self.turn_around_action
+                                                   self.turn_around_action,
+                                                   self.rotation_action,
+                                                   self.center_in_dead_end_action
                                                    )
         
         self.follower_corridor_behavior.add_listener(self.stop_action,
