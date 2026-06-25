@@ -13,5 +13,6 @@ class HeightControl(Action):
     def action(self): #FIXME
         self.agent.move_drone[2] += 0.45 - self.height
         print(f"Current height : {self.height}")
-        if abs(0.45 - self.height) < 0.01:
+        if abs(0.45 - self.height) < 0.001:
             self.agent.move_drone[2] = 0
+        print(f"Current height command : {self.agent.move_drone[2]}")

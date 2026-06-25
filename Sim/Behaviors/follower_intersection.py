@@ -13,6 +13,7 @@ class FollowerIntersection(Behavior):
         self.need_standby = False
         self.waiting_rot = False
         self.come_closer_received = False
+        self.has_receive_reconfig = False
         super().__init__(name=self.name)
 
     @property
@@ -36,6 +37,10 @@ class FollowerIntersection(Behavior):
         # 6 : Go
         if self.situation[Situation.RECONFIG_RECEIVED]:
             self.situation[Situation.RECONFIG] = True
+            self.has_receive_reconfig = True
+        if self.has_receive_reconfig:
+            print("I have received reconfig message")
+
 
         if FollowerIntersection.Active.Sub_Stop.Stop in self.configuration:
                 self.need_standby = False

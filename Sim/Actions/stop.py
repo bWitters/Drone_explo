@@ -10,5 +10,6 @@ class Stop(Action):
         super().__init__(self.name)
 
     def action(self):
-        self.agent.move_drone = [0,0,0,0,0]
+        self.agent.move_drone[0] = 0
+        self.agent.move_drone[1] = 0
 

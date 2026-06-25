@@ -62,7 +62,7 @@ class SituationState():
         
     def is_in_intersection(self, graph_branch_counter: int) -> bool:
         print(f"Number of branch : {graph_branch_counter}")
-        if graph_branch_counter > 2:
+        if graph_branch_counter >= 3:
             if self.entrance:
                 self.intersection_entrance = [self.agent.position[0], self.agent.position[1]]
                 self.entrance = False
@@ -94,7 +94,12 @@ class SituationState():
             else:
                 return False
         elif graph_branch_counter == 1:
-            if (graph_neighborhood["L"] or graph_neighborhood["R"]) and occupied_gaps["B"] != False:
+            if ((graph_neighborhood["L"] or graph_neighborhood["R"]) and occupied_gaps["B"] != False) or ((occupied_gaps["L"] != False or occupied_gaps["R"] != False) and graph_neighborhood["B"]):
+                return True
+            else:
+                return False
+        elif graph_branch_counter == 0:
+            if occupied_gaps["B"] != False and occupied_gaps["F"] != False:
                 return True
             else:
                 return False
@@ -155,9 +160,12 @@ class SituationState():
     #         return False
 
     def com_analyzer(self, com_received):
+        print("Checking for coms")
         if not com_received.empty():
+            print("Com not empty")
             while not com_received.empty():
                 last_com = com_received.get()
+                print(f"Last com : {last_com}")
                 if last_com[0] == "Come Closer":
                     if  "leader" in self.role:
                         self.situation[Situation.COME_CLOSER] = (False,last_com[1])
@@ -170,6 +178,7 @@ class SituationState():
                 if last_com[0] == "Current Direction":
                     self.situation[Situation.PRECEDING_DIRECTION] = last_com[1]
                 if last_com[0] == "Reconfig":
+                    print("Reconfig received")
                     self.situation[Situation.RECONFIG_RECEIVED] = True
                 else:
                     self.situation[Situation.RECONFIG_RECEIVED] = False

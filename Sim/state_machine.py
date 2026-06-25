@@ -105,27 +105,29 @@ class DroneStateMachine(StateChart):
                     if situation[Situation.COME_CLOSER][0]:
                         if situation[Situation.CORRIDOR]:
                             self.follow()
-                        if situation[Situation.CURVE]:
+                        elif situation[Situation.CURVE]:
                             self.take_off_curve()
             elif self.configuration == {DroneStateMachine.FollowerCorridor}:
-                if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
+                if situation[Situation.RECONFIG]:
+                    self.reconfig()
+                elif situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
                     self.follow()
                 elif situation[Situation.CURVE]:
-                    self.follow_curve()
-                if situation[Situation.RECONFIG]:
-                    self.reconfig()
+                    self.follow_curve()          
             elif self.configuration == {DroneStateMachine.FollowerCurve}:
-                if situation[Situation.CORRIDOR]:
+                if situation[Situation.RECONFIG]:
+                    self.reconfig()
+                elif situation[Situation.CORRIDOR]:
                     self.follow_curve()
-                if situation[Situation.RECONFIG]:
-                    self.reconfig()
             elif self.configuration == {DroneStateMachine.FollowerIntersection}:
-                if situation[Situation.CORRIDOR]:
-                    self.follow()
                 if situation[Situation.RECONFIG]:
                     self.reconfig()
+                elif situation[Situation.CORRIDOR]:
+                    self.follow()
             elif self.configuration == {DroneStateMachine.ForcedWait}:
-                if situation[Situation.CORRIDOR]:
+                if situation[Situation.RECONFIG]:
+                    self.reconfig()
+                elif situation[Situation.CORRIDOR]:
                     if not situation[Situation.FORCED_WAIT]:
                         self.follow()
         

@@ -1,6 +1,6 @@
 from agents import Drones
 from Actions.Action import Action
-
+import math
 class CenterInCorridor(Action):
     def __init__(self, agent):
         self.agent:Drones = agent
@@ -29,3 +29,5 @@ class CenterInCorridor(Action):
             k = 1
         if abs(self.d_L_wall-self.d_R_wall) <0.15:
             self.agent.move_drone[i] += k*-(self.d_L_wall-self.d_R_wall)
+        else:
+            self.agent.move_drone[i] += math.copysign(0.15,k*-(self.d_L_wall-self.d_R_wall))
