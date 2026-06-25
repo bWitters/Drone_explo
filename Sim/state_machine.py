@@ -12,9 +12,10 @@ class DroneStateMachine(StateChart):
     FollowerCorridor = State("FollowerCorridor")
     FollowerCurve = State("FollowerCurve")
     FollowerIntersection = State("FollowerIntersection")
-    ForcedWait = State("Forced Wait")
     ReconfigFollower = State("ReconfigFollower")
-
+    ReconfigCorridor = State("ReconfigCorridor")
+    ReconfigCurve = State("ReconfigCurve")
+    ReconfigIntersection = State("ReconfigIntersection")
     
     stock = Stock.to.itself()
 
@@ -23,9 +24,6 @@ class DroneStateMachine(StateChart):
                    LeaderIntersection.to(LeaderCorridor)|
                    LeaderCorridor.to(LeaderCurve)|
                    LeaderCurve.to(LeaderCorridor))
-    
-    waiting = (LeaderCorridor.to(ForcedWait)|
-               ForcedWait.to(LeaderCorridor))
 
     reach_intersection = (LeaderCorridor.to(LeaderIntersection)|
                           LeaderIntersection.to.itself())
@@ -34,18 +32,17 @@ class DroneStateMachine(StateChart):
               Takeoff.to(FollowerCorridor) |
               FollowerCorridor.to(FollowerIntersection)|
               FollowerIntersection.to(FollowerCorridor)|
-              ForcedWait.to(FollowerCorridor))
+              ReconfigFollower.to(FollowerCorridor))
 
     take_off_curve = (Takeoff.to(FollowerCurve)|
                       FollowerCurve.to(FollowerCorridor))
     
     follow_curve = (FollowerCorridor.to(FollowerCurve)|
-                    FollowerCurve.to(FollowerCorridor))
+                    FollowerCurve.to(FollowerCorridor)|
+                    ReconfigFollower.to(FollowerCurve))
     
     become_leader = (FollowerCorridor.to(LeaderIntersection)|
                      FollowerIntersection.to(LeaderIntersection))
-    
-    forced_wait = (FollowerCorridor.to(ForcedWait))
 
     reach_dead_end = (LeaderCorridor.to(LeaderDeadEnd)|
                       LeaderDeadEnd.to.itself())
@@ -56,6 +53,17 @@ class DroneStateMachine(StateChart):
                 FollowerIntersection.to(ReconfigFollower)|
                 ReconfigFollower.to.itself())
 
+    reconfig_intersection = (ReconfigFollower.to(ReconfigIntersection)|
+                             ReconfigCurve.to(ReconfigIntersection)|
+                             ReconfigCorridor.to(ReconfigIntersection))
+
+    reconfig_curve = (ReconfigFollower.to(ReconfigCurve)|
+                      ReconfigIntersection.to(ReconfigCurve)|
+                      ReconfigCorridor.to(ReconfigCurve))
+    
+    reconfig_corridor = (ReconfigFollower.to(ReconfigCorridor)|
+                         ReconfigCurve.to(ReconfigCorridor)|
+                         ReconfigIntersection.to(ReconfigCorridor))
     
     @property
     def role(self):
@@ -124,12 +132,57 @@ class DroneStateMachine(StateChart):
                     self.reconfig()
                 elif situation[Situation.CORRIDOR]:
                     self.follow()
-            elif self.configuration == {DroneStateMachine.ForcedWait}:
-                if situation[Situation.RECONFIG]:
-                    self.reconfig()
+        
+        elif "reconfig_leader" in self.role:
+            if self.configuration == {DroneStateMachine.ReconfigFollower}:
+                if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
+                    self.reconfig_intersection()
+                elif situation[Situation.CURVE]:
+                    self.reconfig_curve()
+                if situation[Situation.CORRIDOR]:
+                    self.reconfig_corridor()
+            elif self.configuration == {DroneStateMachine.ReconfigCorridor}:
+                if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
+                    self.reconfig_intersection()
+                elif situation[Situation.CURVE]:
+                    self.reconfig_curve()
+                # elif situation[Situation.DEAD_END]:
+                #     self.reach_dead_end()
+            elif self.configuration == {DroneStateMachine.ReconfigCurve}:
+                if situation[Situation.CORRIDOR]:
+                    self.reconfig_corridor()
+            elif self.configuration == {DroneStateMachine.ReconfigIntersection}:
+                if situation[Situation.CORRIDOR]:
+                    self.reconfig_corridor()
+            # elif self.configuration == {DroneStateMachine.ReconfigDeadEnd}:
+            #     if situation[Situation.RECONFIG]:
+            #         self.reconfig()
+
+        elif "reconfig_follower" in self.role:
+            if self.configuration == {DroneStateMachine.ReconfigFollower}:
+                if situation[Situation.CURVE]:
+                    self.follow_curve()
                 elif situation[Situation.CORRIDOR]:
-                    if not situation[Situation.FORCED_WAIT]:
-                        self.follow()
+                    self.follow()
+            if self.configuration == {DroneStateMachine.FollowerCorridor}:
+                # if situation[Situation.RECONFIG]:
+                #     self.reconfig()
+                if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
+                    self.follow()
+                elif situation[Situation.CURVE]:
+                    self.follow_curve()          
+            elif self.configuration == {DroneStateMachine.FollowerCurve}:
+                # if situation[Situation.RECONFIG]:
+                #     self.reconfig()
+                if situation[Situation.CORRIDOR]:
+                    self.follow_curve()
+            elif self.configuration == {DroneStateMachine.FollowerIntersection}:
+                if self.agent.neighboring_agent_list["F"] ==  None:
+                    print("End of reconfig")
+                # if situation[Situation.RECONFIG]:
+                #     self.reconfig()
+                elif situation[Situation.CORRIDOR]:
+                    self.follow()
         
 
     def __init__(self,agent):

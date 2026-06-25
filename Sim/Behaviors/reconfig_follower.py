@@ -12,6 +12,7 @@ class ReconfigFollower(Behavior):
         self.neighborhood_changed = False
         self.stop_rotation_command = False
         self.reconfig_sent = False
+        self.completed = False
         super().__init__(name = self.name)
     
     @property
@@ -27,12 +28,17 @@ class ReconfigFollower(Behavior):
             if ReconfigFollower.Active.Sub_Stop.Stop in self.configuration:
                 self.send("standby_stop")
                 self.change_neighborhood = True
+                self.completed = False
             elif self.change_neighborhood:
                 self.agent.neighboring_agent_list["P"] = self.agent.neighboring_agent_list["F"]
                 self.agent.neighboring_agent_list["F"] = None
                 self.rotate = False
                 self.change_neighborhood = False
-            print(self.agent.neighboring_agent_list)
+                self.send("do_change_role")
+                self.completed = True
+            elif self.completed:
+                self.send("standby_change_role")
+                print("Waiting for next command")
         else:
             if ReconfigFollower.Active.Sub_Stop.Stop in self.configuration:
                 self.rotate = True
@@ -40,6 +46,7 @@ class ReconfigFollower(Behavior):
                 self.neighborhood_changed = False
                 self.reconfig_sent = False
                 self.stop_rotation_command = False
+                self.completed = False
                 self.send("standby_stop")
             elif self.rotate:
                 self.send("do_turn_around")
@@ -56,6 +63,7 @@ class ReconfigFollower(Behavior):
                 self.reconfig_sent = True
                 self.change_neighborhood = False
             elif self.reconfig_sent:
+                self.send("standby_SendReconfig")
                 self.send("standby_turn_around")
                 self.send("standby_rotate")
                 old_preceding = self.agent.neighboring_agent_list["P"]
@@ -64,5 +72,9 @@ class ReconfigFollower(Behavior):
                 self.neighborhood_changed = True
                 self.reconfig_sent = False
             elif self.neighborhood_changed:
-                self.send("standby_SendReconfig")
-                print("Reconfig done")
+                self.send("do_change_role")
+                self.neighborhood_changed = False
+                self.completed = True
+            elif self.completed:
+                self.send("standby_change_role")
+                print("Waiting for next command")

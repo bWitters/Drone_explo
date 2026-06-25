@@ -19,7 +19,7 @@ class LeaderCurve(Behavior):
     def role(self):
         return self.agent.role.configuration_values
     
-    def update_action(self): # FIXME : Weird comportement when leaving the curve state
+    def update_action(self):
         if LeaderCurve.Active.Sub_Stop.Stop in self.configuration:
             self.send("standby_stop")
             self.send("do_send_come_closer")

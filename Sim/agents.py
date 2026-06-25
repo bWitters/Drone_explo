@@ -36,12 +36,6 @@ class Drones():
         self.commands_logs = csv.writer(self.file)
         self.commands_logs.writerow(["vx","vy","vz","speed_frac","v_yaw"])
         self.file.flush()
-
-        # from Controleur import Controleur
-
-        # print(self.uri)
-        # if self.uri != None:
-        #     self.controleur = Controleur(uri,self)
         
 
         from state_machine import DroneStateMachine
@@ -64,6 +58,9 @@ class Drones():
         from Behaviors.follower_curve import FollowerCurve
         from Behaviors.leader_dead_end import LeaderDeadEnd
         from Behaviors.reconfig_follower import ReconfigFollower
+        from Behaviors.reconfig_corridor import ReconfigCorridor
+        from Behaviors.reconfig_curve import ReconfigCurve
+        from Behaviors.reconfig_intersection import ReconfigIntersection
 
         self.stock_behavior = Stock(agent = self)
         self.takeoff_behavior = Takeoff(agent = self)
@@ -75,6 +72,9 @@ class Drones():
         self.follower_intersection_behavior = FollowerIntersection(agent = self)
         self.follower_curve_behavior = FollowerCurve(agent = self)
         self.reconfig_follower_behavior = ReconfigFollower(agent = self)
+        self.reconfig_corridor_behavior = ReconfigCorridor(agent = self)
+        self.reconfig_curve_behavior = ReconfigCurve(agent = self)
+        self.reconfig_intersection_behavior = ReconfigIntersection(agent = self)
 
 
         self.sm_behavior_dict = {"Stock" : self.stock_behavior,
@@ -87,6 +87,9 @@ class Drones():
                                  "Follower Intersection" : self.follower_intersection_behavior,
                                  "Follower Curve" : self.follower_curve_behavior,
                                  "Reconfig Follower": self.reconfig_follower_behavior,
+                                 "Reconfig Corridor":self.reconfig_corridor_behavior,
+                                 "Reconfig Curve":self.reconfig_curve_behavior,
+                                 "Reconfid Intersection":self.reconfig_intersection_behavior,
                                  }
 
         self.state.add_listener(self.stock_behavior,
@@ -99,6 +102,9 @@ class Drones():
                                 self.follower_intersection_behavior,
                                 self.follower_curve_behavior,
                                 self.reconfig_follower_behavior,
+                                self.reconfig_corridor_behavior,
+                                self.reconfig_curve_behavior,
+                                self.reconfig_intersection_behavior,
                                 )
         
         from Actions.stop import Stop
@@ -274,6 +280,41 @@ class Drones():
                                                      self.turn_around_action,
                                                      )
 
+
+        self.reconfig_corridor_behavior.add_listener(self.stop_action,
+                                                   self.gap_direction_determination_action,
+                                                   self.rotation_action,
+                                                   self.move_action,
+                                                   self.send_come_closer_action,
+                                                   self.center_in_corridor_action,
+                                                   self.height_control_action,
+                                                   self.rotation_conrol_action,
+                                                   self.forced_waiting_action,
+                                                   self.send_current_direction_action
+                                                   )
+        
+        self.reconfig_curve_behavior.add_listener(self.stop_action,
+                                                self.send_come_closer_action,
+                                                self.send_cell_action,
+                                                self.gap_direction_determination_action,
+                                                self.rotation_action,
+                                                self.move_action,
+                                                #self.test_action,
+                                                self.center_in_curve_action
+                                                )
+        
+        self.reconfig_intersection_behavior.add_listener(self.stop_action,
+                                                         self.send_cell_action,
+                                                         self.new_cell_to_follow_action,
+                                                         self.come_closer_cell_to_follow_action,
+                                                         self.rotation_action,
+                                                         self.move_action,
+                                                         self.change_role_action,
+                                                         self.send_come_closer_action,
+                                                         self.center_in_corridor_action,
+                                                         self.center_in_intersection_action,
+                                                         self.send_reconfig_message
+                                                         )
         self.initialize_agent()
 
         # graph = DotGraphMachine(self.state)

@@ -31,10 +31,21 @@ class ChangeRole(Action):
         elif "LeaderIntersection" in self.state:
             if "follower" in self.role:
                 return "leader"
+        print("Trying to get new role")
+        if "ReconfigFollower" in self.state:
+            if self.agent.neighboring_agent_list["P"] == None:
+                return "reconfig_leader"
+            else:
+                return "reconfig_follower"
 
     def action(self):
+        print("Changing Role")
         new_role = self.new_role()
         if new_role == "leader":
             self.agent.role.become_leader()
         elif new_role == "follower":
             self.agent.role.become_follower()
+        elif new_role == "reconfig_follower":
+            self.agent.role.become_reconfig_follower()
+        elif new_role == "reconfig_leader":
+            self.agent.role.become_reconfig_leader()
