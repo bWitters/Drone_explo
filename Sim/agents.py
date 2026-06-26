@@ -340,7 +340,8 @@ class Drones():
         print(f"Current role : {self.role.configuration_values}")
         self.move_drone = [0,0,0,0,0]
         self.rays = rays
-        self.sensor_data.neighborhood_analysis()
+        if self.rays[0] != math.inf:
+            self.sensor_data.neighborhood_analysis()
         self.situation.update_situation(self.sensor_data.gaps_dir,
                                         self.sensor_data.occupied_neighborhood,
                                         self.sensor_data.graph_branch_counter_var,

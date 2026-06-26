@@ -63,6 +63,7 @@ URIS = [
 def go( queues = None,
         queues_etat_reel = None,
         queues_commandes_for_display = None,
+        queues_lidar = None,
         drone=DEFAULT_DRONES,
         physics=DEFAULT_PHYSICS,
         gui=DEFAULT_GUI,
@@ -247,52 +248,60 @@ def go( queues = None,
         #### Exécuter le contrôle pour chaque drone (gérées par State Machines) ####
         for j in range(num_drones):
             try:
-                ### LIDAR ###
-                # Générer les rayons lidar
-                rayFrom = []
-                rayTo = []
-                rayIds = []
+                if queues_lidar == None :
+                    ### LIDAR ###
+                    # Générer les rayons lidar
+                    rayFrom = []
+                    rayTo = []
+                    rayIds = []
 
-                startOfRays = [-3/40*math.pi, math.pi/2-3/40*math.pi, math.pi-3/40*math.pi, 3*math.pi/2-3/40*math.pi]
+                    startOfRays = [-3/40*math.pi, math.pi/2-3/40*math.pi, math.pi-3/40*math.pi, 3*math.pi/2-3/40*math.pi]
 
-                for starts in startOfRays:
-                    for i in range(16):
-                        rayFrom.append(env.pos[j])
-                        rayTo.append([
-                            rayFrom[i][0] + rayLen * math.sin((3/20*math.pi * float(i)/15) + starts),
-                            rayFrom[i][1] + rayLen * math.cos((3/20*math.pi * float(i)/15) + starts),
-                            rayFrom[i][2]
-                        ])
-                        rayIds.append(-1)
+                
+                    for starts in startOfRays:
+                        for i in range(16):
+                            rayFrom.append(env.pos[j])
+                            rayTo.append([
+                                rayFrom[i][0] + rayLen * math.sin((3/20*math.pi * float(i)/15) + starts),
+                                rayFrom[i][1] + rayLen * math.cos((3/20*math.pi * float(i)/15) + starts),
+                                rayFrom[i][2]
+                            ])
+                            rayIds.append(-1)
 
-                results = p.rayTestBatch(rayFrom, rayTo)
+                    results = p.rayTestBatch(rayFrom, rayTo)
 
-                # Affichage du lidar (optionnel)
-                if show_lidar:
-                    p.removeAllUserDebugItems()
+                    # Affichage du lidar (optionnel)
+                    if show_lidar:
+                        p.removeAllUserDebugItems()
+                        for i in range(len(results)):
+                            hitObjectUid = results[i][0]
+                            if hitObjectUid < 0:
+                                p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
+                            else:
+                                hitPosition = results[i][3]
+                                p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
+
+                    # Extraire les distances lidar depuis les résultats                
+                    mins_ray = [(math.inf,False),(math.inf,False),(math.inf,False),(math.inf,False)]
                     for i in range(len(results)):
-                        hitObjectUid = results[i][0]
-                        if hitObjectUid < 0:
-                            p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
-                        else:
-                            hitPosition = results[i][3]
-                            p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
-
-                # Extraire les distances lidar depuis les résultats                
-                mins_ray = [(math.inf,False),(math.inf,False),(math.inf,False),(math.inf,False)]
-                for i in range(len(results)):
-                    if i < 16 :
-                        if results[i][2]*RAY_LENGTH < mins_ray[0][0]:
-                            mins_ray[0] = (results[i][2]*RAY_LENGTH,results[i][0])
-                    elif i < 32:
-                        if results[i][2]*RAY_LENGTH < mins_ray[1][0]:
-                            mins_ray[1] = (results[i][2]*RAY_LENGTH,results[i][0])
-                    elif i < 48:
-                        if results[i][2]*RAY_LENGTH < mins_ray[2][0]:              
-                            mins_ray[2] = (results[i][2]*RAY_LENGTH,results[i][0])
-                    elif i < 64:
-                        if results[i][2]*RAY_LENGTH < mins_ray[3][0]:           
-                            mins_ray[3] = (results[i][2]*RAY_LENGTH,results[i][0])
+                        if i < 16 :
+                            if results[i][2]*RAY_LENGTH < mins_ray[0][0]:
+                                mins_ray[0] = (results[i][2]*RAY_LENGTH,results[i][0])
+                        elif i < 32:
+                            if results[i][2]*RAY_LENGTH < mins_ray[1][0]:
+                                mins_ray[1] = (results[i][2]*RAY_LENGTH,results[i][0])
+                        elif i < 48:
+                            if results[i][2]*RAY_LENGTH < mins_ray[2][0]:              
+                                mins_ray[2] = (results[i][2]*RAY_LENGTH,results[i][0])
+                        elif i < 64:
+                            if results[i][2]*RAY_LENGTH < mins_ray[3][0]:           
+                                mins_ray[3] = (results[i][2]*RAY_LENGTH,results[i][0])
+                
+                else:
+                    mins_ray = [math.inf,math.inf,math.inf,math.inf]
+                    if not queues_lidar[j].empty():
+                        commande = queues_lidar[j].get()
+                        mins_ray = [commande[1],commande[2],commande[3],commande[4]]
 
                 drones[j].position = env.pos[j]
                 drones[j].rpy = env.rpy[j]
