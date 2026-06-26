@@ -19,10 +19,6 @@ class Stock(Behavior):
     def role(self):
         return self.agent.role.configuration_values
     
-    @property
-    def new_role(self):
-        return self.agent.new_role
-    
     def update_action(self):
         if Stock.Active.Sub_Stop.Stop in self.configuration:
             if "stock" in self.role:

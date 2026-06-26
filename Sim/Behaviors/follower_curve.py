@@ -9,6 +9,7 @@ class FollowerCurve(Behavior):
         self.agent: Drones = agent
         self.dir_to_follow = None
         self.ready_to_continue = False
+        self.has_receive_reconfig = False
         super().__init__(name=self.name)
 
     @property
@@ -21,7 +22,11 @@ class FollowerCurve(Behavior):
 
     def update_action(self):
         if self.situation[Situation.RECONFIG_RECEIVED]:
-            self.situation[Situation.RECONFIG] = True    
+            self.situation[Situation.RECONFIG] = True   
+            self.has_receive_reconfig = True
+        if self.has_receive_reconfig:
+            print("I have received reconfig message")
+ 
 
         if FollowerCurve.Active.Sub_Stop.Stop in self.configuration:
             self.ready_to_continue = False

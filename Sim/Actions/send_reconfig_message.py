@@ -12,5 +12,5 @@ class SendReconfig(Com, Action):
         Retourne la nouvelle cellule de l'agent à suivre
         """
         print("Sending reconfig")
-        self.send_com_follower("Reconfig", self.agent.front) # TODO : Faire un deuxieme capteur pour emettre en broadcast les come closer et utiliser le systeme de detection des gaps et les positions des drones pour recevoir les messages qui viennent de devant/derriere
+        self.send_com_follower("Reconfig", self.agent.front)
         self.send("standby_send_reconfig_message")

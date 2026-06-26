@@ -49,6 +49,9 @@ running = True
 log_files = {}
 log_writers = {}
 
+ranger_file = {}
+ranger_writers = {}
+
 
 # === LOGGING FILES ===
 
@@ -67,26 +70,35 @@ def init_csv_logs() -> None:
 
     for uri in URIS:
         split_uri = uri.split("/")
-        filename = flight_log_dir + f"{split_uri[-1]}.csv"
+        filename = flight_log_dir + "/" + f"{split_uri[-1]}.csv"
+        filename_ranger = flight_log_dir + "/" + "ranger_" + f"{split_uri[-1]}.csv"
 
         outfile = open(filename, "w", newline="")
+        outfile_ranger = open(filename_ranger, "w", newline="")
         writer = csv.writer(outfile)
+        writer_ranger = csv.writer(outfile_ranger)
 
         writer.writerow([
             "t",
             "x", "y", "z",
             "vx", "vy", "vz",
-            "Vx_cmd", "Vy_cmd", "Vz_cmd",
-            "Ranger_left", "Ranger_front", "Ranger_right", "Ranger_back"
+            "Vx_cmd", "Vy_cmd", "Vz_cmd"
+        ])
+
+        writer_ranger.writerow([
+            "timestamp", "Ranger_left", "Ranger_front", "Ranger_right", "Ranger_back"
         ])
 
         log_files[uri] = outfile
         log_writers[uri] = writer
+        ranger_file[uri] = outfile_ranger
+        ranger_writers[uri] = writer_ranger
         cmd_dict[uri] = np.array([0.0, 0.0, 0.0])
         e_stops[uri] = False
         pm_state_last[uri] = -1
 
         outfile.flush()
+        outfile_ranger.flush()
 
 
 def close_csv_logs() -> None:
@@ -170,7 +182,7 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
 
     platform = cf.platform()
     hlc = cf.high_level_commander()
-    if cf.uri == 'radio://0/20/2M/1':
+    if cf.uri == 'radio://1/100/2M/14':
         pygame.init()
         pygame.display.set_mode((600, 400))
         pygame.display.set_caption("Leader Control - AZER / U/P (W = EMERGENCY STOP)")
@@ -184,7 +196,7 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         await asyncio.sleep(3.0)
         
         while running:
-            if cf.uri == 'radio://0/20/2M/1':
+            if cf.uri == 'radio://1/100/2M/14':
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
@@ -302,6 +314,17 @@ async def read_state_log(uri: str, stream) -> None:
             dtype=float,
         )
 
+        cmd = cmd_dict.get(uri, np.array([0.0, 0.0, 0.0]))
+        row = [timestamp, *pos_dict[uri], *vel_dict[uri], *cmd]
+        log_writers[uri].writerow(row)
+        log_files[uri].flush()
+
+async def read_ranger_log(uri: str, stream) -> None:
+    while running and not e_stops.get(uri, False):
+        sample = await stream.next()
+        data = sample.data
+        timestamp = sample.timestamp
+
         ranger_dict[uri] = np.array(
             [
                 data[LEFT],
@@ -312,11 +335,9 @@ async def read_state_log(uri: str, stream) -> None:
             dtype=float,
         )
 
-        cmd = cmd_dict.get(uri, np.array([0.0, 0.0, 0.0]))
-        row = [timestamp, *pos_dict[uri], *vel_dict[uri], *cmd, *ranger_dict[uri]]
-        log_writers[uri].writerow(row)
-        log_files[uri].flush()
-
+        row = [timestamp, *ranger_dict[uri]]
+        ranger_writers[uri].writerow(row)
+        ranger_file[uri].flush()
 
 async def read_status_log(uri: str, stream) -> None:
     global running
@@ -352,12 +373,11 @@ async def start_states_log(cf: Crazyflie) -> None:
     ]:
         await state_block.add_variable(var)
 
-    await state_block.add_variable(FRONT)
-    await state_block.add_variable(BACK)
-    await state_block.add_variable(LEFT)
-    await state_block.add_variable(RIGHT)
-    await state_block.add_variable(UP)
-    await state_block.add_variable(DOWN)
+    ranger_block = await log.create_block()
+    await ranger_block.add_variable(FRONT)
+    await ranger_block.add_variable(BACK)
+    await ranger_block.add_variable(LEFT)
+    await ranger_block.add_variable(RIGHT)
 
     status_block = await log.create_block()
     for var in [
@@ -366,6 +386,7 @@ async def start_states_log(cf: Crazyflie) -> None:
     ]:
         await status_block.add_variable(var)
 
+    ranger_stream = await ranger_block.start(STATE_LOG_PERIOD_MS)
     state_stream = await state_block.start(STATE_LOG_PERIOD_MS)
     status_stream = await status_block.start(STATE_LOG_PERIOD_MS)
 
@@ -374,6 +395,7 @@ async def start_states_log(cf: Crazyflie) -> None:
     try:
         await asyncio.gather(
             read_state_log(uri, state_stream),
+            read_ranger_log(uri,ranger_stream),
             read_status_log(uri, status_stream),
         )
     except asyncio.CancelledError:
@@ -381,7 +403,7 @@ async def start_states_log(cf: Crazyflie) -> None:
     except Exception as e:
         print(f"[{uri}] log task error: {e}")
     finally:
-        for stream in [state_stream, status_stream]:
+        for stream in [state_stream, status_stream, ranger_stream]:
             try:
                 await stream.stop()
             except Exception:

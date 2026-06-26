@@ -1,8 +1,10 @@
 from multiprocessing import Process, Queue
 import app
 import test_commande_gen
-import test_controleur_rust
+import controleur_rust
 import real_time_log
+import os
+import sys
 
 NUM_DRONES = 1
 
@@ -16,7 +18,7 @@ if __name__ == "__main__":
         queues_commande_for_display.append(Queue())
 
     p1 = Process(target=app.go, args=(queues_commande,queues_etat_reel,queues_commande_for_display,))
-    p2 = Process(target=test_controleur_rust.wrapper_sync, args=(queues_commande,queues_etat_reel,))
+    p2 = Process(target=controleur_rust.wrapper_sync, args=(queues_commande,queues_etat_reel,))
     p3 = Process(target=real_time_log.go, args=(queues_commande_for_display[0],))
     
     p1.start()

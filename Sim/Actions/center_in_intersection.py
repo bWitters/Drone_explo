@@ -1,5 +1,6 @@
 from agents import Drones
 from Actions.Action import Action
+import math
 
 class CenterInIntersection(Action):
     def __init__(self, agent):
@@ -22,5 +23,11 @@ class CenterInIntersection(Action):
                 distance_y = self.entrance_position[0] + 0.2 - self.agent.position[0]
             case "W":
                 distance_y = self.entrance_position[0] - 0.2 - self.agent.position[0]
-        self.agent.move_drone[1] += distance_x
-        self.agent.move_drone[0] += distance_y
+        if abs(distance_x)<0.15:
+            self.agent.move_drone[1] += distance_x
+        else:
+            self.agent.move_drone[1] += math.copysign(0.15,distance_x)
+        if abs(distance_y)<0.15:
+            self.agent.move_drone[0] += distance_y
+        else:
+            self.agent.move_drone[0] += math.copysign(0.15,distance_y)

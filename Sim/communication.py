@@ -15,7 +15,10 @@ class Com:
             #print("sending com")
             #print(content)
             self.neighboring_agents["F"].sensor_data.com_stack.put((title, content))
-            self.agent.situation.situation[Situation.COME_CLOSER_SENT] = True
+            print(f"Sending : {title}, {content}")
+            print(f"Sending to : {self.neighboring_agents["F"].unique_id}")
+            if title == "Come Closer":
+                self.agent.situation.situation[Situation.COME_CLOSER_SENT] = True
     
     def send_com_preceding(self, title:str, content):
         if self.neighboring_agents["P"] != None:

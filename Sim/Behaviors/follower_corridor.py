@@ -7,6 +7,7 @@ class FollowerCorridor(Behavior):
 
     def __init__(self, agent):
         self.agent: Drones = agent
+        self.has_receive_reconfig = False
 
         super().__init__(name = self.name)
     
@@ -15,11 +16,14 @@ class FollowerCorridor(Behavior):
         return self.agent.situation.situation
     @property
     def role(self):
-        return self.agent.role.configuration_values 
+        return self.agent.role.configuration_values
 
     def update_action(self):
         if self.situation[Situation.RECONFIG_RECEIVED]:
             self.situation[Situation.RECONFIG] = True
+            self.has_receive_reconfig = True
+        if self.has_receive_reconfig:
+            print("I have received reconfig message")
 
         if FollowerCorridor.Active.Sub_Stop.Stop in self.configuration:
             self.send("do_CenterInCorridor")

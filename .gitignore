@@ -21,6 +21,8 @@ Usefull/
 Images/
 Sim_*
 Controleur_*
+sortie.txt
+error.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

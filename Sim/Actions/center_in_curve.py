@@ -1,5 +1,6 @@
 from agents import Drones
 from Actions.Action import Action
+import math
 
 class CenterInCurve(Action):
     def __init__(self, agent):
@@ -54,5 +55,12 @@ class CenterInCurve(Action):
             i = 0
             k = -1
             j = 1
-        self.agent.move_drone[i] += k*(self.d_F_wall-0.25)
-        self.agent.move_drone[(i+1)%2] += j*self.side_wall_action()
+        if abs(self.d_F_wall-0.25) < 0.15 :
+            self.agent.move_drone[i] += k*(self.d_F_wall-0.25)
+        else:
+            self.agent.move_drone[i] += math.copysign(0.15,k*(self.d_F_wall-0.25))
+        a = self.side_wall_action()
+        if abs(a) < 0.15 :
+            self.agent.move_drone[(i+1)%2] += j*self.side_wall_action()
+        else:
+            self.agent.move_drone[(i+1)%2] += math.copysign(0.15,j*self.side_wall_action())
