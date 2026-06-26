@@ -160,10 +160,12 @@ class DroneStateMachine(StateChart):
 
         elif "reconfig_follower" in self.role:
             if self.configuration == {DroneStateMachine.ReconfigFollower}:
-                if situation[Situation.CURVE]:
-                    self.follow_curve()
-                elif situation[Situation.CORRIDOR]:
-                    self.follow()
+                print("Trying to change state")
+                if situation[Situation.COME_CLOSER][0]:
+                    if situation[Situation.CURVE]:
+                        self.follow_curve()
+                    elif situation[Situation.CORRIDOR]:
+                        self.follow()
             if self.configuration == {DroneStateMachine.FollowerCorridor}:
                 # if situation[Situation.RECONFIG]:
                 #     self.reconfig()

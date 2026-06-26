@@ -34,6 +34,7 @@ class SituationState():
             Situation.BACKWARD_TOO_FAR : False,
             Situation.DEAD_END : False,
             Situation.RECONFIG : False,
+            Situation.ROTATION_COMPLETED : False,
             }
 
     @property

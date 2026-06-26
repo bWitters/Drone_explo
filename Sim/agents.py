@@ -217,10 +217,14 @@ class Drones():
                                                 )
 
         self.leader_dead_end_behavior.add_listener(self.stop_action,
+                                                   self.send_come_closer_action,
                                                    self.send_reconfig_message,
                                                    self.turn_around_action,
                                                    self.rotation_action,
-                                                   self.center_in_dead_end_action
+                                                   self.center_in_dead_end_action,
+                                                   self.stop_action,
+                                                   self.send_cell_action,
+                                                   self.gap_direction_determination_action,
                                                    )
         
         self.follower_corridor_behavior.add_listener(self.stop_action,
