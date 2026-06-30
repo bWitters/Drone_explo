@@ -61,6 +61,7 @@ class Drones():
         from Behaviors.reconfig_corridor import ReconfigCorridor
         from Behaviors.reconfig_curve import ReconfigCurve
         from Behaviors.reconfig_intersection import ReconfigIntersection
+        from Behaviors.reconfig_follower_curve import ReconfigFollowerCurve
 
         self.stock_behavior = Stock(agent = self)
         self.takeoff_behavior = Takeoff(agent = self)
@@ -75,6 +76,7 @@ class Drones():
         self.reconfig_corridor_behavior = ReconfigCorridor(agent = self)
         self.reconfig_curve_behavior = ReconfigCurve(agent = self)
         self.reconfig_intersection_behavior = ReconfigIntersection(agent = self)
+        self.reconfig_follower_curve_behavior = ReconfigFollowerCurve(agent = self)
 
 
         self.sm_behavior_dict = {"Stock" : self.stock_behavior,
@@ -89,7 +91,8 @@ class Drones():
                                  "Reconfig Follower": self.reconfig_follower_behavior,
                                  "Reconfig Corridor":self.reconfig_corridor_behavior,
                                  "Reconfig Curve":self.reconfig_curve_behavior,
-                                 "Reconfid Intersection":self.reconfig_intersection_behavior,
+                                 "Reconfig Intersection":self.reconfig_intersection_behavior,
+                                 "Reconfig Follower Curve":self.reconfig_follower_curve_behavior,
                                  }
 
         self.state.add_listener(self.stock_behavior,
@@ -105,6 +108,7 @@ class Drones():
                                 self.reconfig_corridor_behavior,
                                 self.reconfig_curve_behavior,
                                 self.reconfig_intersection_behavior,
+                                self.reconfig_follower_curve_behavior
                                 )
         
         from Actions.stop import Stop
@@ -128,6 +132,7 @@ class Drones():
         from Actions.send_current_direction import SendCurrentDirection
         from Actions.send_reconfig_message import SendReconfig
         from Actions.center_in_dead_end import CenterInDeadEnd
+        from Actions.rotation_reconfig_curve import RotationReconfigCurve
 
         self.stop_action = Stop(self)
         self.change_role_action = ChangeRole(self)
@@ -150,6 +155,7 @@ class Drones():
         self.send_current_direction_action = SendCurrentDirection(self)
         self.send_reconfig_message = SendReconfig(self)
         self.center_in_dead_end_action = CenterInDeadEnd(self)
+        self.rotation_reconfig_curve_action = RotationReconfigCurve(self)
 
         self.actions_dict = {"Stop" : self.stop_action,
                              "Change Role" : self.change_role_action,
@@ -171,6 +177,7 @@ class Drones():
                              "Send Current Direction" : self.send_current_direction_action,
                              "Send Reconfig Message" : self.send_reconfig_message,
                              "Center in Dead End" : self.center_in_dead_end_action,
+                             "Rotation reconfig curve" : self.rotation_reconfig_curve_action,
                              }
 
 
@@ -319,6 +326,22 @@ class Drones():
                                                          self.center_in_intersection_action,
                                                          self.send_reconfig_message
                                                          )
+        
+        self.reconfig_follower_curve_behavior.add_listener(self.rotation_reconfig_curve_action,
+                                                           self.stop_action,
+                                                           self.send_cell_action,
+                                                           self.new_cell_to_follow_action,
+                                                           self.come_closer_cell_to_follow_action,
+                                                           self.rotation_action,
+                                                           self.move_action,
+                                                           self.send_come_closer_action,
+                                                           self.change_role_action,
+                                                           self.center_in_corridor_action,
+                                                           self.center_in_curve_action,
+                                                           self.send_reconfig_message,
+                                                           self.turn_around_action,
+                                                           )
+        
         self.initialize_agent()
 
         # graph = DotGraphMachine(self.state)

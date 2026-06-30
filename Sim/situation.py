@@ -225,6 +225,7 @@ class SituationState():
                     angle = -pi
                 else:
                     angle = pi
+        print(f"{self.agent.unique_id}")
         print(f"Rotation to complete : {angle - self.yaw_angle}")
         print(f"Rotation completed : {abs(angle - self.yaw_angle) < 0.1}")
         return abs(angle - self.yaw_angle) < 0.1

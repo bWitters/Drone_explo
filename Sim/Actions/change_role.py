@@ -32,7 +32,7 @@ class ChangeRole(Action):
             if "follower" in self.role:
                 return "leader"
         print("Trying to get new role")
-        if "ReconfigFollower" in self.state:
+        if "ReconfigFollower" in self.state or "ReconfigFollowerCurve" in self.state:
             if self.agent.neighboring_agent_list["P"] == None:
                 return "reconfig_leader"
             else:
