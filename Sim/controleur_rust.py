@@ -105,10 +105,10 @@ def close_csv_logs() -> None:
     for f in log_files.values():
         f.close()
 
-def wrapper_sync(queues, queue_etat_reel):
-    asyncio.run(go(queues, queue_etat_reel))
+def wrapper_sync(queues, queue_etat_reel, queues_lidar):
+    asyncio.run(go(queues, queue_etat_reel,queues_lidar))
 
-async def go(queues, queue_etat_reel):
+async def go(queues, queue_etat_reel,queues_lidar):
     global running
     context = LinkContext()
     cache = FileTocCache("./cache")
@@ -128,8 +128,8 @@ async def go(queues, queue_etat_reel):
     print("Connected to Crazyflies")
 
     log_tasks = [
-            asyncio.create_task(start_states_log(cf))
-            for cf in cfs
+            asyncio.create_task(start_states_log(cfs[i],queues_lidar[i]))
+            for i in range(len(cfs))
         ]
     
     try:
@@ -319,7 +319,7 @@ async def read_state_log(uri: str, stream) -> None:
         log_writers[uri].writerow(row)
         log_files[uri].flush()
 
-async def read_ranger_log(uri: str, stream) -> None:
+async def read_ranger_log(uri: str, stream,queue_lidar) -> None:
     while running and not e_stops.get(uri, False):
         sample = await stream.next()
         data = sample.data
@@ -336,6 +336,7 @@ async def read_ranger_log(uri: str, stream) -> None:
         )
 
         row = [timestamp, *ranger_dict[uri]]
+        queue_lidar.put([timestamp, *ranger_dict[uri]])
         ranger_writers[uri].writerow(row)
         ranger_file[uri].flush()
 
@@ -357,7 +358,7 @@ def convert_log_to_distance(data):
         else:
             return data / 1000.0
         
-async def start_states_log(cf: Crazyflie) -> None:
+async def start_states_log(cf: Crazyflie, queue_lidar) -> None:
     uri = cf.uri
     log = cf.log()
 
@@ -395,7 +396,7 @@ async def start_states_log(cf: Crazyflie) -> None:
     try:
         await asyncio.gather(
             read_state_log(uri, state_stream),
-            read_ranger_log(uri,ranger_stream),
+            read_ranger_log(uri,ranger_stream,queue_lidar),
             read_status_log(uri, status_stream),
         )
     except asyncio.CancelledError:

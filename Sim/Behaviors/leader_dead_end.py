@@ -9,7 +9,6 @@ class LeaderDeadEnd(Behavior):
         self.agent: Drones = agent
         self.stop_centering = False
         self.doing_rotation = False
-
         super().__init__(name = self.name)
     
     @property
@@ -21,10 +20,10 @@ class LeaderDeadEnd(Behavior):
 
     def update_action(self):
         if LeaderDeadEnd.Active.Sub_Stop.Stop in self.configuration:
-            self.send("standby_stop")
             self.send("do_CenterInDeadEnd")
+            self.send("standby_stop")
             self.doing_rotation = False
-        elif self.agent.sensor_data.centered_in_corner and not self.doing_rotation:
+        elif self.agent.sensor_data.centered_in_corner and (not self.doing_rotation):
             self.send("standby_CenterInDeadEnd")
             self.send("do_turn_around")
             self.send("do_rotation")

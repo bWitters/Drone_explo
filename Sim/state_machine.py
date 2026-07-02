@@ -16,6 +16,7 @@ class DroneStateMachine(StateChart):
     ReconfigCorridor = State("ReconfigCorridor")
     ReconfigCurve = State("ReconfigCurve")
     ReconfigIntersection = State("ReconfigIntersection")
+    ReconfigFollowerCurve = State("ReconfigFollowerCurve")
     
     stock = Stock.to.itself()
 
@@ -39,7 +40,8 @@ class DroneStateMachine(StateChart):
     
     follow_curve = (FollowerCorridor.to(FollowerCurve)|
                     FollowerCurve.to(FollowerCorridor)|
-                    ReconfigFollower.to(FollowerCurve))
+                    ReconfigFollower.to(FollowerCurve)|
+                    ReconfigFollowerCurve.to(FollowerCurve))
     
     become_leader = (FollowerCorridor.to(LeaderIntersection)|
                      FollowerIntersection.to(LeaderIntersection))
@@ -52,6 +54,9 @@ class DroneStateMachine(StateChart):
                 FollowerCurve.to(ReconfigFollower)|
                 FollowerIntersection.to(ReconfigFollower)|
                 ReconfigFollower.to.itself())
+    
+    reconfig_follower_curve = (FollowerCurve.to(ReconfigFollowerCurve)|
+                      ReconfigFollowerCurve.to.itself())
 
     reconfig_intersection = (ReconfigFollower.to(ReconfigIntersection)|
                              ReconfigCurve.to(ReconfigIntersection)|
@@ -124,7 +129,7 @@ class DroneStateMachine(StateChart):
                     self.follow_curve()          
             elif self.configuration == {DroneStateMachine.FollowerCurve}:
                 if situation[Situation.RECONFIG]:
-                    self.reconfig()
+                    self.reconfig_follower_curve()
                 elif situation[Situation.CORRIDOR]:
                     self.follow_curve()
             elif self.configuration == {DroneStateMachine.FollowerIntersection}:
@@ -159,11 +164,14 @@ class DroneStateMachine(StateChart):
             #         self.reconfig()
 
         elif "reconfig_follower" in self.role:
+            print(self.configuration)
             if self.configuration == {DroneStateMachine.ReconfigFollower}:
-                if situation[Situation.CURVE]:
-                    self.follow_curve()
-                elif situation[Situation.CORRIDOR]:
+                print("Trying to change state")
+                if situation[Situation.COME_CLOSER][0]:
                     self.follow()
+            if self.configuration == {DroneStateMachine.ReconfigFollowerCurve}:
+                print("Trying to change state")
+                self.follow_curve()
             if self.configuration == {DroneStateMachine.FollowerCorridor}:
                 # if situation[Situation.RECONFIG]:
                 #     self.reconfig()

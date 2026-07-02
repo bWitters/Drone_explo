@@ -21,7 +21,9 @@ class FollowerCurve(Behavior):
 
 
     def update_action(self):
-        if self.situation[Situation.RECONFIG_RECEIVED]:
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
+        if self.situation[Situation.RECONFIG_RECEIVED] and "reconfig_follower" not in self.role:
             self.situation[Situation.RECONFIG] = True   
             self.has_receive_reconfig = True
         if self.has_receive_reconfig:

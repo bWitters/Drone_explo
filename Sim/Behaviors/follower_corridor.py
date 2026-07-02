@@ -19,6 +19,8 @@ class FollowerCorridor(Behavior):
         return self.agent.role.configuration_values
 
     def update_action(self):
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         if self.situation[Situation.RECONFIG_RECEIVED]:
             self.situation[Situation.RECONFIG] = True
             self.has_receive_reconfig = True
@@ -39,7 +41,7 @@ class FollowerCorridor(Behavior):
         elif FollowerCorridor.Active.Sub_Move.Move in self.configuration:
             self.send("standby_ComeCloserDirectionToGo")
 
-            if self.situation[Situation.BACKWARD_TOO_FAR][0]:
+            if self.situation[Situation.BACKWARD_TOO_FAR][0] and self.agent.neighboring_agent_list["F"] != None:
                 if self.situation[Situation.COME_CLOSER_SENT] == False:
                     self.send("do_send_come_closer")
                 if self.situation[Situation.BACKWARD_TOO_FAR][1] == 2:
@@ -54,9 +56,9 @@ class FollowerCorridor(Behavior):
                 self.send("standby_ForcedWaiting")        
 
         elif FollowerCorridor.Active.Sub_ForcedWaiting.ForcedWaiting in self.configuration:
-            if self.situation[Situation.BACKWARD_TOO_FAR][0] == False:
+            if self.situation[Situation.BACKWARD_TOO_FAR][0] == False or self.agent.neighboring_agent_list["F"] == None:
                 self.send("do_move")
                 self.send("standby_ForcedWaiting")
-            if self.situation[Situation.BACKWARD_TOO_FAR][1] == 1:
+            if self.situation[Situation.BACKWARD_TOO_FAR][1] == 1 or self.agent.neighboring_agent_list["F"] == None:
                 self.send("do_move")
                 self.send("standby_ForcedWaiting")

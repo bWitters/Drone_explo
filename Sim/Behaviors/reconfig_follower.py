@@ -23,6 +23,8 @@ class ReconfigFollower(Behavior):
         return self.agent.role.configuration_values 
 
     def update_action(self):
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         print(self.role)
         if "leader" in self.role:
             if ReconfigFollower.Active.Sub_Stop.Stop in self.configuration:

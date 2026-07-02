@@ -34,6 +34,8 @@ class SituationState():
             Situation.BACKWARD_TOO_FAR : False,
             Situation.DEAD_END : False,
             Situation.RECONFIG : False,
+            Situation.ROTATION_COMPLETED : False,
+            Situation.STOP_RECONFIG : False,
             }
 
     @property
@@ -98,11 +100,11 @@ class SituationState():
                 return True
             else:
                 return False
-        elif graph_branch_counter == 0:
-            if occupied_gaps["B"] != False and occupied_gaps["F"] != False:
-                return True
-            else:
-                return False
+        # elif graph_branch_counter == 0:
+        #     if occupied_gaps["B"] != False and occupied_gaps["F"] != False:
+        #         return True
+        #     else:
+        #         return False
         else:
             return False
     
@@ -166,6 +168,7 @@ class SituationState():
             while not com_received.empty():
                 last_com = com_received.get()
                 print(f"Last com : {last_com}")
+                
                 if last_com[0] == "Come Closer":
                     if  "leader" in self.role:
                         self.situation[Situation.COME_CLOSER] = (False,last_com[1])
@@ -173,15 +176,24 @@ class SituationState():
                         self.situation[Situation.COME_CLOSER] = (True,last_com[1])
                 else:
                     self.situation[Situation.COME_CLOSER] = (False,last_com[1])
+                
                 if last_com[0] == "Stop forced wait":
                     self.situation[Situation.FORCED_WAIT] = (False,last_com[1])
+                
                 if last_com[0] == "Current Direction":
                     self.situation[Situation.PRECEDING_DIRECTION] = last_com[1]
+                
                 if last_com[0] == "Reconfig":
                     print("Reconfig received")
                     self.situation[Situation.RECONFIG_RECEIVED] = True
                 else:
                     self.situation[Situation.RECONFIG_RECEIVED] = False
+                
+                if last_com[0] == "Stop_Reconfig":
+                    self.situation[Situation.STOP_RECONFIG] = True
+                else:
+                    self.situation[Situation.STOP_RECONFIG] = False
+
         else:
             self.situation[Situation.COME_CLOSER] = (False,None)
     
@@ -224,6 +236,7 @@ class SituationState():
                     angle = -pi
                 else:
                     angle = pi
+        print(f"{self.agent.unique_id}")
         print(f"Rotation to complete : {angle - self.yaw_angle}")
         print(f"Rotation completed : {abs(angle - self.yaw_angle) < 0.1}")
         return abs(angle - self.yaw_angle) < 0.1

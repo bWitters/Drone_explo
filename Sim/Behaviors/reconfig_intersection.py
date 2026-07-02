@@ -22,6 +22,8 @@ class ReconfigIntersection(Behavior):
     
     def update_action(self): #TODO : Aller dans la direction où il y a un drone qui est resté
         pass
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         # print(f"Leader front direction : {self.agent.front}")
         # if LeaderIntersection.Active.Sub_Stop.Stop in self.configuration:
         #     self.send("standby_stop")
