@@ -20,6 +20,8 @@ class ReconfigCurve(Behavior):
         return self.agent.role.configuration_values
     
     def update_action(self):
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         if ReconfigCurve.Active.Sub_Stop.Stop in self.configuration:
             self.send("standby_stop")
             self.send("do_send_come_closer")

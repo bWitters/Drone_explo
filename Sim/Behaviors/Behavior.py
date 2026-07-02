@@ -45,6 +45,12 @@ class Behavior(StateChart):
             do_RotationControl = Idle_RotationControl.to(RotationControl)
             standby_RotationControl = RotationControl.to(Idle_RotationControl)
         
+        class Sub_SendStopReconfig(State.Compound):
+            Idle_SendStopReconfig = State(initial=True)
+            SendStopReconfig = State()
+
+            do_SendStopReconfig = Idle_SendStopReconfig.to(SendStopReconfig)
+            standby_SendStopReconfig = SendStopReconfig.to(Idle_SendStopReconfig)
         class Sub_RotationReconfigCurve(State.Compound):
             Idle_RotationReconfigCurve = State(initial=True)
             RotationReconfigCurve = State()

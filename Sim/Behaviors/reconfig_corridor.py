@@ -16,6 +16,8 @@ class ReconfigCorridor(Behavior):
         return self.agent.situation.situation
     
     def update_action(self):
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         if ReconfigCorridor.Active.Sub_Stop.Stop in self.configuration:
             self.send("standby_stop")
             self.situation[Situation.COME_CLOSER_SENT] = False

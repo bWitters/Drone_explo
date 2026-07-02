@@ -24,6 +24,8 @@ class ReconfigFollowerCurve(Behavior):
         return self.agent.role.configuration_values
     
     def update_action(self):
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         print(self.change_neighborhood)
         print(self.situation[Situation.ROTATION_COMPLETED])
         if ReconfigFollowerCurve.Active.Sub_Stop.Stop in self.configuration:

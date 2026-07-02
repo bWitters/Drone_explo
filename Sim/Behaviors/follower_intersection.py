@@ -14,6 +14,7 @@ class FollowerIntersection(Behavior):
         self.waiting_rot = False
         self.come_closer_received = False
         self.has_receive_reconfig = False
+        self.stop = False
         super().__init__(name=self.name)
 
     @property
@@ -28,6 +29,8 @@ class FollowerIntersection(Behavior):
         return self.agent.sensor_data.centered_in_intersection
 
     def update_action(self):
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         print(f"Follower front direction : {self.agent.front}")
         # 1 : Center
         # 2 : Wait come closer
@@ -40,17 +43,26 @@ class FollowerIntersection(Behavior):
             self.has_receive_reconfig = True
         if self.has_receive_reconfig:
             print("I have received reconfig message")
+        
+        if "reconfig_follower" in self.role:
+            if self.agent.neighboring_agent_list["F"] == None:
+                self.send("do_stop")
+                self.send("do_SendStopReconfig")
+                self.stop = True
 
 
         if FollowerIntersection.Active.Sub_Stop.Stop in self.configuration:
-                self.need_standby = False
-                self.centered = False
-                self.waiting_come_closer = True
-                self.dir_to_follow = None
-                self.waiting_rot = False
-                self.come_closer_received = False
-                self.send("do_CenterInIntersection")
-                self.send("standby_stop")
+                if self.stop:
+                    pass
+                else:
+                    self.need_standby = False
+                    self.centered = False
+                    self.waiting_come_closer = True
+                    self.dir_to_follow = None
+                    self.waiting_rot = False
+                    self.come_closer_received = False
+                    self.send("do_CenterInIntersection")
+                    self.send("standby_stop")
 
         if FollowerIntersection.Active.Sub_SendComeCloser.SendComeCloser in self.configuration:
             self.send("standby_send_come_closer")

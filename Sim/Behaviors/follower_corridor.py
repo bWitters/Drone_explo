@@ -19,6 +19,8 @@ class FollowerCorridor(Behavior):
         return self.agent.role.configuration_values
 
     def update_action(self):
+        if self.situation[Situation.STOP_RECONFIG]:
+            print("Stop reconfig received")
         if self.situation[Situation.RECONFIG_RECEIVED]:
             self.situation[Situation.RECONFIG] = True
             self.has_receive_reconfig = True

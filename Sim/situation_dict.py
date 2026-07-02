@@ -29,3 +29,4 @@ class Situation(Enum):
     PRECEDING_DIRECTION = auto()
     RECONFIG_RECEIVED = auto()
     RECONFIG = auto()
+    STOP_RECONFIG = auto()
