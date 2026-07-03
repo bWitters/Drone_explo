@@ -11,16 +11,16 @@ We are using [CFlib2](https://github.com/bitcraze/crazyflie-lib-python-v2/tree/m
 
 # Installation
 
-git clone https://gitlab.inria.fr/bwitters/Drone_explo.git
+```git clone https://gitlab.inria.fr/bwitters/Drone_explo.git
 cd 
-pip install -r requirements.txt
+pip install -r requirements.txt```
 
 # Run
 
 ## Run the simulator alone
 
-python Sim/app.py
+`python Sim/app.py`
 
 ## Run with CrazyFlie connection
 
-python Sim/orchestrateur.py
+`python Sim/orchestrateur.py`
