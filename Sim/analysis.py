@@ -32,7 +32,14 @@ class Analyzer:
 
     @property
     def rays(self):
-        return [element[0] for element in self.agent.rays]
+        if self.agent.uri == None:
+            rx = [element[0] for element in self.agent.rays]
+            print(f"Should be pybullet lidar : \n{rx}")
+        else:
+            rx = self.agent.rays
+            print(f"Should be multiranger lidar : \n{rx}")
+
+        return rx
     
     @property
     def neighborhood(self):

@@ -76,10 +76,13 @@ def go( queues = None,
         num_drones=NUM_DRONES,
         output_folder=DEFAULT_OUTPUT_FOLDER,
         ):
-    
+    original_std_out = sys.stdout
     def mute():
         sys.stdout = open("sortie.txt", 'w') 
         sys.stderr = open("error.txt", "w")
+
+    def unmute():
+        sys.stdout = original_std_out
     
     mute()
     # Vérifie qu'il y a assez d'URIS associé aux drones simulé
@@ -143,6 +146,8 @@ def go( queues = None,
             if compte == taille:
                 ready = True
 
+    unmute()
+    print("Every drones ready")
     #### Run the simulation ####################################
     action = np.zeros((num_drones,5))
     START = time.time()
@@ -155,6 +160,7 @@ def go( queues = None,
     show_lidar = SHOW_LIDAR
     numRays = 181
     drones = []
+    mins_ray = [math.inf,math.inf,math.inf,math.inf]
     for sim_steps in range(running):
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
@@ -246,7 +252,6 @@ def go( queues = None,
 
         p.removeAllUserDebugItems()
 
-
         #### Exécuter le contrôle pour chaque drone (gérées par State Machines) ####
         for j in range(num_drones):
             try:
@@ -300,11 +305,11 @@ def go( queues = None,
                                 mins_ray[3] = (results[i][2]*RAY_LENGTH,results[i][0])
                 
                 else:
-                    mins_ray = [math.inf,math.inf,math.inf,math.inf]
                     if not queues_lidar[j].empty():
                         commande = queues_lidar[j].get()
                         mins_ray = [commande[1],commande[2],commande[3],commande[4]]
 
+                print(mins_ray)
                 drones[j].position = env.pos[j]
                 drones[j].rpy = env.rpy[j]
                 drones[j].step(mins_ray)

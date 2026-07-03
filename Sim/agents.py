@@ -17,7 +17,7 @@ class Drones():
         elif init_dir[2] == angles[3]:
             direction = "S"
         self.front = direction
-        #self.uri = uri
+        self.uri = uri
         self.neighboring_agent_list = {"F":None,"P":None}
         self.stocking_area = stocking_area
         self.unique_id = unique_id
@@ -374,8 +374,7 @@ class Drones():
         print(f"Current role : {self.role.configuration_values}")
         self.move_drone = [0,0,0,0,0]
         self.rays = rays
-        if self.rays[0] != math.inf:
-            self.sensor_data.neighborhood_analysis()
+        self.sensor_data.neighborhood_analysis()
         self.situation.update_situation(self.sensor_data.gaps_dir,
                                         self.sensor_data.occupied_neighborhood,
                                         self.sensor_data.graph_branch_counter_var,
