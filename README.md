@@ -13,7 +13,8 @@ We are using [CFlib2](https://github.com/bitcraze/crazyflie-lib-python-v2/tree/m
 
 ```git clone https://gitlab.inria.fr/bwitters/Drone_explo.git
 cd 
-pip install -r requirements.txt```
+pip install -r requirements.txt
+```
 
 # Run
 
