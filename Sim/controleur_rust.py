@@ -13,7 +13,7 @@ from cflib2.toc_cache import FileTocCache
 URIS = [
     # 'radio://0/20/2M/1',
     # 'radio://0/20/2M/2',
-    # 'radio://0/20/2M/4',
+    'radio://0/20/2M/4',
 
     # 'radio://0/60/2M/10',
     # 'radio://0/60/2M/7',
@@ -22,7 +22,7 @@ URIS = [
 
     # 'radio://1/100/2M/11',
     # 'radio://1/100/2M/12',
-    'radio://1/100/2M/14',
+    'radio://0/100/2M/14',
 ]
 
 STATE_LOG_PERIOD_MS = 100
@@ -105,10 +105,10 @@ def close_csv_logs() -> None:
     for f in log_files.values():
         f.close()
 
-def wrapper_sync(queues, queue_etat_reel, queues_lidar):
-    asyncio.run(go(queues, queue_etat_reel,queues_lidar))
+def wrapper_sync(queues, queues_etat_reel, queues_lidar):
+    asyncio.run(go(queues, queues_etat_reel,queues_lidar))
 
-async def go(queues, queue_etat_reel,queues_lidar):
+async def go(queues, queues_etat_reel,queues_lidar):
     global running
     context = LinkContext()
     cache = FileTocCache("./cache")
@@ -126,17 +126,22 @@ async def go(queues, queue_etat_reel,queues_lidar):
     )
 
     print("Connected to Crazyflies")
-
-    log_tasks = [
-            asyncio.create_task(start_states_log(cfs[i],queues_lidar[i]))
-            for i in range(len(cfs))
-        ]
+    if queues_lidar != None:
+        log_tasks = [
+                asyncio.create_task(start_states_log(cfs[i],queues_lidar[i]))
+                for i in range(len(cfs))
+            ]
+    else:
+        log_tasks = [
+                asyncio.create_task(start_states_log(cfs[i],None))
+                for i in range(len(cfs))
+            ]
     
     try:
         await asyncio.sleep(0.5)
 
         flight_tasks = [
-            asyncio.create_task(fly_sequence(cfs[i], queues[i], queue_etat_reel[i]))
+            asyncio.create_task(fly_sequence(cfs[i], queues[i], queues_etat_reel[i]))
             for i in range(len(cfs))
         ]
 
@@ -180,9 +185,11 @@ async def fly_sequence(cf: Crazyflie, queue, queue_etat_reel):
 async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
     global running
 
+    print(f"Voici la queue : {queue_etat_reel}")
+
     platform = cf.platform()
     hlc = cf.high_level_commander()
-    if cf.uri == 'radio://1/100/2M/14':
+    if cf.uri == 'radio://0/100/2M/14':
         pygame.init()
         pygame.display.set_mode((600, 400))
         pygame.display.set_caption("Leader Control - AZER / U/P (W = EMERGENCY STOP)")
@@ -194,9 +201,12 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         print("taking off...")
         await hlc.take_off(0.45, None, 3.0, None)
         await asyncio.sleep(3.0)
-        
+        print_running = True
         while running:
-            if cf.uri == 'radio://1/100/2M/14':
+            if print_running:
+                print("running")
+                print_running = False
+            if cf.uri == 'radio://0/100/2M/14':
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
@@ -206,6 +216,8 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
                     running = False
 
             queue_etat_reel.put([True])
+            if print_running:
+                print(f"Voici la queue apres le lancement : {queue_etat_reel}")
             if not queue.empty():
                 commandes = queue.get()
                 x_world, y_world, z, yaw = commandes[0], commandes[1], commandes[2], commandes[3]
@@ -232,7 +244,7 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         await emergency_stop(cf)
 
     finally:
-        print("Leader controlled landing.")
+        print(f"Drone : {cf.uri}, controlled landing.")
         await land_drone_velocity(cf, cf.uri)
 
 async def emergency_stop(cf: Crazyflie) -> None:
@@ -336,7 +348,8 @@ async def read_ranger_log(uri: str, stream,queue_lidar) -> None:
         )
 
         row = [timestamp, *ranger_dict[uri]]
-        queue_lidar.put([timestamp, *ranger_dict[uri]])
+        if queue_lidar != None:
+            queue_lidar.put([timestamp, *ranger_dict[uri]])
         ranger_writers[uri].writerow(row)
         ranger_file[uri].flush()
 
