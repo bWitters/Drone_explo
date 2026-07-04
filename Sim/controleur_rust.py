@@ -196,16 +196,43 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         clock = pygame.time.Clock()
 
     await platform.send_arming_request(do_arm=True)
+    y = 0
+    if cf.uri == 'radio://0/100/2M/14':
+        y = 0.5
 
     try:
         print("taking off...")
-        await hlc.take_off(0.45, None, 3.0, None)
+        await hlc.take_off(0.70, None, 3.0, None)
         await asyncio.sleep(3.0)
+
+        await hlc.go_to(
+                    float(y),
+                    float(0),
+                    float(0.70),
+                    0,
+                    1,
+                    False,
+                    False,
+                    0
+                )
+        await asyncio.sleep(1)
+
+        await hlc.go_to(
+                    float(y),
+                    float(0),
+                    float(0.45),
+                    0,
+                    1,
+                    False,
+                    False,
+                    0
+                )
+        await asyncio.sleep(1)
+
         print_running = True
         while running:
             if print_running:
                 print("running")
-                print_running = False
             if cf.uri == 'radio://0/100/2M/14':
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -218,6 +245,8 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
             queue_etat_reel.put([True])
             if print_running:
                 print(f"Voici la queue apres le lancement : {queue_etat_reel}")
+                print(queue_etat_reel.empty())
+                print_running = False
             if not queue.empty():
                 commandes = queue.get()
                 x_world, y_world, z, yaw = commandes[0], commandes[1], commandes[2], commandes[3]
