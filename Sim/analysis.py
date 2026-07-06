@@ -31,7 +31,7 @@ class Analyzer:
 
 
     @property
-    def rays(self):
+    def rays(self): #TODO : Problème avec la variable rays qui n'est pas bien utilisé quand on est avec le multiranger
         if self.agent.uri == None:
             rx = [element[0] for element in self.agent.rays]
             print(f"Should be pybullet lidar : \n{rx}")
