@@ -31,7 +31,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 2
+NUM_DRONES = 1
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 #LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
 LIST_POS = [[0, 0, .15], [.5, 0, .15]]
@@ -48,7 +48,7 @@ print(INIT_XYZ)
 URIS = [
     # 'radio://0/20/2M/1',
     # 'radio://0/20/2M/2',
-    'radio://0/20/2M/4',
+    # 'radio://0/20/2M/4',
 
     # #'radio://1/80/2M/5',
     # #'radio://1/80/2M/6',

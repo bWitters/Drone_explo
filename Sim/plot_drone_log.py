@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Lire le fichier CSV (remplace 'data.csv' par ton nom de fichier)
-df = pd.read_csv('logs/Controleur/Controleur_07-07_16h02m36035474/4.csv')
+df = pd.read_csv('logs/Controleur/Controleur_07-07_16h40m21960860/14.csv')
 
 # Tracer chaque colonne en fonction de l'index
 plt.figure(figsize=(12, 6))

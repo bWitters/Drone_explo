@@ -1,12 +1,13 @@
 from multiprocessing import Process, Queue
 import app
 import test_commande_gen
+import test_multi_ranger_takeoff as test_multi_ranger_takeoff
 import controleur_rust
 import real_time_log
 import os
 import sys
 
-NUM_DRONES = 2
+NUM_DRONES = 1
 
 if __name__ == "__main__":
     queues_commande = []
@@ -20,7 +21,7 @@ if __name__ == "__main__":
         queues_lidar.append(Queue())
 
     p1 = Process(target=app.go, args=(queues_commande,queues_etat_reel,queues_commande_for_display,queues_lidar,))
-    p2 = Process(target=controleur_rust.wrapper_sync, args=(queues_commande,queues_etat_reel,queues_lidar,))
+    p2 = Process(target=test_multi_ranger_takeoff.wrapper_sync, args=(queues_commande,queues_etat_reel,queues_lidar,))
     p3 = Process(target=real_time_log.go, args=(queues_commande_for_display[0],))
     
     p1.start()
