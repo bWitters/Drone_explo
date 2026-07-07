@@ -36,14 +36,24 @@ class Analyzer:
             rx = [element[0] for element in self.agent.rays]
             #print(f"Should be pybullet lidar : \n{rx}")
         else:
-            rx = self.agent.rays
+            rx = []
+            for i in range(4):
+                rx.append(self.agent.rays_reel[i])
             #print(f"Should be multiranger lidar : \n{rx}")
-
+        print(rx)
         return rx
     
     @property
     def neighborhood(self):
-        return self.world_to_drone_list(self.agent.rays)
+        if self.agent.uri == None:
+            rx = self.agent.rays
+        else:
+            rx = []
+            for i in range(4):
+                rx.append((self.agent.rays_reel[i],self.agent.rays[i][1]))
+            #print(f"Should be multiranger lidar : \n{rx}")
+        print(rx)
+        return self.world_to_drone_list(rx)
     
     #Follow the gap
     def get_alignement_in_gap(self):
@@ -62,6 +72,7 @@ class Analyzer:
                 else:
                     dist_wall = self.rays[0]-self.rays[2]
                     is_centered = False
+        print("get_alignement_in_gap works !")
         return (is_centered,dist_wall)
     
     #Distance close enough to leader
@@ -80,6 +91,7 @@ class Analyzer:
             case "W":
                 if self.rays[3] < 0.6:
                     close_to_leader = True
+        print("get_close_to_leader works !")
         return close_to_leader
 
     #Center in corner
@@ -98,6 +110,7 @@ class Analyzer:
             case "W":
                 if self.rays[3] < 0.26:
                     centered_in_corner = True
+        print("get_centerd_in_corner works !")
         return centered_in_corner
                 
     #Intersection
@@ -139,6 +152,7 @@ class Analyzer:
                         gaps_dir["S"] = True
                     case 3:
                         gaps_dir["W"] = True
+        print("get_gap_direction works !")
         return gaps_dir
     
     def gaps_type(self): #FIXME for the curve corridor transition
@@ -250,6 +264,7 @@ class Analyzer:
         direction = ["N","E","S","W"]
         for i in range(len(self.rays)):
             wall_distance[direction[i]] = self.rays[i]
+        print("get_wall_dsitance works !")
         return wall_distance
     
     def get_wall_distance_drone(self,wall_distance):

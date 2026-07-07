@@ -210,12 +210,12 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
                     float(0),
                     float(0.70),
                     0,
-                    1,
+                    2,
                     False,
                     False,
                     0
                 )
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
 
         await hlc.go_to(
                     float(y),
@@ -368,10 +368,10 @@ async def read_ranger_log(uri: str, stream,queue_lidar) -> None:
 
         ranger_dict[uri] = np.array(
             [
-                data[LEFT],
-                data[FRONT],
-                data[RIGHT],
-                data[BACK],
+                data[LEFT]/1000,
+                data[FRONT]/1000,
+                data[RIGHT]/1000,
+                data[BACK]/1000,
             ],
             dtype=float,
         )

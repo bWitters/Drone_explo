@@ -47,10 +47,10 @@ class SituationState():
         return self.agent.role.configuration_values
     
     def is_good_height(self):
-        return self.position[2] > 0.42
+        return self.position[2] > self.agent.hauteur_vol - 0.03
     
     def is_stock_height(self):
-            return self.position[2] < 0.30
+            return self.position[2] < self.agent.hauteur_take_off
 
     def is_in_stock(self):
         ok = 0

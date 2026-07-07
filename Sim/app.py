@@ -17,7 +17,7 @@ from multiprocessing import Queue
 from agents import Drones
 import yaml
 
-with open("Map/Demo_soft_stock/Demo_soft_stock.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
+with open("Map/Corridor/Corridor.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -33,12 +33,12 @@ DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
 NUM_DRONES = 2
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
-#LIST_POS = [[0, 0, .2], [.5, 0, .2]]
+#LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
+LIST_POS = [[0, 0, .15], [.5, 0, .15]]
 INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
-LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
-#LIST_RPY = [[0,0,math.pi], [0,0,math.pi]]
+#LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
+LIST_RPY = [[0,0,math.pi], [0,0,math.pi]]
 INIT_RPY = np.array([LIST_RPY[i] for i in range(NUM_DRONES)])
 RAY_LENGTH = 10
 RAY_HIT_COLOR = [1, 0, 0]
@@ -48,7 +48,7 @@ print(INIT_XYZ)
 URIS = [
     # 'radio://0/20/2M/1',
     # 'radio://0/20/2M/2',
-    # 'radio://0/20/2M/4',
+    'radio://0/20/2M/4',
 
     # #'radio://1/80/2M/5',
     # #'radio://1/80/2M/6',
@@ -59,7 +59,7 @@ URIS = [
 
     # 'radio://1/100/2M/11',
     # 'radio://1/100/2M/12',
-    # 'radio://0/100/2M/14',
+    'radio://0/100/2M/14',
 ]
 
 def go( queues = None,
@@ -108,7 +108,7 @@ def go( queues = None,
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
 
-    p.loadURDF("Map/Demo_soft_stock/Demo_soft_stock.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("Map/Corridor/Corridor.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     ### Log files 
 
@@ -161,6 +161,7 @@ def go( queues = None,
     numRays = 181
     drones = []
     mins_ray = [math.inf,math.inf,math.inf,math.inf]
+    ray_reel = None
     for sim_steps in range(running):
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
@@ -255,64 +256,63 @@ def go( queues = None,
         #### Exécuter le contrôle pour chaque drone (gérées par State Machines) ####
         for j in range(num_drones):
             try:
-                if queues_lidar == None :
-                    ### LIDAR ###
-                    # Générer les rayons lidar
-                    rayFrom = []
-                    rayTo = []
-                    rayIds = []
+                ### LIDAR ###
+                # Générer les rayons lidar
+                rayFrom = []
+                rayTo = []
+                rayIds = []
 
-                    startOfRays = [-3/40*math.pi, math.pi/2-3/40*math.pi, math.pi-3/40*math.pi, 3*math.pi/2-3/40*math.pi]
+                startOfRays = [-3/40*math.pi, math.pi/2-3/40*math.pi, math.pi-3/40*math.pi, 3*math.pi/2-3/40*math.pi]
 
-                
-                    for starts in startOfRays:
-                        for i in range(16):
-                            rayFrom.append(env.pos[j])
-                            rayTo.append([
-                                rayFrom[i][0] + rayLen * math.sin((3/20*math.pi * float(i)/15) + starts),
-                                rayFrom[i][1] + rayLen * math.cos((3/20*math.pi * float(i)/15) + starts),
-                                rayFrom[i][2]
-                            ])
-                            rayIds.append(-1)
+            
+                for starts in startOfRays:
+                    for i in range(16):
+                        rayFrom.append(env.pos[j])
+                        rayTo.append([
+                            rayFrom[i][0] + rayLen * math.sin((3/20*math.pi * float(i)/15) + starts),
+                            rayFrom[i][1] + rayLen * math.cos((3/20*math.pi * float(i)/15) + starts),
+                            rayFrom[i][2]
+                        ])
+                        rayIds.append(-1)
 
-                    results = p.rayTestBatch(rayFrom, rayTo)
+                results = p.rayTestBatch(rayFrom, rayTo)
 
-                    # Affichage du lidar (optionnel)
-                    if show_lidar:
-                        p.removeAllUserDebugItems()
-                        for i in range(len(results)):
-                            hitObjectUid = results[i][0]
-                            if hitObjectUid < 0:
-                                p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
-                            else:
-                                hitPosition = results[i][3]
-                                p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
-
-                    # Extraire les distances lidar depuis les résultats                
-                    mins_ray = [(math.inf,False),(math.inf,False),(math.inf,False),(math.inf,False)]
+                # Affichage du lidar (optionnel)
+                if show_lidar:
+                    p.removeAllUserDebugItems()
                     for i in range(len(results)):
-                        if i < 16 :
-                            if results[i][2]*RAY_LENGTH < mins_ray[0][0]:
-                                mins_ray[0] = (results[i][2]*RAY_LENGTH,results[i][0])
-                        elif i < 32:
-                            if results[i][2]*RAY_LENGTH < mins_ray[1][0]:
-                                mins_ray[1] = (results[i][2]*RAY_LENGTH,results[i][0])
-                        elif i < 48:
-                            if results[i][2]*RAY_LENGTH < mins_ray[2][0]:              
-                                mins_ray[2] = (results[i][2]*RAY_LENGTH,results[i][0])
-                        elif i < 64:
-                            if results[i][2]*RAY_LENGTH < mins_ray[3][0]:           
-                                mins_ray[3] = (results[i][2]*RAY_LENGTH,results[i][0])
+                        hitObjectUid = results[i][0]
+                        if hitObjectUid < 0:
+                            p.addUserDebugLine(rayFrom[i], rayTo[i], rayMissColor, replaceItemUniqueId=rayIds[i])
+                        else:
+                            hitPosition = results[i][3]
+                            p.addUserDebugLine(rayFrom[i], hitPosition, rayHitColor, replaceItemUniqueId=rayIds[i])
+
+                # Extraire les distances lidar depuis les résultats                
+                mins_ray = [(math.inf,False),(math.inf,False),(math.inf,False),(math.inf,False)]
+                for i in range(len(results)):
+                    if i < 16 :
+                        if results[i][2]*RAY_LENGTH < mins_ray[0][0]:
+                            mins_ray[0] = (results[i][2]*RAY_LENGTH,results[i][0])
+                    elif i < 32:
+                        if results[i][2]*RAY_LENGTH < mins_ray[1][0]:
+                            mins_ray[1] = (results[i][2]*RAY_LENGTH,results[i][0])
+                    elif i < 48:
+                        if results[i][2]*RAY_LENGTH < mins_ray[2][0]:              
+                            mins_ray[2] = (results[i][2]*RAY_LENGTH,results[i][0])
+                    elif i < 64:
+                        if results[i][2]*RAY_LENGTH < mins_ray[3][0]:           
+                            mins_ray[3] = (results[i][2]*RAY_LENGTH,results[i][0])
                 
-                else:
+
+                if queues_lidar != None:
                     if not queues_lidar[j].empty():
                         commande = queues_lidar[j].get()
-                        mins_ray = [commande[1],commande[2],commande[3],commande[4]]
+                        ray_reel = [commande[1],commande[2],commande[3],commande[4]]
 
-                print(mins_ray)
                 drones[j].position = env.pos[j]
                 drones[j].rpy = env.rpy[j]
-                drones[j].step(mins_ray)
+                drones[j].step(mins_ray,ray_reel)
                 vx_w, vy_w, vz_w, speed_frac, wz = drones[j].move_drone
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
                 if v_norm < 1e-3:
