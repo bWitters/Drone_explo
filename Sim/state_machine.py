@@ -63,6 +63,7 @@ class DroneStateMachine(StateChart):
                              ReconfigCorridor.to(ReconfigIntersection))
 
     reconfig_curve = (ReconfigFollower.to(ReconfigCurve)|
+                      ReconfigFollowerCurve.to(ReconfigCurve)|
                       ReconfigIntersection.to(ReconfigCurve)|
                       ReconfigCorridor.to(ReconfigCurve))
     
@@ -146,6 +147,8 @@ class DroneStateMachine(StateChart):
                     self.reconfig_curve()
                 if situation[Situation.CORRIDOR]:
                     self.reconfig_corridor()
+            if self.configuration == {DroneStateMachine.ReconfigFollowerCurve}:
+                self.reconfig_curve()
             elif self.configuration == {DroneStateMachine.ReconfigCorridor}:
                 if situation[Situation.INTERSECTION] and not self.agent.sensor_data.maybe_corner:
                     self.reconfig_intersection()
