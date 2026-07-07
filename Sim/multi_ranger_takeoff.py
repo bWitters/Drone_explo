@@ -57,6 +57,57 @@ ranger_writers = {}
 
 flight_log_dir: str | None = None
 
+class MoyenneGlissanteTempsReel:
+    """
+    Calcule une moyenne glissante en temps réel, échantillon par échantillon.
+    Complexité O(1) par échantillon (aucun recalcul complet à chaque appel).
+    """
+    
+    def __init__(self, taille_fenetre):
+        if taille_fenetre <= 0:
+            raise ValueError("La taille de la fenêtre doit être positive.")
+        
+        self.taille_fenetre = taille_fenetre
+        self.buffer = [0.0] * taille_fenetre  # buffer circulaire pré-alloué
+        self.index = 0        # position d'écriture actuelle dans le buffer
+        self.somme = 0.0       # somme courante des valeurs dans le buffer
+        self.compte = 0        # nombre d'échantillons reçus (utile au démarrage)
+
+    def ajouter_echantillon(self, valeur):
+        """
+        Ajoute un nouvel échantillon et retourne la moyenne glissante à jour.
+        """
+        # Retirer l'ancienne valeur à cette position du buffer
+        ancienne_valeur = self.buffer[self.index]
+        self.somme -= ancienne_valeur
+        
+        # Ajouter la nouvelle valeur
+        self.buffer[self.index] = valeur
+        self.somme += valeur
+        
+        # Avancer l'index de manière circulaire
+        self.index = (self.index + 1) % self.taille_fenetre
+        
+        # Gérer le cas où le buffer n'est pas encore plein (démarrage)
+        if self.compte < self.taille_fenetre:
+            self.compte += 1
+            return self.somme / self.compte
+        
+        return self.somme / self.taille_fenetre
+
+    def valeur_actuelle(self):
+        """Retourne la moyenne actuelle sans ajouter de nouvel échantillon."""
+        if self.compte == 0:
+            return 0.0
+        diviseur = min(self.compte, self.taille_fenetre)
+        return self.somme / diviseur
+
+    def reinitialiser(self):
+        """Réinitialise complètement l'état du filtre."""
+        self.buffer = [0.0] * self.taille_fenetre
+        self.index = 0
+        self.somme = 0.0
+        self.compte = 0
 
 def init_csv_logs() -> None:
     global flight_log_dir
@@ -331,12 +382,14 @@ async def read_ranger_log(uri: str, stream,queue_lidar) -> None:
         data = sample.data
         timestamp = sample.timestamp
 
+        moyenneur = MoyenneGlissanteTempsReel(5)
+
         ranger_dict[uri] = np.array(
             [
-                data[LEFT]/1000,
-                data[FRONT]/1000,
-                data[RIGHT]/1000,
-                data[BACK]/1000,
+                moyenneur.ajouter_echantillon(data[LEFT]/1000),
+                moyenneur.ajouter_echantillon(data[FRONT]/1000),
+                moyenneur.ajouter_echantillon(data[RIGHT]/1000),
+                moyenneur.ajouter_echantillon(data[BACK]/1000),
             ],
             dtype=float,
         )
