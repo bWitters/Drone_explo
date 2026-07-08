@@ -33,14 +33,13 @@ class Analyzer:
     @property
     def rays(self): #TODO : Problème avec la variable rays qui n'est pas bien utilisé quand on est avec le multiranger
         if self.agent.uri == None:
-            rx = [element[0] for element in self.agent.rays]
+            rx = self.agent.rays
             #print(f"Should be pybullet lidar : \n{rx}")
         else:
             rx = []
             for i in range(4):
-                rx.append(self.agent.rays_reel[i])
+                rx.append((self.agent.rays_reel[i],self.agent.rays[i][1]))
             #print(f"Should be multiranger lidar : \n{rx}")
-        print(rx)
         return rx
     
     @property
@@ -52,25 +51,24 @@ class Analyzer:
             for i in range(4):
                 rx.append((self.agent.rays_reel[i],self.agent.rays[i][1]))
             #print(f"Should be multiranger lidar : \n{rx}")
-        print(rx)
         return self.world_to_drone_list(rx)
     
     #Follow the gap
     def get_alignement_in_gap(self):
         match self.agent.current_active_direction:
             case w if w in ["North", "South"]:
-                if abs(self.rays[1]-self.rays[3]) < 0.1:
+                if abs(self.rays[1][0]-self.rays[3][0]) < 0.1:
                     is_centered = True
                     dist_wall = 0
                 else:
-                    dist_wall = self.rays[1]-self.rays[3]
+                    dist_wall = self.rays[1][0]-self.rays[3][0]
                     is_centered = False
             case w if w in ["East", "West"]:
-                if abs(self.rays[0]-self.rays[2]) < 0.1:
+                if abs(self.rays[0][0]-self.rays[2][0]) < 0.1:
                     is_centered = True
                     dist_wall = 0
                 else:
-                    dist_wall = self.rays[0]-self.rays[2]
+                    dist_wall = self.rays[0][0]-self.rays[2][0]
                     is_centered = False
         print("get_alignement_in_gap works !")
         return (is_centered,dist_wall)
@@ -80,16 +78,16 @@ class Analyzer:
         close_to_leader = False
         match self.agent.front:
             case "N":
-                if self.rays[0] < 0.6:
+                if self.rays[0][0] < 0.6:
                     close_to_leader = True
             case "E":
-                if self.rays[1] < 0.6:
+                if self.rays[1][0] < 0.6:
                     close_to_leader = True
             case "S":
-                if self.rays[2] < 0.6:
+                if self.rays[2][0] < 0.6:
                     close_to_leader = True
             case "W":
-                if self.rays[3] < 0.6:
+                if self.rays[3][0] < 0.6:
                     close_to_leader = True
         print("get_close_to_leader works !")
         return close_to_leader
@@ -99,16 +97,16 @@ class Analyzer:
         centered_in_corner = False
         match self.agent.front:
             case "N":
-                if self.rays[0] < 0.26:
+                if self.rays[0][0] < 0.26:
                     centered_in_corner = True
             case "E":
-                if self.rays[1] < 0.26:
+                if self.rays[1][0] < 0.26:
                     centered_in_corner = True
             case "S":
-                if self.rays[2] < 0.26:
+                if self.rays[2][0] < 0.26:
                     centered_in_corner = True
             case "W":
-                if self.rays[3] < 0.26:
+                if self.rays[3][0] < 0.26:
                     centered_in_corner = True
         print("get_centerd_in_corner works !")
         return centered_in_corner
@@ -142,7 +140,7 @@ class Analyzer:
         gaps_dir = {"N": False, "E":False, "S":False, "W":False}
         
         for i in range(len(self.rays)):
-            if self.rays[i] > 0.4:
+            if self.rays[i][0] > 0.4 or self.rays[i][1] in self.env_id_drones.keys():
                 match i:
                     case 0:
                         gaps_dir["N"] = True
@@ -263,7 +261,7 @@ class Analyzer:
         wall_distance = {"N":None, "E":None, "S":None,"W":None}
         direction = ["N","E","S","W"]
         for i in range(len(self.rays)):
-            wall_distance[direction[i]] = self.rays[i]
+            wall_distance[direction[i]] = self.rays[i][0]
         print("get_wall_dsitance works !")
         return wall_distance
     
