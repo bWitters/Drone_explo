@@ -358,10 +358,10 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         await asyncio.sleep(3.0)
 
         await hlc.go_to(
-                    float(2),
+                    float(1.5),
                     float(y),
                     float(0.70),
-                    np.pi,
+                    np.pi/2,
                     2,
                     False,
                     False,
@@ -370,10 +370,10 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         await asyncio.sleep(2)
 
         await hlc.go_to(
-                    float(2),
+                    float(1.5),
                     float(y),
                     float(0.25),
-                    np.pi,
+                    np.pi/2,
                     1,
                     False,
                     False,

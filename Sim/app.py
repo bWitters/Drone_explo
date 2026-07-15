@@ -36,7 +36,7 @@ NUM_DRONES = 2
 #Demo soft stock
 #LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
 #Demo inventory
-LIST_POS = [[-1.5,0.5,.2], [-1.5,0,.2]]
+LIST_POS = [[1.5,0,.2], [1.5,-0.5,.2]]
 #Demo corridor
 #LIST_POS = [[0, 0, .15], [.5, 0, .15]]
 INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
@@ -44,7 +44,7 @@ STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
 #Demo soft stock
 #LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
 #Demo inventory
-LIST_RPY = [[0,0,3*math.pi/2],[0,0,3*math.pi/2]]
+LIST_RPY = [[0,0,math.pi/2],[0,0,math.pi/2]]
 #Demo corridor
 #LIST_RPY = [[0,0,math.pi], [0,0,math.pi]]
 INIT_RPY = np.array([LIST_RPY[i] for i in range(NUM_DRONES)])
@@ -56,7 +56,7 @@ print(INIT_XYZ)
 URIS = [
     # 'radio://0/20/2M/1',
     # 'radio://0/20/2M/2',
-    'radio://0/20/2M/4',
+    # 'radio://0/20/2M/4',
 
     # #'radio://1/80/2M/5',
     # #'radio://1/80/2M/6',
@@ -67,7 +67,7 @@ URIS = [
 
     # 'radio://1/100/2M/11',
     # 'radio://1/100/2M/12',
-    'radio://0/100/2M/14',
+    # 'radio://0/100/2M/14',
 ]
 
 def go( queues = None,
