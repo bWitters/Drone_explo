@@ -231,11 +231,11 @@ def init_csv_logs() -> None:
         ])
 
         writer_ranger_without_filter.writerow([
-            "timestamp", "Ranger_left", "Ranger_front", "Ranger_right", "Ranger_back"
+            "timestamp", "Ranger_front", "Ranger_right", "Ranger_back", "Ranger_left"
         ])
 
         writer_ranger_with_filter.writerow([
-            "timestamp", "Ranger_left", "Ranger_front", "Ranger_right", "Ranger_back"
+            "timestamp", "Ranger_front", "Ranger_right", "Ranger_back", "Ranger_left"
         ])
 
         log_files[uri] = outfile
