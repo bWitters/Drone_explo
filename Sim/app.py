@@ -17,7 +17,7 @@ from multiprocessing import Queue
 from agents import Drones
 import yaml
 
-with open("Map/Demo_soft_stock/Demo_soft_stock.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
+with open("Map/Demo_with_current_inventory/Demo_with_current_inventory.yaml") as stream: # TODO : Faire les centrages par rapport à la width du fichier de config plutot que pour une width de 1
     try:
         init_conf = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
@@ -31,13 +31,21 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 9
+NUM_DRONES = 2
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
-LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
+#Demo soft stock
+#LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
+#Demo inventory
+LIST_POS = [[-1.5,0.5,.2], [-1.5,0,.2]]
+#Demo corridor
 #LIST_POS = [[0, 0, .15], [.5, 0, .15]]
 INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
 STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
-LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
+#Demo soft stock
+#LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
+#Demo inventory
+LIST_RPY = [[0,0,3*math.pi/2],[0,0,3*math.pi/2]]
+#Demo corridor
 #LIST_RPY = [[0,0,math.pi], [0,0,math.pi]]
 INIT_RPY = np.array([LIST_RPY[i] for i in range(NUM_DRONES)])
 RAY_LENGTH = 10
@@ -48,7 +56,7 @@ print(INIT_XYZ)
 URIS = [
     # 'radio://0/20/2M/1',
     # 'radio://0/20/2M/2',
-    # 'radio://0/20/2M/4',
+    'radio://0/20/2M/4',
 
     # #'radio://1/80/2M/5',
     # #'radio://1/80/2M/6',
@@ -59,7 +67,7 @@ URIS = [
 
     # 'radio://1/100/2M/11',
     # 'radio://1/100/2M/12',
-    # 'radio://0/100/2M/14',
+    'radio://0/100/2M/14',
 ]
 
 def go( queues = None,
@@ -108,7 +116,7 @@ def go( queues = None,
     #### Obtain the PyBullet Client ID from the environment ####
     PYB_CLIENT = env.getPyBulletClient()
 
-    p.loadURDF("Map/Demo_soft_stock/Demo_soft_stock.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
+    p.loadURDF("Map/Demo_with_current_inventory/Demo_with_current_inventory.urdf", useFixedBase=True, physicsClientId=PYB_CLIENT)
 
     ### Log files 
 
@@ -142,8 +150,9 @@ def go( queues = None,
                     commande = queue_drone.get()
                     if commande[0] == True:
                         compte += 1
-            print(f"Number of drone ready : {compte}")
+            #print(f"Number of drone ready : {compte}")
             if compte == taille:
+                print("Drones are ready")
                 ready = True
 
     #### Run the simulation ####################################

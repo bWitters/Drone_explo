@@ -38,7 +38,9 @@ class Analyzer:
         else:
             rx = []
             for i in range(4):
-                rx.append((self.agent.rays_reel[i],self.agent.rays[i][1]))
+                rays = self.drone_to_world_list(self.agent.rays_reel)
+                #print(rays)
+                rx.append((rays[i],self.agent.rays[i][1]))
             #print(f"Should be multiranger lidar : \n{rx}")
         return rx
     
@@ -138,9 +140,11 @@ class Analyzer:
     def get_gap_direction(self):
         self.previous_gap_dir = [val for val in self.gaps_dir]
         gaps_dir = {"N": False, "E":False, "S":False, "W":False}
+        print(self.rays)
+        print(self.env_id_drones.keys())
         
         for i in range(len(self.rays)):
-            if self.rays[i][0] > 0.4 or self.rays[i][1] in self.env_id_drones.keys():
+            if self.rays[i][0] > 0.4: #or self.rays[i][1] in self.env_id_drones.keys()
                 match i:
                     case 0:
                         gaps_dir["N"] = True
@@ -238,6 +242,22 @@ class Analyzer:
         gaps_drone_dir["R"] = gaps_dir[(i+1)%4]
         gaps_drone_dir["B"] = gaps_dir[(i+2)%4]
         gaps_drone_dir["L"] = gaps_dir[(i+3)%4]
+        return gaps_drone_dir
+    
+    def drone_to_world_list(self, gaps_dir):
+        gaps_drone_dir = []
+        if self.agent.front == "N":
+            i = 0
+        elif self.agent.front == "E":
+            i = 3
+        elif self.agent.front == "S":
+            i = 2
+        elif self.agent.front == "W":
+            i = 1
+        gaps_drone_dir.append(gaps_dir[i%4])
+        gaps_drone_dir.append(gaps_dir[(i+1)%4])
+        gaps_drone_dir.append(gaps_dir[(i+2)%4])
+        gaps_drone_dir.append(gaps_dir[(i+3)%4])
         return gaps_drone_dir
 
     def wolrd_to_drone_dict(self, gaps_dir): #FIXME for the curve corridor transition
