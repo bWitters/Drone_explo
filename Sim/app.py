@@ -56,7 +56,7 @@ print(INIT_XYZ)
 URIS = [
     # 'radio://0/20/2M/1',
     # 'radio://0/20/2M/2',
-    # 'radio://0/20/2M/4',
+    'radio://0/20/2M/4',
 
     # #'radio://1/80/2M/5',
     # #'radio://1/80/2M/6',
@@ -67,7 +67,7 @@ URIS = [
 
     # 'radio://1/100/2M/11',
     # 'radio://1/100/2M/12',
-    # 'radio://0/100/2M/14',
+    'radio://0/100/2M/14',
 ]
 
 def go( queues = None,
