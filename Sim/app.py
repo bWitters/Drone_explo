@@ -126,6 +126,8 @@ def go( queues = None,
     log_pos = []
     files_behavior = []
     log_behavior = []
+    files_lidar = []
+    log_lidar = []
 
     #### ID drones ####
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
@@ -220,6 +222,12 @@ def go( queues = None,
                     log_behavior.append(csv.writer(files_behavior[-1]))
                     log_behavior[-1].writerow(["Behavior"])
                     files_behavior[-1].flush()
+
+                    nom_fichier = f"{directory_name}/drone_lidar_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_lidar.append(open(nom_fichier,"w"))
+                    log_lidar.append(csv.writer(files_lidar[-1]))
+                    log_lidar[-1].writerow(["lidar_front","lidar_right","lidar_back","lidar_left"])
+                    files_lidar[-1].flush()
                 else:
                     drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,INIT_RPY[drone_i],URIS[unique_id-1]))
 
@@ -240,6 +248,12 @@ def go( queues = None,
                     log_behavior.append(csv.writer(files_behavior[-1]))
                     log_behavior[-1].writerow(["Behavior"])
                     files_behavior[-1].flush()
+
+                    nom_fichier = f"{directory_name}/drone_lidar_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_lidar.append(open(nom_fichier,"w"))
+                    log_lidar.append(csv.writer(files_lidar[-1]))
+                    log_lidar[-1].writerow(["lidar_front","lidar_right","lidar_back","lidar_left"])
+                    files_lidar[-1].flush()
                     unique_id +=1
 
                 
@@ -316,6 +330,8 @@ def go( queues = None,
                     if not queues_lidar[j].empty():
                         commande = queues_lidar[j].get()
                         ray_reel = [commande[1],commande[2],commande[3],commande[4]]
+
+                log_lidar[j].writerow(ray_reel)
 
                 drones[j].position = env.pos[j]
                 drones[j].rpy = env.rpy[j]

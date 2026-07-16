@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Lire le fichier CSV (remplace 'ton_fichier.csv' par le chemin de ton fichier)
-df = pd.read_csv('logs/Controleur/Controleur_07-15_15h53m03676370/ranger_with_filter4.csv')
+df = pd.read_csv('logs/Controleur/Controleur_07-16_16h12m29865407/ranger_without_filter4.csv')
 
 # Créer une figure avec 4 sous-graphiques
 fig, axes = plt.subplots(2, 2, figsize=(12, 8))

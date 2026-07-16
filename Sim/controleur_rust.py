@@ -549,11 +549,13 @@ async def read_ranger_log(uri: str, stream,queue_lidar) -> None:
             dtype=float,
         )
 
-        if queue_lidar != None and start_queues:
-            queue_lidar.put([timestamp, *ranger_dict_with_filter[uri]])
 
         row_without_filter = [timestamp, *ranger_dict[uri]]
         row_with_filter = [timestamp, *ranger_dict_with_filter[uri]]
+
+        if queue_lidar != None and start_queues:
+            queue_lidar.put(row_with_filter)
+
 
         ranger_with_filter_writers[uri].writerow(row_with_filter)
         ranger_with_filter_file[uri].flush()
