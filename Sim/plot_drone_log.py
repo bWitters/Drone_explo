@@ -9,9 +9,9 @@ plt.figure(figsize=(12, 6))
 
 # Variables de position
 plt.subplot(2, 1, 1)
-plt.plot(df.index, df['x'], label='x')
-plt.plot(df.index, df['y'], label='y')
-plt.plot(df.index, df['z'], label='z')
+plt.plot(df["x"], df['y'], label='position')
+# plt.plot(df.index, df['y'], label='y')
+# plt.plot(df.index, df['z'], label='z')
 plt.title('Position en fonction de l\'index')
 plt.xlabel('Index')
 plt.ylabel('Valeur')

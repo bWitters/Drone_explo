@@ -162,7 +162,7 @@ URIS = [
     'radio://0/100/2M/14',
 ]
 
-STATE_LOG_PERIOD_MS = 100
+STATE_LOG_PERIOD_MS = 30
 CTRL_FREQ = 30
 
 FRONT = 'range.front'

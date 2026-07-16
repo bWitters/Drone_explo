@@ -170,7 +170,7 @@ def go( queues = None,
     numRays = 181
     drones = []
     mins_ray = [math.inf,math.inf,math.inf,math.inf]
-    ray_reel = None
+    ray_reel = [None, None]
     for sim_steps in range(running):
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
@@ -329,13 +329,13 @@ def go( queues = None,
                 if queues_lidar != None:
                     if not queues_lidar[j].empty():
                         commande = queues_lidar[j].get()
-                        ray_reel = [commande[1],commande[2],commande[3],commande[4]]
+                        ray_reel[j] = [commande[1],commande[2],commande[3],commande[4]]
 
-                log_lidar[j].writerow(ray_reel)
+                log_lidar[j].writerow(ray_reel[j])
 
                 drones[j].position = env.pos[j]
                 drones[j].rpy = env.rpy[j]
-                drones[j].step(mins_ray,ray_reel)
+                drones[j].step(mins_ray,ray_reel[j])
                 vx_w, vy_w, vz_w, speed_frac, wz = drones[j].move_drone
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
                 if v_norm < 1e-3:
