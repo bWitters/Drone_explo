@@ -31,37 +31,48 @@ class Analyzer:
 
 
     @property
-    def rays(self):
+    def rays(self): #TODO : Problème avec la variable rays qui n'est pas bien utilisé quand on est avec le multiranger
         if self.agent.uri == None:
-            rx = [element[0] for element in self.agent.rays]
-            print(f"Should be pybullet lidar : \n{rx}")
-        else:
             rx = self.agent.rays
-            print(f"Should be multiranger lidar : \n{rx}")
-
+            #print(f"Should be pybullet lidar : \n{rx}")
+        else:
+            rx = []
+            for i in range(4):
+                rays = self.drone_to_world_list(self.agent.rays_reel)
+                #print(rays)
+                rx.append((rays[i],self.agent.rays[i][1]))
+            #print(f"Should be multiranger lidar : \n{rx}")
         return rx
     
     @property
     def neighborhood(self):
-        return self.world_to_drone_list(self.agent.rays)
+        if self.agent.uri == None:
+            rx = self.agent.rays
+        else:
+            rx = []
+            for i in range(4):
+                rx.append((self.agent.rays_reel[i],self.agent.rays[i][1]))
+            #print(f"Should be multiranger lidar : \n{rx}")
+        return self.world_to_drone_list(rx)
     
     #Follow the gap
     def get_alignement_in_gap(self):
         match self.agent.current_active_direction:
             case w if w in ["North", "South"]:
-                if abs(self.rays[1]-self.rays[3]) < 0.1:
+                if abs(self.rays[1][0]-self.rays[3][0]) < 0.1:
                     is_centered = True
                     dist_wall = 0
                 else:
-                    dist_wall = self.rays[1]-self.rays[3]
+                    dist_wall = self.rays[1][0]-self.rays[3][0]
                     is_centered = False
             case w if w in ["East", "West"]:
-                if abs(self.rays[0]-self.rays[2]) < 0.1:
+                if abs(self.rays[0][0]-self.rays[2][0]) < 0.1:
                     is_centered = True
                     dist_wall = 0
                 else:
-                    dist_wall = self.rays[0]-self.rays[2]
+                    dist_wall = self.rays[0][0]-self.rays[2][0]
                     is_centered = False
+        print("get_alignement_in_gap works !")
         return (is_centered,dist_wall)
     
     #Distance close enough to leader
@@ -69,17 +80,18 @@ class Analyzer:
         close_to_leader = False
         match self.agent.front:
             case "N":
-                if self.rays[0] < 0.6:
+                if self.rays[0][0] < 0.6:
                     close_to_leader = True
             case "E":
-                if self.rays[1] < 0.6:
+                if self.rays[1][0] < 0.6:
                     close_to_leader = True
             case "S":
-                if self.rays[2] < 0.6:
+                if self.rays[2][0] < 0.6:
                     close_to_leader = True
             case "W":
-                if self.rays[3] < 0.6:
+                if self.rays[3][0] < 0.6:
                     close_to_leader = True
+        print("get_close_to_leader works !")
         return close_to_leader
 
     #Center in corner
@@ -87,17 +99,18 @@ class Analyzer:
         centered_in_corner = False
         match self.agent.front:
             case "N":
-                if self.rays[0] < 0.26:
+                if self.rays[0][0] < 0.26:
                     centered_in_corner = True
             case "E":
-                if self.rays[1] < 0.26:
+                if self.rays[1][0] < 0.26:
                     centered_in_corner = True
             case "S":
-                if self.rays[2] < 0.26:
+                if self.rays[2][0] < 0.26:
                     centered_in_corner = True
             case "W":
-                if self.rays[3] < 0.26:
+                if self.rays[3][0] < 0.26:
                     centered_in_corner = True
+        print("get_centerd_in_corner works !")
         return centered_in_corner
                 
     #Intersection
@@ -127,9 +140,11 @@ class Analyzer:
     def get_gap_direction(self):
         self.previous_gap_dir = [val for val in self.gaps_dir]
         gaps_dir = {"N": False, "E":False, "S":False, "W":False}
+        print(self.rays)
+        print(self.env_id_drones.keys())
         
         for i in range(len(self.rays)):
-            if self.rays[i] > 0.4:
+            if self.rays[i][0] > 0.4: #or self.rays[i][1] in self.env_id_drones.keys()
                 match i:
                     case 0:
                         gaps_dir["N"] = True
@@ -139,6 +154,7 @@ class Analyzer:
                         gaps_dir["S"] = True
                     case 3:
                         gaps_dir["W"] = True
+        print("get_gap_direction works !")
         return gaps_dir
     
     def gaps_type(self): #FIXME for the curve corridor transition
@@ -227,6 +243,22 @@ class Analyzer:
         gaps_drone_dir["B"] = gaps_dir[(i+2)%4]
         gaps_drone_dir["L"] = gaps_dir[(i+3)%4]
         return gaps_drone_dir
+    
+    def drone_to_world_list(self, gaps_dir):
+        gaps_drone_dir = []
+        if self.agent.front == "N":
+            i = 0
+        elif self.agent.front == "E":
+            i = 3
+        elif self.agent.front == "S":
+            i = 2
+        elif self.agent.front == "W":
+            i = 1
+        gaps_drone_dir.append(gaps_dir[i%4])
+        gaps_drone_dir.append(gaps_dir[(i+1)%4])
+        gaps_drone_dir.append(gaps_dir[(i+2)%4])
+        gaps_drone_dir.append(gaps_dir[(i+3)%4])
+        return gaps_drone_dir
 
     def wolrd_to_drone_dict(self, gaps_dir): #FIXME for the curve corridor transition
         gaps_drone_dir = {"B":None, "R":None, "F":None, "L":None}
@@ -249,7 +281,8 @@ class Analyzer:
         wall_distance = {"N":None, "E":None, "S":None,"W":None}
         direction = ["N","E","S","W"]
         for i in range(len(self.rays)):
-            wall_distance[direction[i]] = self.rays[i]
+            wall_distance[direction[i]] = self.rays[i][0]
+        print("get_wall_dsitance works !")
         return wall_distance
     
     def get_wall_distance_drone(self,wall_distance):

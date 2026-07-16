@@ -25,6 +25,8 @@ class Drones():
         self.position = [0,0,0]
         self.rpy = [0,0,0]
         self.log_directory = log_directory
+        self.hauteur_vol = 0.4
+        self.hauteur_take_off = 0.25
 
         nom_fichier = f"{self.log_directory}/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
         nom_fichier_rt = f"Sim/real_time_logs/drone_{unique_id}.csv"
@@ -369,11 +371,12 @@ class Drones():
         return res
 
 
-    def step(self, rays):
+    def step(self, rays,rays_reel):
         print(f"\nDrone {self.unique_id}")
         print(f"Current role : {self.role.configuration_values}")
         self.move_drone = [0,0,0,0,0]
         self.rays = rays
+        self.rays_reel = rays_reel
         self.sensor_data.neighborhood_analysis()
         self.situation.update_situation(self.sensor_data.gaps_dir,
                                         self.sensor_data.occupied_neighborhood,
