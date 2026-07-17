@@ -1,8 +1,6 @@
 # Files
 cache/
 positions/
-logs/
-real_time_logs/
 .vscode/
 test*
 ray_analyse.py
@@ -22,6 +20,7 @@ Images/
 Sim_*
 Controleur_*
 sortie.txt
+logs_old/
 error.txt
 
 # Byte-compiled / optimized / DLL files

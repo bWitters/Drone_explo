@@ -25,7 +25,7 @@ class Drones():
         self.position = [0,0,0]
         self.rpy = [0,0,0]
         self.log_directory = log_directory
-        self.hauteur_vol = 0.4
+        self.hauteur_vol = 0.35
         self.hauteur_take_off = 0.25
 
         nom_fichier = f"{self.log_directory}/drone_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"

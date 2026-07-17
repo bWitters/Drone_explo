@@ -521,10 +521,10 @@ async def read_ranger_log(uri: str, stream,queue_lidar) -> None:
     moyenneur_front = MoyenneGlissanteTempsReel(5)
     moyenneur_right = MoyenneGlissanteTempsReel(5)
     moyenneur_back = MoyenneGlissanteTempsReel(5)
-    median_left = FiltreMedianTempsReel(15)
-    median_front = FiltreMedianTempsReel(15)
-    median_right = FiltreMedianTempsReel(15)
-    median_back = FiltreMedianTempsReel(15)
+    median_left = FiltreMedianTempsReel(20)
+    median_front = FiltreMedianTempsReel(20)
+    median_right = FiltreMedianTempsReel(20)
+    median_back = FiltreMedianTempsReel(20)
     while running and not e_stops.get(uri, False):
         sample = await stream.next()
         data = sample.data

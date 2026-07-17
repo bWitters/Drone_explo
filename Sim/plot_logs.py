@@ -236,7 +236,7 @@ def plot_lidar_comparison(drones, real_alpha=0.7):
     plt.show()
 
 if __name__ == "__main__":
-    folder_path = "logs/Simu/Sim_2026-07-16-16-12-42"
+    folder_path = "logs/Simu/Sim_2026-07-17-16-03-42"
     drones = get_drone_files(folder_path)
     plot_drones_comparison(drones, real_alpha=0.7)
     plot_lidar_comparison(drones, real_alpha=0.7)
