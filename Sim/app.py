@@ -31,7 +31,7 @@ DEFAULT_USER_DEBUG_GUI = True
 DEFAULT_SIMULATION_FREQ_HZ = 60
 DEFAULT_CONTROL_FREQ_HZ = 30
 DEFAULT_OUTPUT_FOLDER = 'results'
-NUM_DRONES = 5
+NUM_DRONES = 2
 #INIT_XYZ = np.array([[.0, (-init_conf["length"]/2) + 1 + .2*i, .1] for i in range(NUM_DRONES)])
 #Demo soft stock
 #LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
@@ -170,7 +170,7 @@ def go( queues = None,
     numRays = 181
     drones = []
     mins_ray = [math.inf,math.inf,math.inf,math.inf]
-    ray_reel = [None, None]
+    ray_reel = [None for i in range(num_drones)]
     for sim_steps in range(running):
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
@@ -330,12 +330,19 @@ def go( queues = None,
                     if not queues_lidar[j].empty():
                         commande = queues_lidar[j].get()
                         ray_reel[j] = [commande[1],commande[2],commande[3],commande[4]]
+                    
+                print("test")
 
-                log_lidar[j].writerow(ray_reel[j])
+                if ray_reel[j] != None:
+                    log_lidar[j].writerow(ray_reel[j])
+
+                print("test2")
 
                 drones[j].position = env.pos[j]
                 drones[j].rpy = env.rpy[j]
+                print("test3")
                 drones[j].step(mins_ray,ray_reel[j])
+                print("test4")
                 vx_w, vy_w, vz_w, speed_frac, wz = drones[j].move_drone
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
                 if v_norm < 1e-3:
