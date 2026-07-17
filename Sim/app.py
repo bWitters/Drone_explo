@@ -36,7 +36,7 @@ NUM_DRONES = 2
 #Demo soft stock
 #LIST_POS = [[.4, .7, .2], [.8, .7, .2], [1.2, .7, .2], [1.6, .7, .2], [2, .7, .2], [2, .2, .2], [2, -0.3, .2], [2, -0.8, .2], [2, -1.3, .2], [1.5, -1.3, .2]]
 #Demo inventory
-LIST_POS = [[-1.5,0.5,.2], [-1.5,0,.2]]
+LIST_POS = [[1.5,0,.2], [1.5,-0.5,.2]]
 #Demo corridor
 #LIST_POS = [[0, 0, .15], [.5, 0, .15]]
 INIT_XYZ = np.array([LIST_POS[i] for i in range(NUM_DRONES)])
@@ -44,7 +44,7 @@ STOCKING_AREA = np.array([[0,.5],[0,-1],[-.4,.4]])
 #Demo soft stock
 #LIST_RPY = [[.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, math.pi/2], [.0, .0, 0]]
 #Demo inventory
-LIST_RPY = [[0,0,3*math.pi/2],[0,0,3*math.pi/2]]
+LIST_RPY = [[0,0,math.pi/2],[0,0,math.pi/2]]
 #Demo corridor
 #LIST_RPY = [[0,0,math.pi], [0,0,math.pi]]
 INIT_RPY = np.array([LIST_RPY[i] for i in range(NUM_DRONES)])
@@ -126,6 +126,8 @@ def go( queues = None,
     log_pos = []
     files_behavior = []
     log_behavior = []
+    files_lidar = []
+    log_lidar = []
 
     #### ID drones ####
     n = p.getNumBodies(physicsClientId=PYB_CLIENT)
@@ -168,7 +170,7 @@ def go( queues = None,
     numRays = 181
     drones = []
     mins_ray = [math.inf,math.inf,math.inf,math.inf]
-    ray_reel = None
+    ray_reel = [None, None]
     for sim_steps in range(running):
         #### Step the simulation ###################################
         obs, reward, terminated, truncated, info = env.step(action)
@@ -220,6 +222,12 @@ def go( queues = None,
                     log_behavior.append(csv.writer(files_behavior[-1]))
                     log_behavior[-1].writerow(["Behavior"])
                     files_behavior[-1].flush()
+
+                    nom_fichier = f"{directory_name}/drone_lidar_1_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_lidar.append(open(nom_fichier,"w"))
+                    log_lidar.append(csv.writer(files_lidar[-1]))
+                    log_lidar[-1].writerow(["lidar_front","lidar_right","lidar_back","lidar_left"])
+                    files_lidar[-1].flush()
                 else:
                     drones.append(Drones(unique_id,drones,env_id_drones,STOCKING_AREA,directory_name,INIT_RPY[drone_i],URIS[unique_id-1]))
 
@@ -240,6 +248,12 @@ def go( queues = None,
                     log_behavior.append(csv.writer(files_behavior[-1]))
                     log_behavior[-1].writerow(["Behavior"])
                     files_behavior[-1].flush()
+
+                    nom_fichier = f"{directory_name}/drone_lidar_{unique_id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.csv"
+                    files_lidar.append(open(nom_fichier,"w"))
+                    log_lidar.append(csv.writer(files_lidar[-1]))
+                    log_lidar[-1].writerow(["lidar_front","lidar_right","lidar_back","lidar_left"])
+                    files_lidar[-1].flush()
                     unique_id +=1
 
                 
@@ -315,11 +329,13 @@ def go( queues = None,
                 if queues_lidar != None:
                     if not queues_lidar[j].empty():
                         commande = queues_lidar[j].get()
-                        ray_reel = [commande[1],commande[2],commande[3],commande[4]]
+                        ray_reel[j] = [commande[1],commande[2],commande[3],commande[4]]
+
+                log_lidar[j].writerow(ray_reel[j])
 
                 drones[j].position = env.pos[j]
                 drones[j].rpy = env.rpy[j]
-                drones[j].step(mins_ray,ray_reel)
+                drones[j].step(mins_ray,ray_reel[j])
                 vx_w, vy_w, vz_w, speed_frac, wz = drones[j].move_drone
                 v_norm = math.sqrt(vx_w * vx_w + vy_w * vy_w + vz_w * vz_w)
                 if v_norm < 1e-3:

@@ -521,11 +521,11 @@
       rgba="${color}"/>
 
   <!-- corridors (positionnés pour que l'intérieur fasse width) -->
-  <xacro:u_corridor
+  <xacro:corridor
   name="1"
-  x="2"
+  x="1.5"
   y="-0.5"
-  yaw="${PI}"
+  yaw="${0}"
   length="0.5"
   thk="0.04"
   height="0.5"
@@ -534,7 +534,7 @@
   
   <xacro:corridor
   name="2"
-  x="2"
+  x="1.5"
   y="0"
   yaw="${0}"
   length="${L}"
@@ -545,7 +545,7 @@
 
   <xacro:corridor
   name="3"
-  x="2"
+  x="1.5"
   y="0.5"
   yaw="${0}"
   length="${L}"
@@ -556,9 +556,9 @@
 
   <xacro:corner
   name="4"
-  x="2"
+  x="1.5"
   y="1"
-  yaw="${PI/2}"
+  yaw="${3*PI/2}"
   length="${L}"
   width="${W}"
   height="${H}"
@@ -568,7 +568,7 @@
   <xacro:corridor
   name="5"
   x="1"
-  y="1.5"
+  y="1"
   yaw="${PI/2}"
   length="${L}"
   width="${W}"
@@ -580,7 +580,7 @@
   name="6"
   x="0.5"
   y="1"
-  yaw="${PI}"
+  yaw="${0}"
   length="${L}"
   width="${W}"
   height="${H}"
@@ -602,7 +602,7 @@
   name="8"
   x="0.5"
   y="0"
-  yaw="${0}"
+  yaw="${PI}"
   length="${L}"
   width="${W}"
   height="${H}"
@@ -622,9 +622,9 @@
 
   <xacro:T_intersection
   name="10"
-  x="0.5"
+  x="-0.5"
   y="0"
-  yaw="${PI}"
+  yaw="${0}"
   length="${L}"
   width="${W}"
   height="${H}"
@@ -633,7 +633,7 @@
 
   <xacro:corridor
   name="11"
-  x="1"
+  x="-1"
   y="0"
   yaw="${PI/2}"
   length="${L}"
@@ -644,9 +644,9 @@
 
   <xacro:u_corridor
   name="12"
-  x="1.5"
+  x="-1.5"
   y="0"
-  yaw="${PI/2}"
+  yaw="${3*PI/2}"
   length="0.5"
   thk="0.04"
   height="0.5"
@@ -655,8 +655,8 @@
 
   <xacro:corridor
   name="13"
-  x="0.5"
-  y="0.5"
+  x="-0.5"
+  y="-0.5"
   yaw="${0}"
   length="${L}"
   width="${W}"
@@ -666,9 +666,9 @@
 
   <xacro:corner
   name="14"
-  x="0.5"
-  y="1"
-  yaw="${0}"
+  x="-0.5"
+  y="-1"
+  yaw="${PI}"
   length="${L}"
   width="${W}"
   height="${H}"
@@ -677,8 +677,8 @@
 
   <xacro:corridor
   name="15"
-  x="1"
-  y="1"
+  x="-1"
+  y="-1"
   yaw="${PI/2}"
   length="${L}"
   width="${W}"
@@ -688,8 +688,8 @@
 
   <xacro:corridor
   name="16"
-  x="1.5"
-  y="1"
+  x="-1.5"
+  y="-1"
   yaw="${PI/2}"
   length="${L}"
   width="${W}"
@@ -699,9 +699,9 @@
 
   <xacro:u_corridor
   name="17"
-  x="2"
-  y="1"
-  yaw="${PI/2}"
+  x="-2"
+  y="-1"
+  yaw="${3*PI/2}"
   length="0.5"
   thk="0.04"
   height="0.5"

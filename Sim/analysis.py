@@ -50,8 +50,9 @@ class Analyzer:
             rx = self.agent.rays
         else:
             rx = []
+            world_rays = self.drone_to_world_list(self.agent.rays_reel)
             for i in range(4):
-                rx.append((self.agent.rays_reel[i],self.agent.rays[i][1]))
+                rx.append((world_rays[i],self.agent.rays[i][1]))
             #print(f"Should be multiranger lidar : \n{rx}")
         return self.world_to_drone_list(rx)
     

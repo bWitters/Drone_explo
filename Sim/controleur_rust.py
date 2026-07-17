@@ -162,7 +162,7 @@ URIS = [
     'radio://0/100/2M/14',
 ]
 
-STATE_LOG_PERIOD_MS = 100
+STATE_LOG_PERIOD_MS = 30
 CTRL_FREQ = 30
 
 FRONT = 'range.front'
@@ -231,11 +231,11 @@ def init_csv_logs() -> None:
         ])
 
         writer_ranger_without_filter.writerow([
-            "timestamp", "Ranger_left", "Ranger_front", "Ranger_right", "Ranger_back"
+            "timestamp", "Ranger_front", "Ranger_right", "Ranger_back", "Ranger_left"
         ])
 
         writer_ranger_with_filter.writerow([
-            "timestamp", "Ranger_left", "Ranger_front", "Ranger_right", "Ranger_back"
+            "timestamp", "Ranger_front", "Ranger_right", "Ranger_back", "Ranger_left"
         ])
 
         log_files[uri] = outfile
@@ -358,10 +358,10 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         await asyncio.sleep(3.0)
 
         await hlc.go_to(
-                    float(2),
+                    float(1.5),
                     float(y),
                     float(0.70),
-                    np.pi,
+                    np.pi/2,
                     2,
                     False,
                     False,
@@ -370,10 +370,10 @@ async def fly(cf: Crazyflie, queue, queue_etat_reel) -> None:
         await asyncio.sleep(2)
 
         await hlc.go_to(
-                    float(2),
+                    float(1.5),
                     float(y),
                     float(0.25),
-                    np.pi,
+                    np.pi/2,
                     1,
                     False,
                     False,
@@ -549,11 +549,13 @@ async def read_ranger_log(uri: str, stream,queue_lidar) -> None:
             dtype=float,
         )
 
-        if queue_lidar != None and start_queues:
-            queue_lidar.put([timestamp, *ranger_dict_with_filter[uri]])
 
         row_without_filter = [timestamp, *ranger_dict[uri]]
         row_with_filter = [timestamp, *ranger_dict_with_filter[uri]]
+
+        if queue_lidar != None and start_queues:
+            queue_lidar.put(row_with_filter)
+
 
         ranger_with_filter_writers[uri].writerow(row_with_filter)
         ranger_with_filter_file[uri].flush()

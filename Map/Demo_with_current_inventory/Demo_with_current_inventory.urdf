@@ -132,7 +132,7 @@
     </inertial>
   </link>
   <joint name="1_left_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-1.77 0.5 0"/>
+    <origin rpy="0 0 0" xyz="1.77 -0.5 0"/>
     <parent link="world"/>
     <child link="1_left"/>
   </joint>
@@ -158,35 +158,9 @@
     </inertial>
   </link>
   <joint name="1_right_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-1.23 0.49999999999999994 0"/>
+    <origin rpy="0 0 0" xyz="1.23 -0.5 0"/>
     <parent link="world"/>
     <child link="1_right"/>
-  </joint>
-  <link name="1_back">
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-      <material name="1_back_mat">
-        <color rgba="0.85 0.85 0.9 0.6"/>
-      </material>
-    </visual>
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.25"/>
-      <geometry>
-        <box size="0.04 0.5 0.5"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
-    </inertial>
-  </link>
-  <joint name="1_back_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-1.5 0.77 0"/>
-    <parent link="world"/>
-    <child link="1_back"/>
   </joint>
   <link name="2_left">
     <visual>
@@ -210,7 +184,7 @@
     </inertial>
   </link>
   <joint name="2_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-1.23 0.0 0"/>
+    <origin rpy="0 0 0" xyz="1.77 0.0 0"/>
     <parent link="world"/>
     <child link="2_left"/>
   </joint>
@@ -236,7 +210,7 @@
     </inertial>
   </link>
   <joint name="2_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-1.77 0.0 0"/>
+    <origin rpy="0 0 0" xyz="1.23 0.0 0"/>
     <parent link="world"/>
     <child link="2_right"/>
   </joint>
@@ -262,7 +236,7 @@
     </inertial>
   </link>
   <joint name="3_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-1.23 -0.5 0"/>
+    <origin rpy="0 0 0" xyz="1.77 0.5 0"/>
     <parent link="world"/>
     <child link="3_left"/>
   </joint>
@@ -288,7 +262,7 @@
     </inertial>
   </link>
   <joint name="3_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-1.77 -0.5 0"/>
+    <origin rpy="0 0 0" xyz="1.23 0.5 0"/>
     <parent link="world"/>
     <child link="3_right"/>
   </joint>
@@ -314,7 +288,7 @@
     </inertial>
   </link>
   <joint name="4_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-1.25 -0.73 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="1.25 0.73 0"/>
     <parent link="world"/>
     <child link="4_left"/>
   </joint>
@@ -340,7 +314,7 @@
     </inertial>
   </link>
   <joint name="4_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-1.5 -1.27 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="1.5 1.27 0"/>
     <parent link="world"/>
     <child link="4_right"/>
   </joint>
@@ -366,7 +340,7 @@
     </inertial>
   </link>
   <joint name="4_front_up_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-1.77 -1.0 0"/>
+    <origin rpy="0 0 6.283185307179586" xyz="1.77 1.0 0"/>
     <parent link="world"/>
     <child link="4_front_up"/>
   </joint>
@@ -392,7 +366,7 @@
     </inertial>
   </link>
   <joint name="4_front_down_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-1.23 -0.75 0"/>
+    <origin rpy="0 0 6.283185307179586" xyz="1.23 0.75 0"/>
     <parent link="world"/>
     <child link="4_front_down"/>
   </joint>
@@ -418,7 +392,7 @@
     </inertial>
   </link>
   <joint name="5_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 -0.73 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="1.0 1.27 0"/>
     <parent link="world"/>
     <child link="5_left"/>
   </joint>
@@ -444,7 +418,7 @@
     </inertial>
   </link>
   <joint name="5_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 -1.27 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="1.0 0.73 0"/>
     <parent link="world"/>
     <child link="5_right"/>
   </joint>
@@ -470,7 +444,7 @@
     </inertial>
   </link>
   <joint name="6_left_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-0.77 -0.75 0"/>
+    <origin rpy="0 0 0" xyz="0.77 0.75 0"/>
     <parent link="world"/>
     <child link="6_left"/>
   </joint>
@@ -496,7 +470,7 @@
     </inertial>
   </link>
   <joint name="6_right_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="-0.22999999999999998 -1.0 0"/>
+    <origin rpy="0 0 0" xyz="0.22999999999999998 1.0 0"/>
     <parent link="world"/>
     <child link="6_right"/>
   </joint>
@@ -522,7 +496,7 @@
     </inertial>
   </link>
   <joint name="6_front_up_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-0.5 -1.27 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="0.5 1.27 0"/>
     <parent link="world"/>
     <child link="6_front_up"/>
   </joint>
@@ -548,7 +522,7 @@
     </inertial>
   </link>
   <joint name="6_front_down_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="-0.75 -0.73 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="0.75 0.73 0"/>
     <parent link="world"/>
     <child link="6_front_down"/>
   </joint>
@@ -574,7 +548,7 @@
     </inertial>
   </link>
   <joint name="7_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.22999999999999998 -0.5 0"/>
+    <origin rpy="0 0 0" xyz="0.77 0.5 0"/>
     <parent link="world"/>
     <child link="7_left"/>
   </joint>
@@ -600,7 +574,7 @@
     </inertial>
   </link>
   <joint name="7_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.77 -0.5 0"/>
+    <origin rpy="0 0 0" xyz="0.22999999999999998 0.5 0"/>
     <parent link="world"/>
     <child link="7_right"/>
   </joint>
@@ -626,7 +600,7 @@
     </inertial>
   </link>
   <joint name="8_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.22999999999999998 -0.25 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="0.23 0.25000000000000006 0"/>
     <parent link="world"/>
     <child link="8_left"/>
   </joint>
@@ -652,7 +626,7 @@
     </inertial>
   </link>
   <joint name="8_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.77 0.0 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="0.77 -3.306546357697854e-17 0"/>
     <parent link="world"/>
     <child link="8_right"/>
   </joint>
@@ -678,7 +652,7 @@
     </inertial>
   </link>
   <joint name="8_front_up_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-0.5 0.27 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="0.49999999999999994 -0.27 0"/>
     <parent link="world"/>
     <child link="8_front_up"/>
   </joint>
@@ -704,7 +678,7 @@
     </inertial>
   </link>
   <joint name="8_front_down_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="-0.25 -0.27 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="0.25000000000000006 0.2700000000000001 0"/>
     <parent link="world"/>
     <child link="8_front_down"/>
   </joint>
@@ -782,7 +756,7 @@
     </inertial>
   </link>
   <joint name="10_fond_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="0.49999999999999994 -0.27 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.5 0.27 0"/>
     <parent link="world"/>
     <child link="10_fond"/>
   </joint>
@@ -808,7 +782,7 @@
     </inertial>
   </link>
   <joint name="10_gauche_h_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="0.75 0.26999999999999996 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.75 -0.27 0"/>
     <parent link="world"/>
     <child link="10_gauche_h"/>
   </joint>
@@ -834,7 +808,7 @@
     </inertial>
   </link>
   <joint name="10_gauche_v_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.77 0.24999999999999997 0"/>
+    <origin rpy="0 0 0" xyz="-0.77 -0.25 0"/>
     <parent link="world"/>
     <child link="10_gauche_v"/>
   </joint>
@@ -860,7 +834,7 @@
     </inertial>
   </link>
   <joint name="10_droit_h_world" type="fixed">
-    <origin rpy="0 0 4.71238898038469" xyz="0.25000000000000006 0.2700000000000001 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-0.25 -0.27 0"/>
     <parent link="world"/>
     <child link="10_droit_h"/>
   </joint>
@@ -886,7 +860,7 @@
     </inertial>
   </link>
   <joint name="10_droit_v_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="0.23 0.25000000000000006 0"/>
+    <origin rpy="0 0 0" xyz="-0.22999999999999998 -0.25 0"/>
     <parent link="world"/>
     <child link="10_droit_v"/>
   </joint>
@@ -912,7 +886,7 @@
     </inertial>
   </link>
   <joint name="11_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.0 0.27 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 0.27 0"/>
     <parent link="world"/>
     <child link="11_left"/>
   </joint>
@@ -938,7 +912,7 @@
     </inertial>
   </link>
   <joint name="11_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.0 -0.27 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 -0.27 0"/>
     <parent link="world"/>
     <child link="11_right"/>
   </joint>
@@ -964,7 +938,7 @@
     </inertial>
   </link>
   <joint name="12_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.5 0.27 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-1.5 -0.27 0"/>
     <parent link="world"/>
     <child link="12_left"/>
   </joint>
@@ -990,7 +964,7 @@
     </inertial>
   </link>
   <joint name="12_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.5 -0.27 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-1.5 0.27 0"/>
     <parent link="world"/>
     <child link="12_right"/>
   </joint>
@@ -1016,7 +990,7 @@
     </inertial>
   </link>
   <joint name="12_back_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="1.77 -1.653273178848927e-17 0"/>
+    <origin rpy="0 0 6.283185307179586" xyz="-1.77 4.9598195365467806e-17 0"/>
     <parent link="world"/>
     <child link="12_back"/>
   </joint>
@@ -1042,7 +1016,7 @@
     </inertial>
   </link>
   <joint name="13_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 0.5 0"/>
+    <origin rpy="0 0 0" xyz="-0.22999999999999998 -0.5 0"/>
     <parent link="world"/>
     <child link="13_left"/>
   </joint>
@@ -1068,7 +1042,7 @@
     </inertial>
   </link>
   <joint name="13_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 0.5 0"/>
+    <origin rpy="0 0 0" xyz="-0.77 -0.5 0"/>
     <parent link="world"/>
     <child link="13_right"/>
   </joint>
@@ -1094,7 +1068,7 @@
     </inertial>
   </link>
   <joint name="14_left_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.77 0.75 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="-0.77 -0.75 0"/>
     <parent link="world"/>
     <child link="14_left"/>
   </joint>
@@ -1120,7 +1094,7 @@
     </inertial>
   </link>
   <joint name="14_right_world" type="fixed">
-    <origin rpy="0 0 0" xyz="0.22999999999999998 1.0 0"/>
+    <origin rpy="0 0 3.141592653589793" xyz="-0.22999999999999998 -1.0 0"/>
     <parent link="world"/>
     <child link="14_right"/>
   </joint>
@@ -1146,7 +1120,7 @@
     </inertial>
   </link>
   <joint name="14_front_up_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0.5 1.27 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-0.5 -1.27 0"/>
     <parent link="world"/>
     <child link="14_front_up"/>
   </joint>
@@ -1172,7 +1146,7 @@
     </inertial>
   </link>
   <joint name="14_front_down_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="0.75 0.73 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-0.75 -0.73 0"/>
     <parent link="world"/>
     <child link="14_front_down"/>
   </joint>
@@ -1198,7 +1172,7 @@
     </inertial>
   </link>
   <joint name="15_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.0 1.27 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 -0.73 0"/>
     <parent link="world"/>
     <child link="15_left"/>
   </joint>
@@ -1224,7 +1198,7 @@
     </inertial>
   </link>
   <joint name="15_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.0 0.73 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.0 -1.27 0"/>
     <parent link="world"/>
     <child link="15_right"/>
   </joint>
@@ -1250,7 +1224,7 @@
     </inertial>
   </link>
   <joint name="16_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.5 1.27 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.5 -0.73 0"/>
     <parent link="world"/>
     <child link="16_left"/>
   </joint>
@@ -1276,7 +1250,7 @@
     </inertial>
   </link>
   <joint name="16_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="1.5 0.73 0"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.5 -1.27 0"/>
     <parent link="world"/>
     <child link="16_right"/>
   </joint>
@@ -1302,7 +1276,7 @@
     </inertial>
   </link>
   <joint name="17_left_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="2.0 1.27 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-2.0 -1.27 0"/>
     <parent link="world"/>
     <child link="17_left"/>
   </joint>
@@ -1328,7 +1302,7 @@
     </inertial>
   </link>
   <joint name="17_right_world" type="fixed">
-    <origin rpy="0 0 1.5707963267948966" xyz="2.0 0.73 0"/>
+    <origin rpy="0 0 4.71238898038469" xyz="-2.0 -0.73 0"/>
     <parent link="world"/>
     <child link="17_right"/>
   </joint>
@@ -1354,7 +1328,7 @@
     </inertial>
   </link>
   <joint name="17_back_world" type="fixed">
-    <origin rpy="0 0 3.141592653589793" xyz="2.27 1.0 0"/>
+    <origin rpy="0 0 6.283185307179586" xyz="-2.27 -1.0 0"/>
     <parent link="world"/>
     <child link="17_back"/>
   </joint>
